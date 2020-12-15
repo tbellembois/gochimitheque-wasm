@@ -38,13 +38,7 @@ func OperateEventsBookmark(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 		}
 
-		if product.Bookmark != nil {
-			Jq(fmt.Sprintf("button#bookmark%d > span", product.ProductID)).RemoveClass(themes.MDI_NO_BOOKMARK.ToString())
-			Jq(fmt.Sprintf("button#bookmark%d > span", product.ProductID)).AddClass(themes.MDI_BOOKMARK.ToString())
-		} else {
-			Jq(fmt.Sprintf("button#bookmark%d > span", product.ProductID)).AddClass(themes.MDI_NO_BOOKMARK.ToString())
-			Jq(fmt.Sprintf("button#bookmark%d > span", product.ProductID)).RemoveClass(themes.MDI_BOOKMARK.ToString())
-		}
+		Jq("#Product_table").Bootstraptable(nil).Refresh(nil)
 
 	}
 	fail := func(data js.Value) {
@@ -1195,6 +1189,7 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 		buttonStorages  string
 		buttonOStorages string
 		iconBookmark    themes.IconFace
+		textBookmark    string
 	)
 
 	row := args[1]
@@ -1202,8 +1197,10 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 
 	if product.Bookmark.BookmarkID.Valid {
 		iconBookmark = themes.MDI_BOOKMARK
+		textBookmark = locales.Translate("unbookmark", HTTPHeaderAcceptLanguage)
 	} else {
 		iconBookmark = themes.MDI_NO_BOOKMARK
+		textBookmark = locales.Translate("bookmark", HTTPHeaderAcceptLanguage)
 	}
 
 	for _, symbol := range product.Symbols {
@@ -1216,8 +1213,8 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 				Alt:   locales.Translate("product_flammable", HTTPHeaderAcceptLanguage),
 				Title: locales.Translate("product_flammable", HTTPHeaderAcceptLanguage),
 			}).OuterHTML()
+			break
 		}
-		break
 	}
 
 	if product.CasNumberCMR.Valid {
@@ -1354,14 +1351,14 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 				Visible:    false,
 				Attributes: map[string]string{"pid": strconv.Itoa(product.ProductID)},
 			},
-			Title: locales.Translate("bookmark", HTTPHeaderAcceptLanguage),
+			Title: textBookmark,
 		},
 		widgets.IconAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 				Classes: []string{"iconlabel"},
 			},
-			Text: locales.Translate("bookmark", HTTPHeaderAcceptLanguage),
+			Text: textBookmark,
 			Icon: themes.NewMdiIcon(iconBookmark, ""),
 		},
 		[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
