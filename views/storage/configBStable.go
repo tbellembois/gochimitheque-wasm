@@ -111,11 +111,15 @@ func Storage_operateEventsBorrow(this js.Value, args []js.Value) interface{} {
 
 	if storage.Borrowing.BorrowingID.Valid {
 
+		// The storage has a borrowing.
+
 		// Unborrow.
 		SaveBorrowing(this, args)
 
 	} else {
 
+		// The storage does not have a borrowing.
+		// Displaying the modal.
 		Jq("#borrow").Object.Call("modal", "show")
 
 		// Selecting the connected user.

@@ -57,12 +57,15 @@ func SaveBorrowing(this js.Value, args []js.Value) interface{} {
 	}
 
 	if len(args) > 0 {
+		// When clicking on the "save" button
+		// of the borrowing modal.
 
 		row := args[2]
 		storage := Storage{}.FromJsJSONValue(row)
 		s = &storage
 
 	} else {
+		// When coming from Storage_operateEventsBorrow (unborrow).
 
 		var storageId int
 
