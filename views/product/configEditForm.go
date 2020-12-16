@@ -11,6 +11,7 @@ import (
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/utils"
+	"github.com/tbellembois/gochimitheque-wasm/views/search"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 )
 
@@ -156,11 +157,11 @@ func FillInProductForm(p Product, id string) {
 	}
 	Jq("#product_msds").SetVal("")
 	if p.ProductMSDS.Valid {
-		Jq("#product_msds").SetVal(p.ProductSpecificity.String)
+		Jq("#product_msds").SetVal(p.ProductMSDS.String)
 	}
 	Jq("#product_sheet").SetVal("")
 	if p.ProductSheet.Valid {
-		Jq("#product_sheet").SetVal(p.ProductSpecificity.String)
+		Jq("#product_sheet").SetVal(p.ProductSheet.String)
 	}
 
 	Jq("#product_threedformula").SetVal("")
@@ -709,6 +710,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 				fmt.Println(err)
 			} else {
 				href := fmt.Sprintf("%sv/products", ApplicationProxyPath)
+				search.ClearSearch(js.Null(), nil)
 				utils.LoadContent("product", href, Product_SaveCallback, product.ProductID)
 			}
 

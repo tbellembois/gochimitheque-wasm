@@ -12,6 +12,7 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/types"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/utils"
+	"github.com/tbellembois/gochimitheque-wasm/views/search"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"honnef.co/go/js/dom/v2"
 )
@@ -366,6 +367,7 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 
 			// TODO: use personId for redirection
 			href := fmt.Sprintf("%sv/people", ApplicationProxyPath)
+			search.ClearSearch(js.Null(), nil)
 			utils.LoadContent("person", href, Person_SaveCallback, person.PersonEmail)
 
 		},

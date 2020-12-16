@@ -21,6 +21,7 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/views/person"
 	"github.com/tbellembois/gochimitheque-wasm/views/personpass"
 	"github.com/tbellembois/gochimitheque-wasm/views/product"
+	"github.com/tbellembois/gochimitheque-wasm/views/search"
 	"github.com/tbellembois/gochimitheque-wasm/views/storage"
 	"github.com/tbellembois/gochimitheque-wasm/views/storelocation"
 	"github.com/tbellembois/gochimitheque-wasm/views/welcomeannounce"
@@ -165,8 +166,8 @@ func main() {
 	js.Global().Set("Product_magic", js.FuncOf(product.Magic))
 	js.Global().Set("Product_howToMagicalSelector", js.FuncOf(product.HowToMagicalSelector))
 
-	js.Global().Set("Common_search", js.FuncOf(common.Search))
-	js.Global().Set("Common_clearSearch", js.FuncOf(common.ClearSearch))
+	js.Global().Set("Common_search", js.FuncOf(search.Search))
+	js.Global().Set("Common_clearSearch", js.FuncOf(search.ClearSearch))
 
 	js.Global().Set("Product_saveProduct", js.FuncOf(product.SaveProduct))
 

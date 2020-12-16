@@ -11,6 +11,7 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/localStorage"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/utils"
+	"github.com/tbellembois/gochimitheque-wasm/views/search"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 )
 
@@ -142,6 +143,7 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 
 			// TODO: use entityId for redirection
 			href := fmt.Sprintf("%sv/storelocations", ApplicationProxyPath)
+			search.ClearSearch(js.Null(), nil)
 			utils.LoadContent("storelocation", href, StoreLocation_SaveCallback, storelocation.StoreLocationName.String)
 
 		},

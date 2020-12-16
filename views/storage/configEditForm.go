@@ -12,6 +12,7 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/locales"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/utils"
+	"github.com/tbellembois/gochimitheque-wasm/views/search"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 )
 
@@ -379,6 +380,7 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 				fmt.Println(err)
 			} else {
 				href := fmt.Sprintf("%sv/storages", ApplicationProxyPath)
+				search.ClearSearch(js.Null(), nil)
 				utils.LoadContent("storage", href, Storage_SaveCallback, int(storage.StorageID.Int64))
 			}
 

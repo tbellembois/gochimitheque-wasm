@@ -553,7 +553,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"row", "mt-sm-3"},
 		},
 	})
-	// Producer
+	// Producer.
 	colProducer := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
@@ -576,7 +576,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Text: fmt.Sprintf("%s: %s", product.Producer.ProducerLabel.String, product.ProducerRef.ProducerRefLabel.String),
 		}))
 	}
-	// Suppliers
+	// Suppliers.
 	colSuppliers := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
@@ -610,6 +610,51 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 
 	rowSupplierAndProducer.AppendChild(colProducer)
 	rowSupplierAndProducer.AppendChild(colSuppliers)
+
+	//
+	// Producer sheet.
+	//
+	rowProducerSheet := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"row", "mt-sm-3"},
+		},
+	})
+	// Producer sheet.
+	colProducerSheet := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"col-sm-12"},
+		},
+	})
+	if product.ProductSheet.Valid {
+		colProducerSheet.AppendChild(
+			widgets.NewSpan(widgets.SpanAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+					Classes: []string{"iconlabel", "mr-sm-2"},
+				},
+				Text: locales.Translate("product_sheet_title", HTTPHeaderAcceptLanguage),
+			}))
+
+		var icon widgets.Widget
+		icon.HTMLElement = widgets.NewIcon(widgets.IconAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+			},
+			Icon: themes.NewMdiIcon(themes.MDI_LINK, themes.MDI_24PX),
+		})
+
+		colProducerSheet.AppendChild(widgets.NewLink(widgets.LinkAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+			},
+			Href:  product.ProductSheet.String,
+			Label: icon,
+		}))
+	}
+
+	rowProducerSheet.AppendChild(colProducerSheet)
 
 	//
 	// Cas, Ce and MSDS.
@@ -729,6 +774,41 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	rowCasCeMsds.AppendChild(colCas)
 	rowCasCeMsds.AppendChild(colCe)
 	rowCasCeMsds.AppendChild(colMsds)
+
+	//
+	// Recommended storage temperature
+	//
+	rowStorageTemperature := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"row", "mt-sm-3"},
+		},
+	})
+	// Storage temperature.
+	colStorageTemperature := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"col-sm-12"},
+		},
+	})
+	if product.ProductTemperature.Valid {
+		colStorageTemperature.AppendChild(
+			widgets.NewSpan(widgets.SpanAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+					Classes: []string{"iconlabel", "mr-sm-2"},
+				},
+				Text: locales.Translate("product_temperature_title", HTTPHeaderAcceptLanguage),
+			}))
+		colStorageTemperature.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+			},
+			Text: fmt.Sprintf("%d%s", product.ProductTemperature.Int64, product.UnitTemperature.UnitLabel.String),
+		}))
+	}
+
+	rowStorageTemperature.AppendChild(colStorageTemperature)
 
 	//
 	// Empirical, linear and 3D formulas.
@@ -1118,6 +1198,8 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	return rowSynonymAndID.OuterHTML() +
 		rowCategoryAndTags.OuterHTML() +
 		rowSupplierAndProducer.OuterHTML() +
+		rowProducerSheet.OuterHTML() +
+		rowStorageTemperature.OuterHTML() +
 		rowCasCeMsds.OuterHTML() +
 		rowFormulas.OuterHTML() +
 		rowSymbolsSignalWordPhysicalState.OuterHTML() +
