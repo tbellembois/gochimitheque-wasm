@@ -78,41 +78,58 @@ type QueryFilter struct {
 
 func (q QueryFilter) DisplayFilter() {
 
+	var isFilter bool
+
 	Jq("#filter-item").SetHtml("")
 
 	if q.Product != "" {
+		isFilter = true
 		Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("storage_product_table_header", globals.HTTPHeaderAcceptLanguage), q.ProductFilterLabel))
 	}
 	if q.Storage != "" {
+		isFilter = true
 		Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("storage", globals.HTTPHeaderAcceptLanguage), q.StorageFilterLabel))
 	}
 	if q.ProductBookmark {
+		isFilter = true
 		Jq("#filter-item").Append(widgets.FilterItem("", locales.Translate("menu_bookmark", globals.HTTPHeaderAcceptLanguage)))
 	}
 	if q.StorageArchive {
+		isFilter = true
 		Jq("#filter-item").Append(widgets.FilterItem("", locales.Translate("archives", globals.HTTPHeaderAcceptLanguage)))
 	}
 	if q.StorageHistory {
+		isFilter = true
 		Jq("#filter-item").Append(widgets.FilterItem("", locales.Translate("storage_history", globals.HTTPHeaderAcceptLanguage)))
 	}
 
 	if q.CustomNamePartOf != "" {
+		isFilter = true
 		Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_custom_name_part_of", globals.HTTPHeaderAcceptLanguage), q.CustomNamePartOf))
 	}
 	if q.CasNumber != "" {
+		isFilter = true
 		Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_casnumber", globals.HTTPHeaderAcceptLanguage), q.CasNumberFilterLabel))
 	}
 	if q.EmpiricalFormula != "" {
+		isFilter = true
 		Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_empiricalformula", globals.HTTPHeaderAcceptLanguage), q.EmpiricalFormulaFilterLabel))
 	}
 	if q.StorageBarecode != "" {
+		isFilter = true
 		Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_storage_barecode", globals.HTTPHeaderAcceptLanguage), q.StorageBarecode))
 	}
 	if q.StoreLocation != "" {
+		isFilter = true
 		Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_storelocation", globals.HTTPHeaderAcceptLanguage), q.StoreLocationFilterLabel))
 	}
 	if q.Name != "" {
+		isFilter = true
 		Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_name", globals.HTTPHeaderAcceptLanguage), q.NameFilterLabel))
+	}
+
+	if !isFilter {
+		Jq("#filter-item").Append(widgets.FilterItem("", locales.Translate("no_filter", globals.HTTPHeaderAcceptLanguage)))
 	}
 
 }
