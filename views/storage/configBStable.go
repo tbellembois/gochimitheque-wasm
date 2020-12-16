@@ -736,7 +736,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"iconlabel"},
 		},
 		Title:   locales.Translate("storage_print_qrcode", HTTPHeaderAcceptLanguage),
-		Onclick: "PrintImage('" + fmt.Sprintf("data:image/png;base64,%s", qrCode) + "'); return false;",
+		Onclick: "PrintImage('" + fmt.Sprintf("data:image/png;base64,%s", qrCode) + "', '" + fmt.Sprintf("%s - %s", storage.Product.Name.NameLabel, storage.StoreLocation.StoreLocationFullPath) + "'); return false;",
 		Href:    "#",
 		Label:   icon,
 	}))
