@@ -12,6 +12,7 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/types"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/utils"
+	"github.com/tbellembois/gochimitheque-wasm/views/search"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
 )
@@ -702,8 +703,24 @@ func LoadUser() {
 
 func LoadSearch() {
 
-	bindShowHideDeletedStorage := func(args ...interface{}) {
+	bindSearchButtons := func(args ...interface{}) {
 
+		// Works only with no select2.
+		Jq("input").On("keyup", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+
+			event := args[0]
+			if event.Get("which").Int() == 13 {
+
+				event.Call("preventDefault")
+				search.Search(js.Null(), nil)
+
+			}
+
+			return nil
+
+		}))
+
+		// Show/Hide archives.
 		Jq("#s_storage_archive_button").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
 			var (
@@ -746,7 +763,7 @@ func LoadSearch() {
 	}
 
 	href := fmt.Sprintf("%ssearch", ApplicationProxyPath)
-	utils.LoadSearch("search", href, bindShowHideDeletedStorage, nil)
+	utils.LoadSearch("search", href, bindSearchButtons, nil)
 
 	SearchLoaded = true
 
