@@ -17,12 +17,11 @@ var (
 	CurrentView                                    string
 	MenuLoaded                                     bool
 	SearchLoaded                                   bool
+	UserLoaded                                     bool
 
 	// permissions
 	PermItems = [3]string{
 		"rproducts",
 		"products",
 		"storages"}
-
-	err error
 )

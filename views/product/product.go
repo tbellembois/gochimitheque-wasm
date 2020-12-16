@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 	"syscall/js"
 
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
@@ -17,6 +18,7 @@ import (
 
 var (
 	supplierrefToSupplier map[string]int64 // supplierref label -> supplier id
+	err                   error
 )
 
 func init() {
@@ -613,8 +615,6 @@ func product_common() {
 
 func ShowIfAuthorizedMenuItems(args ...interface{}) {
 
-	Jq("#logged").SetHtml(ConnectedUserEmail)
-
 	utils.HasPermission("products", "-2", "get", func() {
 		Jq("#menu_scan_qrcode").FadeIn()
 		Jq("#menu_list_products").FadeIn()
@@ -670,6 +670,33 @@ func LoadMenu() {
 	utils.LoadMenu("menu", href, ShowIfAuthorizedMenuItems, nil)
 
 	MenuLoaded = true
+
+}
+
+func LoadUser() {
+
+	// Can not read Email and ID from container as those values
+	// are not set before login.
+	cookie := js.Global().Get("document").Get("cookie").String()
+	regex := regexp.MustCompile(`(?P<token>token=\S*)\s{0,1}(?P<email>email=\S*)\s{0,1}(?P<id>id=\S*)\s{0,1}`)
+	match := regex.FindStringSubmatch(cookie)
+
+	if len(match) > 0 {
+
+		result := make(map[string]string)
+		for i, name := range regex.SubexpNames() {
+			if i != 0 && name != "" {
+				result[name] = match[i]
+			}
+		}
+		ConnectedUserEmail = strings.TrimRight(result["email"], ";")[6:]
+		if ConnectedUserID, err = strconv.Atoi(strings.TrimRight(result["id"], ";")[3:]); err != nil {
+			panic(err)
+		}
+
+	}
+
+	Jq("#logged").SetHtml(ConnectedUserEmail)
 
 }
 
@@ -753,6 +780,9 @@ func Product_listCallback(this js.Value, args []js.Value) interface{} {
 	}
 	if !SearchLoaded {
 		LoadSearch()
+	}
+	if !UserLoaded {
+		LoadUser()
 	}
 
 	Jq("#search").Show()

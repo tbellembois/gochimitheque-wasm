@@ -6,7 +6,6 @@ import (
 	"encoding/csv"
 	"fmt"
 	"net/url"
-	"regexp"
 	"strconv"
 	"strings"
 	"syscall/js"
@@ -67,28 +66,6 @@ func init() {
 	// TODO: get the variables from Go instead of JS
 	ApplicationProxyPath = js.Global().Get("container").Get("ProxyPath").String()
 	HTTPHeaderAcceptLanguage = js.Global().Get("container").Get("PersonLanguage").String()
-
-	// Can not read Email and ID from container as those values
-	// are not set before login.
-	cookie := js.Global().Get("document").Get("cookie").String()
-	regex := regexp.MustCompile(`(?P<token>token=\S*)\s{0,1}(?P<email>email=\S*)\s{0,1}(?P<id>id=\S*)\s{0,1}`)
-	match := regex.FindStringSubmatch(cookie)
-
-	if len(match) > 0 {
-
-		result := make(map[string]string)
-		for i, name := range regex.SubexpNames() {
-			if i != 0 && name != "" {
-				result[name] = match[i]
-			}
-		}
-		ConnectedUserEmail = strings.TrimRight(result["email"], ";")[6:]
-		if ConnectedUserID, err = strconv.Atoi(strings.TrimRight(result["id"], ";")[3:]); err != nil {
-			panic(err)
-		}
-
-	}
-
 	DisableCache, err = strconv.ParseBool(js.Global().Get("disableCache").String())
 	if err != nil {
 		panic(err)
