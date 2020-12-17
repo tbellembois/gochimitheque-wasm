@@ -259,11 +259,15 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 	if len(Jq("select#supplier").Select2Data()) > 0 {
 		select2ItemSupplier := Jq("select#supplier").Select2Data()[0]
 		storage.Supplier = Supplier{}
-		var supplierId int
-		if supplierId, err = strconv.Atoi(select2ItemSupplier.Id); err != nil {
-			fmt.Println(err)
-			return nil
+		var supplierId = -1
+
+		if select2ItemSupplier.IDIsDigit() {
+			if supplierId, err = strconv.Atoi(select2ItemSupplier.Id); err != nil {
+				fmt.Println(err)
+				return nil
+			}
 		}
+
 		storage.Supplier.SupplierID = sql.NullInt64{
 			Int64: int64(supplierId),
 			Valid: true,

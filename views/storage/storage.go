@@ -188,9 +188,11 @@ func storage_common() {
 	})
 
 	Jq("select#supplier").Select2(Select2Config{
-		Placeholder:    locales.Translate("product_supplier_placeholder", HTTPHeaderAcceptLanguage),
+		Placeholder:    locales.Translate("storage_supplier_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(Select2GenericTemplateResults(Supplier{})),
 		AllowClear:     true,
+		Tags:           true,
+		CreateTag:      js.FuncOf(Select2GenericCreateTag(Supplier{})),
 		Ajax: Select2Ajax{
 			URL:            ApplicationProxyPath + "products/suppliers/",
 			DataType:       "json",
