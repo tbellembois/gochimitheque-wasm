@@ -356,9 +356,11 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 	}
 
 	if (!Jq("form#product input#storage_id").GetVal().IsUndefined()) && Jq("form#storage input#storage_id").GetVal().String() != "" {
+		fmt.Println("update")
 		ajaxURL = fmt.Sprintf("%sstorages/%d", ApplicationProxyPath, storage.StorageID.Int64)
 		ajaxMethod = "put"
 	} else {
+		fmt.Println("create")
 		ajaxURL = fmt.Sprintf("%sstorages", ApplicationProxyPath)
 		ajaxMethod = "post"
 	}

@@ -90,18 +90,6 @@ func (q QueryFilter) DisplayFilter() {
 		isFilter = true
 		Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("storage", globals.HTTPHeaderAcceptLanguage), q.StorageFilterLabel))
 	}
-	if q.ProductBookmark {
-		isFilter = true
-		Jq("#filter-item").Append(widgets.FilterItem("", locales.Translate("menu_bookmark", globals.HTTPHeaderAcceptLanguage)))
-	}
-	if q.StorageArchive {
-		isFilter = true
-		Jq("#filter-item").Append(widgets.FilterItem("", locales.Translate("archives", globals.HTTPHeaderAcceptLanguage)))
-	}
-	if q.StorageHistory {
-		isFilter = true
-		Jq("#filter-item").Append(widgets.FilterItem("", locales.Translate("storage_history", globals.HTTPHeaderAcceptLanguage)))
-	}
 
 	if q.CustomNamePartOf != "" {
 		isFilter = true
@@ -126,6 +114,19 @@ func (q QueryFilter) DisplayFilter() {
 	if q.Name != "" {
 		isFilter = true
 		Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_name", globals.HTTPHeaderAcceptLanguage), q.NameFilterLabel))
+	}
+
+	if q.ProductBookmark {
+		isFilter = true
+		Jq("#filter-item").Append(widgets.FilterItem("", locales.Translate("menu_bookmark", globals.HTTPHeaderAcceptLanguage)))
+	}
+	if q.StorageArchive {
+		isFilter = true
+		Jq("#filter-item").Append(widgets.FilterItem("", locales.Translate("archives", globals.HTTPHeaderAcceptLanguage)))
+	}
+	if q.StorageHistory {
+		isFilter = true
+		Jq("#filter-item").Append(widgets.FilterItem("", locales.Translate("storage_history", globals.HTTPHeaderAcceptLanguage)))
 	}
 
 	if !isFilter {
