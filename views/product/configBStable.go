@@ -11,6 +11,7 @@ import (
 
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
 	"github.com/tbellembois/gochimitheque-wasm/locales"
+	"github.com/tbellembois/gochimitheque-wasm/types"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/utils"
 	"github.com/tbellembois/gochimitheque-wasm/views/storage"
@@ -22,9 +23,9 @@ import (
 func OperateEventsBookmark(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	product := Product{}.ProductFromJsJSONValue(row)
+	types.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
 
-	url := fmt.Sprintf("%sbookmarks/%d", ApplicationProxyPath, product.ProductID)
+	url := fmt.Sprintf("%sbookmarks/%d", ApplicationProxyPath, types.CurrentProduct.ProductID)
 	method := "put"
 
 	done := func(data js.Value) {
@@ -61,10 +62,16 @@ func OperateEventsBookmark(this js.Value, args []js.Value) interface{} {
 func OperateEventsStore(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	product := Product{}.FromJsJSONValue(row)
+
+	types.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
+
+	BSTableQueryFilter.Lock()
+	BSTableQueryFilter.QueryFilter.Product = strconv.Itoa(types.CurrentProduct.ProductID)
+	BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", types.CurrentProduct.Name.NameLabel, types.CurrentProduct.ProductSpecificity.String)
+	BSTableQueryFilter.Unlock()
 
 	href := fmt.Sprintf("%svc/storages", ApplicationProxyPath)
-	utils.LoadContent("storage", href, storage.Storage_createCallback, product)
+	utils.LoadContent("storage", href, storage.Storage_createCallback, types.CurrentProduct)
 
 	return nil
 
@@ -79,14 +86,14 @@ func OperateEventsStorages(this js.Value, args []js.Value) interface{} {
 	}
 
 	row := args[2]
-	product := Product{}.ProductFromJsJSONValue(row)
+	types.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
 
 	BSTableQueryFilter.Lock()
-	BSTableQueryFilter.QueryFilter.Product = strconv.Itoa(product.ProductID)
-	BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", product.Name.NameLabel, product.ProductSpecificity.String)
+	BSTableQueryFilter.QueryFilter.Product = strconv.Itoa(types.CurrentProduct.ProductID)
+	BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", types.CurrentProduct.Name.NameLabel, types.CurrentProduct.ProductSpecificity.String)
 
 	href := fmt.Sprintf("%sv/storages", ApplicationProxyPath)
-	utils.LoadContent("storage", href, storageCallbackWrapper, product)
+	utils.LoadContent("storage", href, storageCallbackWrapper, types.CurrentProduct)
 
 	return nil
 
@@ -95,9 +102,9 @@ func OperateEventsStorages(this js.Value, args []js.Value) interface{} {
 func OperateEventsOStorages(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	product := Product{}.ProductFromJsJSONValue(row)
+	types.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
 
-	url := fmt.Sprintf("%sstorages/others?product=%d", ApplicationProxyPath, product.ProductID)
+	url := fmt.Sprintf("%sstorages/others?product=%d", ApplicationProxyPath, types.CurrentProduct.ProductID)
 	method := "get"
 
 	done := func(data js.Value) {
@@ -136,11 +143,11 @@ func OperateEventsOStorages(this js.Value, args []js.Value) interface{} {
 			divEntity.AppendChild(spanEntityName)
 			divEntity.AppendChild(spanEntityDescription)
 
-			Jq(fmt.Sprintf("#ostorages-collapse-%d", product.ProductID)).Append(divEntity.OuterHTML())
+			Jq(fmt.Sprintf("#ostorages-collapse-%d", types.CurrentProduct.ProductID)).SetHtml(divEntity.OuterHTML())
 
 		}
 
-		Jq(fmt.Sprintf("#ostorages-collapse-%d", product.ProductID)).Show()
+		Jq(fmt.Sprintf("#ostorages-collapse-%d", types.CurrentProduct.ProductID)).Show()
 
 	}
 	fail := func(data js.Value) {
@@ -164,9 +171,14 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
 	index := args[3].Int()
-	product := Product{}.ProductFromJsJSONValue(row)
+	types.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
 
-	url := fmt.Sprintf("%sproducts/%d", ApplicationProxyPath, product.ProductID)
+	BSTableQueryFilter.Lock()
+	BSTableQueryFilter.QueryFilter.Product = strconv.Itoa(types.CurrentProduct.ProductID)
+	BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", types.CurrentProduct.Name.NameLabel, types.CurrentProduct.ProductSpecificity.String)
+	BSTableQueryFilter.Unlock()
+
+	url := fmt.Sprintf("%sproducts/%d", ApplicationProxyPath, types.CurrentProduct.ProductID)
 	method := "get"
 
 	done := func(data js.Value) {
@@ -209,9 +221,9 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	product := Product{}.ProductFromJsJSONValue(row)
+	types.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
 
-	url := fmt.Sprintf("%sproducts/%d", ApplicationProxyPath, product.ProductID)
+	url := fmt.Sprintf("%sproducts/%d", ApplicationProxyPath, types.CurrentProduct.ProductID)
 	method := "delete"
 
 	done := func(data js.Value) {
@@ -412,10 +424,10 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 func DetailFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
-	product := Product{}.ProductFromJsJSONValue(row)
+	types.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
 
 	var synonyms strings.Builder
-	for _, synonym := range product.Synonyms {
+	for _, synonym := range types.CurrentProduct.Synonyms {
 		synonyms.WriteString(synonym.NameLabel)
 		synonyms.WriteString("<br/>")
 	}
@@ -424,7 +436,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Id:      fmt.Sprintf("jsmol%d", product.ProductID),
+			Id:      fmt.Sprintf("jsmol%d", types.CurrentProduct.ProductID),
 		},
 	})
 
@@ -470,7 +482,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: strconv.Itoa(product.ProductID),
+			Text: strconv.Itoa(types.CurrentProduct.ProductID),
 		}))
 	// Person.
 	colPerson := widgets.NewDiv(widgets.DivAttributes{
@@ -485,7 +497,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				Visible: true,
 				Classes: []string{"iconlabel"},
 			},
-			Text: product.Person.PersonEmail,
+			Text: types.CurrentProduct.Person.PersonEmail,
 		}))
 
 	rowSynonymAndID.AppendChild(colSynonym)
@@ -508,7 +520,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-10"},
 		},
 	})
-	if product.Category.CategoryID.Valid {
+	if types.CurrentProduct.Category.CategoryID.Valid {
 		colCategory.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -521,7 +533,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: product.Category.CategoryLabel.String,
+			Text: types.CurrentProduct.Category.CategoryLabel.String,
 		}))
 	}
 	// Tags.
@@ -531,7 +543,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-2"},
 		},
 	})
-	for _, tag := range product.Tags {
+	for _, tag := range types.CurrentProduct.Tags {
 		colTags.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -560,7 +572,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-6"},
 		},
 	})
-	if product.ProducerRef.ProducerRefID.Valid {
+	if types.CurrentProduct.ProducerRef.ProducerRefID.Valid {
 		colProducer.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -573,7 +585,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: fmt.Sprintf("%s: %s", product.Producer.ProducerLabel.String, product.ProducerRef.ProducerRefLabel.String),
+			Text: fmt.Sprintf("%s: %s", types.CurrentProduct.Producer.ProducerLabel.String, types.CurrentProduct.ProducerRef.ProducerRefLabel.String),
 		}))
 	}
 	// Suppliers.
@@ -583,7 +595,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-6"},
 		},
 	})
-	if len(product.SupplierRefs) > 0 {
+	if len(types.CurrentProduct.SupplierRefs) > 0 {
 		colSuppliers.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -597,7 +609,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				Visible: true,
 			},
 		})
-		for _, s := range product.SupplierRefs {
+		for _, s := range types.CurrentProduct.SupplierRefs {
 			ul.AppendChild(widgets.NewLi(widgets.LiAttributes{
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
@@ -627,7 +639,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-12"},
 		},
 	})
-	if product.ProductSheet.Valid {
+	if types.CurrentProduct.ProductSheet.Valid {
 		colProducerSheet.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -649,7 +661,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Href:  product.ProductSheet.String,
+			Href:  types.CurrentProduct.ProductSheet.String,
 			Label: icon,
 		}))
 	}
@@ -672,7 +684,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-4"},
 		},
 	})
-	if product.CasNumber.CasNumberID.Valid {
+	if types.CurrentProduct.CasNumber.CasNumberID.Valid {
 		colCas.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -685,10 +697,10 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: product.CasNumber.CasNumberLabel.String,
+			Text: types.CurrentProduct.CasNumber.CasNumberLabel.String,
 		}))
 	}
-	if product.CasNumber.CasNumberCMR.Valid {
+	if types.CurrentProduct.CasNumber.CasNumberCMR.Valid {
 		colCas.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -701,10 +713,10 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: product.CasNumber.CasNumberCMR.String,
+			Text: types.CurrentProduct.CasNumber.CasNumberCMR.String,
 		}))
 	}
-	for _, hs := range product.HazardStatements {
+	for _, hs := range types.CurrentProduct.HazardStatements {
 		if hs.HazardStatementCMR.Valid {
 			colCas.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -721,7 +733,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-4"},
 		},
 	})
-	if product.CeNumber.CeNumberID.Valid {
+	if types.CurrentProduct.CeNumber.CeNumberID.Valid {
 		colCe.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -734,7 +746,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: product.CeNumber.CeNumberLabel.String,
+			Text: types.CurrentProduct.CeNumber.CeNumberLabel.String,
 		}))
 	}
 	// MSDS.
@@ -744,7 +756,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-4"},
 		},
 	})
-	if product.ProductMSDS.Valid {
+	if types.CurrentProduct.ProductMSDS.Valid {
 		colMsds.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -766,7 +778,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Href:  product.ProductMSDS.String,
+			Href:  types.CurrentProduct.ProductMSDS.String,
 			Label: icon,
 		}))
 	}
@@ -791,7 +803,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-12"},
 		},
 	})
-	if product.ProductTemperature.Valid {
+	if types.CurrentProduct.ProductTemperature.Valid {
 		colStorageTemperature.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -804,7 +816,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: fmt.Sprintf("%d%s", product.ProductTemperature.Int64, product.UnitTemperature.UnitLabel.String),
+			Text: fmt.Sprintf("%d%s", types.CurrentProduct.ProductTemperature.Int64, types.CurrentProduct.UnitTemperature.UnitLabel.String),
 		}))
 	}
 
@@ -826,7 +838,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-4"},
 		},
 	})
-	if product.EmpiricalFormula.EmpiricalFormulaID.Valid {
+	if types.CurrentProduct.EmpiricalFormula.EmpiricalFormulaID.Valid {
 		colEmpiricalFormula.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -839,7 +851,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: product.EmpiricalFormula.EmpiricalFormulaLabel.String,
+			Text: types.CurrentProduct.EmpiricalFormula.EmpiricalFormulaLabel.String,
 		}))
 	}
 	// Linear formula.
@@ -849,7 +861,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-4"},
 		},
 	})
-	if product.LinearFormula.LinearFormulaID.Valid {
+	if types.CurrentProduct.LinearFormula.LinearFormulaID.Valid {
 		colLinearFormula.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -862,7 +874,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: product.LinearFormula.LinearFormulaLabel.String,
+			Text: types.CurrentProduct.LinearFormula.LinearFormulaLabel.String,
 		}))
 	}
 	// 3D formula.
@@ -872,7 +884,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-4"},
 		},
 	})
-	if product.ProductThreeDFormula.Valid && product.ProductThreeDFormula.String != "" {
+	if types.CurrentProduct.ProductThreeDFormula.Valid && types.CurrentProduct.ProductThreeDFormula.String != "" {
 		colTreedFormula.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -894,7 +906,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Href:  product.ProductThreeDFormula.String,
+			Href:  types.CurrentProduct.ProductThreeDFormula.String,
 			Label: icon,
 		}))
 	}
@@ -919,7 +931,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-4"},
 		},
 	})
-	for _, symbol := range product.Symbols {
+	for _, symbol := range types.CurrentProduct.Symbols {
 		colSymbols.AppendChild(widgets.NewImg(widgets.ImgAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -936,7 +948,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-4"},
 		},
 	})
-	if product.SignalWord.SignalWordID.Valid {
+	if types.CurrentProduct.SignalWord.SignalWordID.Valid {
 		colSignalWord.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -949,7 +961,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: product.SignalWord.SignalWordLabel.String,
+			Text: types.CurrentProduct.SignalWord.SignalWordLabel.String,
 		}))
 	}
 	// Physical state.
@@ -959,7 +971,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-4"},
 		},
 	})
-	if product.PhysicalState.PhysicalStateID.Valid {
+	if types.CurrentProduct.PhysicalState.PhysicalStateID.Valid {
 		colPhysicalState.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -972,7 +984,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: product.PhysicalState.PhysicalStateLabel.String,
+			Text: types.CurrentProduct.PhysicalState.PhysicalStateLabel.String,
 		}))
 	}
 
@@ -996,7 +1008,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-4"},
 		},
 	})
-	if len(product.HazardStatements) > 0 {
+	if len(types.CurrentProduct.HazardStatements) > 0 {
 		colHs.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -1011,7 +1023,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				Visible: true,
 			},
 		})
-		for _, s := range product.HazardStatements {
+		for _, s := range types.CurrentProduct.HazardStatements {
 			ul.AppendChild(widgets.NewLi(widgets.LiAttributes{
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
@@ -1028,7 +1040,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-4"},
 		},
 	})
-	if len(product.PrecautionaryStatements) > 0 {
+	if len(types.CurrentProduct.PrecautionaryStatements) > 0 {
 		colPs.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -1043,7 +1055,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				Visible: true,
 			},
 		})
-		for _, s := range product.PrecautionaryStatements {
+		for _, s := range types.CurrentProduct.PrecautionaryStatements {
 			ul.AppendChild(widgets.NewLi(widgets.LiAttributes{
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
@@ -1060,7 +1072,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-4"},
 		},
 	})
-	if len(product.ClassOfCompound) > 0 {
+	if len(types.CurrentProduct.ClassOfCompound) > 0 {
 		colCoc.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -1074,7 +1086,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				Visible: true,
 			},
 		})
-		for _, s := range product.ClassOfCompound {
+		for _, s := range types.CurrentProduct.ClassOfCompound {
 			ul.AppendChild(widgets.NewLi(widgets.LiAttributes{
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
@@ -1105,7 +1117,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-6"},
 		},
 	})
-	if product.ProductDisposalComment.Valid && product.ProductDisposalComment.String != "" {
+	if types.CurrentProduct.ProductDisposalComment.Valid && types.CurrentProduct.ProductDisposalComment.String != "" {
 		colDisposalComment.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -1118,7 +1130,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: product.ProductDisposalComment.String,
+			Text: types.CurrentProduct.ProductDisposalComment.String,
 		}))
 	}
 	// Remark.
@@ -1128,7 +1140,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-6"},
 		},
 	})
-	if product.ProductRemark.Valid && product.ProductRemark.String != "" {
+	if types.CurrentProduct.ProductRemark.Valid && types.CurrentProduct.ProductRemark.String != "" {
 		colRemark.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -1141,7 +1153,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: product.ProductRemark.String,
+			Text: types.CurrentProduct.ProductRemark.String,
 		}))
 	}
 
@@ -1164,7 +1176,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-1", "iconlabel"},
 		},
 	})
-	if product.ProductRadioactive.Valid && product.ProductRadioactive.Bool {
+	if types.CurrentProduct.ProductRadioactive.Valid && types.CurrentProduct.ProductRadioactive.Bool {
 		colRadioactive.AppendChild(widgets.NewIcon(widgets.IconAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -1181,7 +1193,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-1", "iconlabel"},
 		},
 	})
-	if product.ProductRestricted.Valid && product.ProductRestricted.Bool {
+	if types.CurrentProduct.ProductRestricted.Valid && types.CurrentProduct.ProductRestricted.Bool {
 		colRestricted.AppendChild(widgets.NewIcon(widgets.IconAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -1212,10 +1224,10 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 func EmpiricalformulaFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
-	product := Product{}.ProductFromJsJSONValue(row)
+	types.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
 
-	if product.EmpiricalFormulaID.Valid {
-		return product.EmpiricalFormulaLabel.String
+	if types.CurrentProduct.EmpiricalFormulaID.Valid {
+		return types.CurrentProduct.EmpiricalFormulaLabel.String
 	} else {
 		return ""
 	}
@@ -1225,10 +1237,10 @@ func EmpiricalformulaFormatter(this js.Value, args []js.Value) interface{} {
 func CasnumberFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
-	product := Product{}.ProductFromJsJSONValue(row)
+	types.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
 
-	if product.CasNumberID.Valid {
-		return product.CasNumberLabel.String
+	if types.CurrentProduct.CasNumberID.Valid {
+		return types.CurrentProduct.CasNumberLabel.String
 	} else {
 		return ""
 	}
@@ -1238,10 +1250,10 @@ func CasnumberFormatter(this js.Value, args []js.Value) interface{} {
 func Product_productSpecificityFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
-	product := Product{}.ProductFromJsJSONValue(row)
+	types.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
 
-	if product.ProductSpecificity.Valid {
-		return product.ProductSpecificity.String
+	if types.CurrentProduct.ProductSpecificity.Valid {
+		return types.CurrentProduct.ProductSpecificity.String
 	} else {
 		return ""
 	}
@@ -1251,10 +1263,10 @@ func Product_productSpecificityFormatter(this js.Value, args []js.Value) interfa
 func Product_productSlFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
-	product := Product{}.ProductFromJsJSONValue(row)
+	types.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
 
-	if product.ProductSL.Valid {
-		return product.ProductSL.String
+	if types.CurrentProduct.ProductSL.Valid {
+		return types.CurrentProduct.ProductSL.String
 	} else {
 		return ""
 	}
@@ -1275,9 +1287,9 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	)
 
 	row := args[1]
-	product := Product{}.ProductFromJsJSONValue(row)
+	types.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
 
-	if product.Bookmark.BookmarkID.Valid {
+	if types.CurrentProduct.Bookmark.BookmarkID.Valid {
 		iconBookmark = themes.MDI_BOOKMARK
 		textBookmark = locales.Translate("unbookmark", HTTPHeaderAcceptLanguage)
 	} else {
@@ -1285,7 +1297,7 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 		textBookmark = locales.Translate("bookmark", HTTPHeaderAcceptLanguage)
 	}
 
-	for _, symbol := range product.Symbols {
+	for _, symbol := range types.CurrentProduct.Symbols {
 		if symbol.SymbolLabel == "SGH02" {
 			imgSGH02 = widgets.NewImg(widgets.ImgAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -1299,17 +1311,17 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 		}
 	}
 
-	if product.CasNumberCMR.Valid {
+	if types.CurrentProduct.CasNumberCMR.Valid {
 		spanCasCMR = widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 				Classes: []string{"text-danger", "font-italic"},
 			},
-			Text: product.CasNumber.CasNumberCMR.String,
+			Text: types.CurrentProduct.CasNumber.CasNumberCMR.String,
 		}).OuterHTML()
 	}
 
-	for _, hs := range product.HazardStatements {
+	for _, hs := range types.CurrentProduct.HazardStatements {
 		if hs.HazardStatementCMR.Valid {
 			spanHSCMR = widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -1321,11 +1333,11 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 		}
 	}
 
-	if product.ProductSC != 0 || product.ProductASC != 0 {
+	if types.CurrentProduct.ProductSC != 0 || types.CurrentProduct.ProductASC != 0 {
 		buttonStorages = widgets.NewBSButtonWithIcon(
 			widgets.ButtonAttributes{
 				BaseAttributes: widgets.BaseAttributes{
-					Id:      "storages" + strconv.Itoa(product.ProductID),
+					Id:      "storages" + strconv.Itoa(types.CurrentProduct.ProductID),
 					Classes: []string{"storages"},
 					Visible: false,
 				},
@@ -1336,18 +1348,18 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 					Visible: true,
 					Classes: []string{"iconlabel"},
 				},
-				Text: fmt.Sprintf("%s %d  (%d)", locales.Translate("storages", HTTPHeaderAcceptLanguage), product.ProductSC, product.ProductASC),
+				Text: fmt.Sprintf("%s %d  (%d)", locales.Translate("storages", HTTPHeaderAcceptLanguage), types.CurrentProduct.ProductSC, types.CurrentProduct.ProductASC),
 				Icon: themes.NewMdiIcon(themes.MDI_STORAGE, ""),
 			},
 			[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
 		).OuterHTML()
 	}
 
-	if product.ProductTSC != 0 {
+	if types.CurrentProduct.ProductTSC != 0 {
 		buttonOStorages = widgets.NewBSButtonWithIcon(
 			widgets.ButtonAttributes{
 				BaseAttributes: widgets.BaseAttributes{
-					Id:      "ostorages" + strconv.Itoa(product.ProductID),
+					Id:      "ostorages" + strconv.Itoa(types.CurrentProduct.ProductID),
 					Classes: []string{"ostorages"},
 					Visible: false,
 				},
@@ -1368,7 +1380,7 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	buttonStore := widgets.NewBSButtonWithIcon(
 		widgets.ButtonAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:      "store" + strconv.Itoa(product.ProductID),
+				Id:      "store" + strconv.Itoa(types.CurrentProduct.ProductID),
 				Classes: []string{"store"},
 				Visible: false,
 			},
@@ -1388,7 +1400,7 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	buttonEdit := widgets.NewBSButtonWithIcon(
 		widgets.ButtonAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:      "edit" + strconv.Itoa(product.ProductID),
+				Id:      "edit" + strconv.Itoa(types.CurrentProduct.ProductID),
 				Classes: []string{"productedit"},
 				Visible: false,
 			},
@@ -1408,7 +1420,7 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	buttonDelete := widgets.NewBSButtonWithIcon(
 		widgets.ButtonAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:      "delete" + strconv.Itoa(product.ProductID),
+				Id:      "delete" + strconv.Itoa(types.CurrentProduct.ProductID),
 				Classes: []string{"productdelete"},
 				Visible: false,
 			},
@@ -1428,10 +1440,10 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	buttonBookmark := widgets.NewBSButtonWithIcon(
 		widgets.ButtonAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:         "bookmark" + strconv.Itoa(product.ProductID),
+				Id:         "bookmark" + strconv.Itoa(types.CurrentProduct.ProductID),
 				Classes:    []string{"bookmark"},
 				Visible:    false,
-				Attributes: map[string]string{"pid": strconv.Itoa(product.ProductID)},
+				Attributes: map[string]string{"pid": strconv.Itoa(types.CurrentProduct.ProductID)},
 			},
 			Title: textBookmark,
 		},
@@ -1449,12 +1461,12 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	collapseDiv := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Id:      "ostorages-collapse-" + strconv.Itoa(product.ProductID),
+			Id:      "ostorages-collapse-" + strconv.Itoa(types.CurrentProduct.ProductID),
 			Classes: []string{"collapse"},
 		},
 	}).OuterHTML()
 
-	if product.ProductRestricted.Valid && product.ProductRestricted.Bool {
+	if types.CurrentProduct.ProductRestricted.Valid && types.CurrentProduct.ProductRestricted.Bool {
 		iconRestricted = widgets.NewIcon(widgets.IconAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,

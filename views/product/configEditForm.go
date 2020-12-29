@@ -9,6 +9,7 @@ import (
 	"syscall/js"
 
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
+	"github.com/tbellembois/gochimitheque-wasm/types"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/utils"
 	"github.com/tbellembois/gochimitheque-wasm/views/search"
@@ -265,7 +266,6 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 	var (
 		ajaxURL, ajaxMethod string
 		dataBytes           []byte
-		product             *Product
 		err                 error
 	)
 
@@ -273,9 +273,9 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	product = &Product{}
+	types.CurrentProduct = Product{}
 	if Jq("input#product_id").GetVal().Truthy() {
-		if product.ProductID, err = strconv.Atoi(Jq("input#product_id").GetVal().String()); err != nil {
+		if types.CurrentProduct.ProductID, err = strconv.Atoi(Jq("input#product_id").GetVal().String()); err != nil {
 			fmt.Println(err)
 			return nil
 		}
@@ -286,70 +286,70 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		if productTemperature, err = strconv.Atoi(Jq("input#product_temperature").GetVal().String()); err != nil {
 			return nil
 		}
-		product.ProductTemperature = sql.NullInt64{
+		types.CurrentProduct.ProductTemperature = sql.NullInt64{
 			Int64: int64(productTemperature),
 			Valid: true,
 		}
 	}
 
 	if Jq("input#product_specificity").GetVal().Truthy() {
-		product.ProductSpecificity = sql.NullString{
+		types.CurrentProduct.ProductSpecificity = sql.NullString{
 			String: Jq("input#product_specificity").GetVal().String(),
 			Valid:  true,
 		}
 	}
 
 	if Jq("input#product_threedformula").GetVal().Truthy() {
-		product.ProductThreeDFormula = sql.NullString{
+		types.CurrentProduct.ProductThreeDFormula = sql.NullString{
 			String: Jq("input#product_threedformula").GetVal().String(),
 			Valid:  true,
 		}
 	}
 
 	if Jq("#hidden_product_molformula_content").GetVal().Truthy() {
-		product.ProductMolFormula = sql.NullString{
+		types.CurrentProduct.ProductMolFormula = sql.NullString{
 			String: Jq("#hidden_product_molformula_content").GetVal().String(),
 			Valid:  true,
 		}
 	}
 
 	if Jq("input#product_sheet").GetVal().Truthy() {
-		product.ProductSheet = sql.NullString{
+		types.CurrentProduct.ProductSheet = sql.NullString{
 			String: Jq("input#product_sheet").GetVal().String(),
 			Valid:  true,
 		}
 	}
 
 	if Jq("input#product_msds").GetVal().Truthy() {
-		product.ProductMSDS = sql.NullString{
+		types.CurrentProduct.ProductMSDS = sql.NullString{
 			String: Jq("input#product_msds").GetVal().String(),
 			Valid:  true,
 		}
 	}
 
 	if Jq("textarea#product_disposalcomment").GetVal().Truthy() {
-		product.ProductDisposalComment = sql.NullString{
+		types.CurrentProduct.ProductDisposalComment = sql.NullString{
 			String: Jq("textarea#product_disposalcomment").GetVal().String(),
 			Valid:  true,
 		}
 	}
 
 	if Jq("textarea#product_remark").GetVal().Truthy() {
-		product.ProductRemark = sql.NullString{
+		types.CurrentProduct.ProductRemark = sql.NullString{
 			String: Jq("textarea#product_remark").GetVal().String(),
 			Valid:  true,
 		}
 	}
 
 	if Jq("input#product_restricted:checked").Object.Length() > 0 {
-		product.ProductRestricted = sql.NullBool{
+		types.CurrentProduct.ProductRestricted = sql.NullBool{
 			Bool:  true,
 			Valid: true,
 		}
 	}
 
 	if Jq("input#product_radioactive:checked").Object.Length() > 0 {
-		product.ProductRadioactive = sql.NullBool{
+		types.CurrentProduct.ProductRadioactive = sql.NullBool{
 			Bool:  true,
 			Valid: true,
 		}
@@ -357,17 +357,17 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 
 	if len(Jq("select#unit_temperature").Select2Data()) > 0 {
 		select2ItemUnitTemperature := Jq("select#unit_temperature").Select2Data()[0]
-		product.UnitTemperature = Unit{}
+		types.CurrentProduct.UnitTemperature = Unit{}
 		var unitTemperatureId int
 		if unitTemperatureId, err = strconv.Atoi(select2ItemUnitTemperature.Id); err != nil {
 			fmt.Println(err)
 			return nil
 		}
-		product.UnitTemperature.UnitID = sql.NullInt64{
+		types.CurrentProduct.UnitTemperature.UnitID = sql.NullInt64{
 			Int64: int64(unitTemperatureId),
 			Valid: true,
 		}
-		product.UnitTemperature.UnitLabel = sql.NullString{
+		types.CurrentProduct.UnitTemperature.UnitLabel = sql.NullString{
 			String: select2ItemUnitTemperature.Text,
 			Valid:  true,
 		}
@@ -375,7 +375,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 
 	if len(Jq("select#casnumber").Select2Data()) > 0 {
 		select2ItemCasNumber := Jq("select#casnumber").Select2Data()[0]
-		product.CasNumber = CasNumber{}
+		types.CurrentProduct.CasNumber = CasNumber{}
 		var casNumberId = -1
 
 		if select2ItemCasNumber.IDIsDigit() {
@@ -385,11 +385,11 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			}
 		}
 
-		product.CasNumber.CasNumberID = sql.NullInt64{
+		types.CurrentProduct.CasNumber.CasNumberID = sql.NullInt64{
 			Int64: int64(casNumberId),
 			Valid: true,
 		}
-		product.CasNumber.CasNumberLabel = sql.NullString{
+		types.CurrentProduct.CasNumber.CasNumberLabel = sql.NullString{
 			String: select2ItemCasNumber.Text,
 			Valid:  true,
 		}
@@ -397,7 +397,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 
 	if len(Jq("select#cenumber").Select2Data()) > 0 {
 		select2ItemCeNumber := Jq("select#cenumber").Select2Data()[0]
-		product.CeNumber = CeNumber{}
+		types.CurrentProduct.CeNumber = CeNumber{}
 		var ceNumberId = -1
 
 		if select2ItemCeNumber.IDIsDigit() {
@@ -407,11 +407,11 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			}
 		}
 
-		product.CeNumber.CeNumberID = sql.NullInt64{
+		types.CurrentProduct.CeNumber.CeNumberID = sql.NullInt64{
 			Int64: int64(ceNumberId),
 			Valid: true,
 		}
-		product.CeNumber.CeNumberLabel = sql.NullString{
+		types.CurrentProduct.CeNumber.CeNumberLabel = sql.NullString{
 			String: select2ItemCeNumber.Text,
 			Valid:  true,
 		}
@@ -419,7 +419,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 
 	if len(Jq("select#empiricalformula").Select2Data()) > 0 {
 		select2ItemEmpiricalFormula := Jq("select#empiricalformula").Select2Data()[0]
-		product.EmpiricalFormula = EmpiricalFormula{}
+		types.CurrentProduct.EmpiricalFormula = EmpiricalFormula{}
 		var empiricalFormulaId = -1
 
 		if select2ItemEmpiricalFormula.IDIsDigit() {
@@ -429,11 +429,11 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			}
 		}
 
-		product.EmpiricalFormula.EmpiricalFormulaID = sql.NullInt64{
+		types.CurrentProduct.EmpiricalFormula.EmpiricalFormulaID = sql.NullInt64{
 			Int64: int64(empiricalFormulaId),
 			Valid: true,
 		}
-		product.EmpiricalFormula.EmpiricalFormulaLabel = sql.NullString{
+		types.CurrentProduct.EmpiricalFormula.EmpiricalFormulaLabel = sql.NullString{
 			String: select2ItemEmpiricalFormula.Text,
 			Valid:  true,
 		}
@@ -441,7 +441,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 
 	if len(Jq("select#linearformula").Select2Data()) > 0 {
 		select2ItemLinearFormula := Jq("select#linearformula").Select2Data()[0]
-		product.LinearFormula = LinearFormula{}
+		types.CurrentProduct.LinearFormula = LinearFormula{}
 		var linearFormulaId = -1
 
 		if select2ItemLinearFormula.IDIsDigit() {
@@ -451,11 +451,11 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			}
 		}
 
-		product.LinearFormula.LinearFormulaID = sql.NullInt64{
+		types.CurrentProduct.LinearFormula.LinearFormulaID = sql.NullInt64{
 			Int64: int64(linearFormulaId),
 			Valid: true,
 		}
-		product.LinearFormula.LinearFormulaLabel = sql.NullString{
+		types.CurrentProduct.LinearFormula.LinearFormulaLabel = sql.NullString{
 			String: select2ItemLinearFormula.Text,
 			Valid:  true,
 		}
@@ -463,7 +463,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 
 	if len(Jq("select#name").Select2Data()) > 0 {
 		select2ItemName := Jq("select#name").Select2Data()[0]
-		product.Name = Name{}
+		types.CurrentProduct.Name = Name{}
 		var nameId = -1
 
 		if select2ItemName.IDIsDigit() {
@@ -473,13 +473,13 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			}
 		}
 
-		product.Name.NameID = nameId
-		product.Name.NameLabel = select2ItemName.Text
+		types.CurrentProduct.Name.NameID = nameId
+		types.CurrentProduct.Name.NameLabel = select2ItemName.Text
 	}
 
 	if len(Jq("select#physicalstate").Select2Data()) > 0 {
 		select2ItemPhysicalState := Jq("select#physicalstate").Select2Data()[0]
-		product.PhysicalState = PhysicalState{}
+		types.CurrentProduct.PhysicalState = PhysicalState{}
 		var physicalStateId = -1
 
 		if select2ItemPhysicalState.IDIsDigit() {
@@ -489,11 +489,11 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			}
 		}
 
-		product.PhysicalState.PhysicalStateID = sql.NullInt64{
+		types.CurrentProduct.PhysicalState.PhysicalStateID = sql.NullInt64{
 			Int64: int64(physicalStateId),
 			Valid: true,
 		}
-		product.PhysicalState.PhysicalStateLabel = sql.NullString{
+		types.CurrentProduct.PhysicalState.PhysicalStateLabel = sql.NullString{
 			String: select2ItemPhysicalState.Text,
 			Valid:  true,
 		}
@@ -501,17 +501,17 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 
 	if len(Jq("select#signalword").Select2Data()) > 0 {
 		select2ItemSignalWord := Jq("select#signalword").Select2Data()[0]
-		product.SignalWord = SignalWord{}
+		types.CurrentProduct.SignalWord = SignalWord{}
 		var signalWordId int
 		if signalWordId, err = strconv.Atoi(select2ItemSignalWord.Id); err != nil {
 			fmt.Println(err)
 			return nil
 		}
-		product.SignalWord.SignalWordID = sql.NullInt64{
+		types.CurrentProduct.SignalWord.SignalWordID = sql.NullInt64{
 			Int64: int64(signalWordId),
 			Valid: true,
 		}
-		product.SignalWord.SignalWordLabel = sql.NullString{
+		types.CurrentProduct.SignalWord.SignalWordLabel = sql.NullString{
 			String: select2ItemSignalWord.Text,
 			Valid:  true,
 		}
@@ -519,7 +519,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 
 	if len(Jq("select#category").Select2Data()) > 0 {
 		select2ItemCategory := Jq("select#category").Select2Data()[0]
-		product.Category = Category{}
+		types.CurrentProduct.Category = Category{}
 		var categoryId = -1
 
 		if select2ItemCategory.IDIsDigit() {
@@ -529,11 +529,11 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			}
 		}
 
-		product.Category.CategoryID = sql.NullInt64{
+		types.CurrentProduct.Category.CategoryID = sql.NullInt64{
 			Int64: int64(categoryId),
 			Valid: true,
 		}
-		product.Category.CategoryLabel = sql.NullString{
+		types.CurrentProduct.Category.CategoryLabel = sql.NullString{
 			String: select2ItemCategory.Text,
 			Valid:  true,
 		}
@@ -541,7 +541,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 
 	if len(Jq("select#producerref").Select2Data()) > 0 {
 		select2ItemProducerRef := Jq("select#producerref").Select2Data()[0]
-		product.ProducerRef = ProducerRef{}
+		types.CurrentProduct.ProducerRef = ProducerRef{}
 		var producerrefId = -1
 
 		if select2ItemProducerRef.IDIsDigit() {
@@ -551,11 +551,11 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			}
 		}
 
-		product.ProducerRef.ProducerRefID = sql.NullInt64{
+		types.CurrentProduct.ProducerRef.ProducerRefID = sql.NullInt64{
 			Int64: int64(producerrefId),
 			Valid: true,
 		}
-		product.ProducerRef.ProducerRefLabel = sql.NullString{
+		types.CurrentProduct.ProducerRef.ProducerRefLabel = sql.NullString{
 			String: select2ItemProducerRef.Text,
 			Valid:  true,
 		}
@@ -566,7 +566,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		product.ProducerRef.Producer = &Producer{
+		types.CurrentProduct.ProducerRef.Producer = &Producer{
 			ProducerID: sql.NullInt64{
 				Int64: int64(producerId),
 				Valid: true,
@@ -587,7 +587,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		classofcompound.ClassOfCompoundID = classofcompoundID
 		classofcompound.ClassOfCompoundLabel = select2Item.Text
 
-		product.ClassOfCompound = append(product.ClassOfCompound, classofcompound)
+		types.CurrentProduct.ClassOfCompound = append(types.CurrentProduct.ClassOfCompound, classofcompound)
 	}
 
 	for _, select2Item := range Jq("select#synonyms").Select2Data() {
@@ -603,7 +603,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		synonym.NameID = nameID
 		synonym.NameLabel = select2Item.Text
 
-		product.Synonyms = append(product.Synonyms, synonym)
+		types.CurrentProduct.Synonyms = append(types.CurrentProduct.Synonyms, synonym)
 	}
 
 	for _, select2Item := range Jq("select#symbols").Select2Data() {
@@ -614,7 +614,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		}
 		symbol.SymbolLabel = select2Item.Text
 
-		product.Symbols = append(product.Symbols, symbol)
+		types.CurrentProduct.Symbols = append(types.CurrentProduct.Symbols, symbol)
 	}
 
 	for _, select2Item := range Jq("select#hazardstatements").Select2Data() {
@@ -625,7 +625,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		}
 		hazardstatement.HazardStatementLabel = select2Item.Text
 
-		product.HazardStatements = append(product.HazardStatements, hazardstatement)
+		types.CurrentProduct.HazardStatements = append(types.CurrentProduct.HazardStatements, hazardstatement)
 	}
 
 	for _, select2Item := range Jq("select#precautionarystatements").Select2Data() {
@@ -636,7 +636,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		}
 		precautionarystatement.PrecautionaryStatementLabel = select2Item.Text
 
-		product.PrecautionaryStatements = append(product.PrecautionaryStatements, precautionarystatement)
+		types.CurrentProduct.PrecautionaryStatements = append(types.CurrentProduct.PrecautionaryStatements, precautionarystatement)
 	}
 
 	for _, select2Item := range Jq("select#tags").Select2Data() {
@@ -652,7 +652,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		tag.TagID = tagId
 		tag.TagLabel = select2Item.Text
 
-		product.Tags = append(product.Tags, tag)
+		types.CurrentProduct.Tags = append(types.CurrentProduct.Tags, tag)
 	}
 
 	for _, select2Item := range Jq("select#supplierrefs").Select2Data() {
@@ -678,18 +678,18 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			},
 		}
 
-		product.SupplierRefs = append(product.SupplierRefs, supplierref)
+		types.CurrentProduct.SupplierRefs = append(types.CurrentProduct.SupplierRefs, supplierref)
 	}
 
 	if (!Jq("form#product input#product_id").GetVal().IsUndefined()) && Jq("form#product input#product_id").GetVal().String() != "" {
-		ajaxURL = fmt.Sprintf("%sproducts/%d", ApplicationProxyPath, product.ProductID)
+		ajaxURL = fmt.Sprintf("%sproducts/%d", ApplicationProxyPath, types.CurrentProduct.ProductID)
 		ajaxMethod = "put"
 	} else {
 		ajaxURL = fmt.Sprintf("%sproducts", ApplicationProxyPath)
 		ajaxMethod = "post"
 	}
 
-	if dataBytes, err = json.Marshal(product); err != nil {
+	if dataBytes, err = json.Marshal(types.CurrentProduct); err != nil {
 		fmt.Println(err)
 		return nil
 	}
@@ -701,17 +701,16 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		Done: func(data js.Value) {
 
 			var (
-				product Product
-				err     error
+				err error
 			)
 
-			if err = json.Unmarshal([]byte(data.String()), &product); err != nil {
+			if err = json.Unmarshal([]byte(data.String()), &CurrentProduct); err != nil {
 				utils.DisplayGenericErrorMessage()
 				fmt.Println(err)
 			} else {
 				href := fmt.Sprintf("%sv/products", ApplicationProxyPath)
 				search.ClearSearch(js.Null(), nil)
-				utils.LoadContent("product", href, Product_SaveCallback, product.ProductID)
+				utils.LoadContent("product", href, Product_SaveCallback, types.CurrentProduct.ProductID)
 			}
 
 		},

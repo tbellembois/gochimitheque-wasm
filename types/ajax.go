@@ -18,7 +18,12 @@ import (
 
 // TODO: move this
 var (
-	BSTableQueryFilter        SafeQueryFilter
+	BSTableQueryFilter SafeQueryFilter
+	// CurrentProduct is the current viewed or edited product, or the product of
+	// the listed storages.
+	CurrentProduct Product
+	// CurrentStorage is the current viewed or edited storage.
+	CurrentStorage            Storage
 	DBPrecautionaryStatements []PrecautionaryStatement // for magic selector
 	DBHazardStatements        []HazardStatement        // for magic selector
 )
@@ -157,6 +162,16 @@ func (s *SafeQueryFilter) Unlock() {
 
 func (s *SafeQueryFilter) Clean() {
 	s.QueryFilter = QueryFilter{}
+}
+
+func (s *SafeQueryFilter) CleanExceptProduct() {
+
+	backupProduct := s.QueryFilter.Product
+	backupProductFilterLabel := s.QueryFilter.ProductFilterLabel
+	s.Clean()
+	s.QueryFilter.Product = backupProduct
+	s.QueryFilter.ProductFilterLabel = backupProductFilterLabel
+
 }
 
 // Response contains the data retrieved

@@ -18,6 +18,7 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/views/common"
 	"github.com/tbellembois/gochimitheque-wasm/views/entity"
 	"github.com/tbellembois/gochimitheque-wasm/views/login"
+	"github.com/tbellembois/gochimitheque-wasm/views/menu"
 	"github.com/tbellembois/gochimitheque-wasm/views/person"
 	"github.com/tbellembois/gochimitheque-wasm/views/personpass"
 	"github.com/tbellembois/gochimitheque-wasm/views/product"
@@ -259,6 +260,9 @@ func main() {
 
 	// About
 	js.Global().Set("About_list", js.FuncOf(about.About_listCallback))
+
+	// Menu
+	js.Global().Set("Menu_loadContent", js.FuncOf(menu.LoadContentWrapper))
 
 	types.Jq("#loading").Empty()
 	types.Jq("div.container").RemoveClass("invisible")

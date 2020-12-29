@@ -843,7 +843,7 @@ func Product_SaveCallback(args ...interface{}) {
 
 	BSTableQueryFilter.Lock()
 	BSTableQueryFilter.QueryFilter.Product = strconv.Itoa(args[0].(int))
-	BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("id: %d", args[0].(int))
+	BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", CurrentProduct.Name.NameLabel, CurrentProduct.ProductSpecificity.String)
 	Jq("#Product_table").Bootstraptable(nil).Refresh(nil)
 
 	// Jq("#Product_table").Bootstraptable(nil).Refresh(&BootstraptableRefreshQuery{
@@ -854,5 +854,8 @@ func Product_SaveCallback(args ...interface{}) {
 	Jq("#Product_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
 
 	product_common()
+
+	Jq("#search").Show()
+	Jq("#actions").Show()
 
 }

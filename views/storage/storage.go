@@ -8,6 +8,7 @@ import (
 
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
 	"github.com/tbellembois/gochimitheque-wasm/locales"
+	"github.com/tbellembois/gochimitheque-wasm/types"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
@@ -238,6 +239,8 @@ func Storage_createCallback(args ...interface{}) {
 
 		FillInStorageForm(storage, "storage")
 
+		Jq("input#storage_nbitem").SetProp("disabled", "disabled")
+
 	}
 
 	title := widgets.NewDiv(widgets.DivAttributes{
@@ -264,16 +267,7 @@ func Storage_createCallback(args ...interface{}) {
 
 }
 
-func Storage_listCallback(this js.Value, args []js.Value) interface{} {
-
-	storage_common()
-
-	Jq("#Storage_table").Bootstraptable(&BootstraptableParams{Ajax: "Storage_getTableData"})
-	Jq("#Storage_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
-
-	Jq("#search").Show()
-	Jq("#actions").Show()
-	Jq("#s_storage_archive_button").Show()
+func changeSwitchButtonToProduct() {
 
 	btnLabel := locales.Translate("switchproductview_text", HTTPHeaderAcceptLanguage)
 	buttonTitle := widgets.NewIcon(widgets.IconAttributes{
@@ -288,6 +282,21 @@ func Storage_listCallback(this js.Value, args []js.Value) interface{} {
 	Jq("#switchview").SetHtml("")
 	Jq("#switchview").Append(buttonTitle.OuterHTML())
 
+}
+
+func Storage_listCallback(this js.Value, args []js.Value) interface{} {
+
+	storage_common()
+
+	Jq("#Storage_table").Bootstraptable(&BootstraptableParams{Ajax: "Storage_getTableData"})
+	Jq("#Storage_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
+
+	Jq("#search").Show()
+	Jq("#actions").Show()
+	Jq("#s_storage_archive_button").Show()
+
+	changeSwitchButtonToProduct()
+
 	return nil
 
 }
@@ -296,7 +305,8 @@ func Storage_SaveCallback(args ...interface{}) {
 
 	BSTableQueryFilter.Lock()
 	BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(args[0].(int))
-	BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("id: %d", args[0].(int))
+	BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("%s id:%d", CurrentStorage.StoreLocation.StoreLocationFullPath, CurrentStorage.StorageID.Int64)
+	BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", types.CurrentProduct.Name.NameLabel, types.CurrentProduct.ProductSpecificity.String)
 	Jq("#Storage_table").Bootstraptable(nil).Refresh(nil)
 
 	// Jq("#Storage_table").Bootstraptable(nil).Refresh(&BootstraptableRefreshQuery{
@@ -307,5 +317,10 @@ func Storage_SaveCallback(args ...interface{}) {
 	Jq("#Storage_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
 
 	storage_common()
+
+	Jq("#search").Show()
+	Jq("#actions").Show()
+
+	changeSwitchButtonToProduct()
 
 }

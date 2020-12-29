@@ -28,8 +28,6 @@ func Export(this js.Value, args []js.Value) interface{} {
 
 func SwitchProductStorageWrapper(this js.Value, args []js.Value) interface{} {
 
-	fmt.Println(CurrentView)
-
 	storageCallbackWrapper := func(args ...interface{}) {
 		storage.Storage_listCallback(js.Null(), nil)
 	}

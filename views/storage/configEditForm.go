@@ -10,6 +10,7 @@ import (
 
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
 	"github.com/tbellembois/gochimitheque-wasm/locales"
+	"github.com/tbellembois/gochimitheque-wasm/types"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/utils"
 	"github.com/tbellembois/gochimitheque-wasm/views/search"
@@ -62,8 +63,8 @@ func SaveBorrowing(this js.Value, args []js.Value) interface{} {
 		// of the borrowing modal.
 
 		row := args[2]
-		storage := Storage{}.FromJsJSONValue(row)
-		s = &storage
+		types.CurrentStorage = Storage{}.FromJsJSONValue(row)
+		s = &types.CurrentStorage
 
 	} else {
 		// When coming from Storage_operateEventsBorrow (unborrow).
@@ -143,7 +144,6 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 	var (
 		ajaxURL, ajaxMethod string
 		dataBytes           []byte
-		storage             *Storage
 		storageId           int
 		err                 error
 	)
@@ -152,10 +152,10 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	storage = &Storage{}
-	storage.Product = Product{}
+	types.CurrentStorage = Storage{}
+	types.CurrentStorage.Product = Product{}
 
-	if storage.Product.ProductID, err = strconv.Atoi(Jq("input#product_id").GetVal().String()); err != nil {
+	if types.CurrentStorage.Product.ProductID, err = strconv.Atoi(Jq("input#product_id").GetVal().String()); err != nil {
 		fmt.Println(err)
 		return nil
 	}
@@ -165,14 +165,14 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		storage.StorageID = sql.NullInt64{
+		types.CurrentStorage.StorageID = sql.NullInt64{
 			Valid: true,
 			Int64: int64(storageId),
 		}
 	}
 
 	if Jq("input#storage_nbitem").GetVal().Truthy() {
-		if storage.StorageNbItem, err = strconv.Atoi(Jq("input#storage_nbitem").GetVal().String()); err != nil {
+		if types.CurrentStorage.StorageNbItem, err = strconv.Atoi(Jq("input#storage_nbitem").GetVal().String()); err != nil {
 			fmt.Println(err)
 			return nil
 		}
@@ -180,17 +180,17 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 
 	if len(Jq("select#storelocation").Select2Data()) > 0 {
 		select2ItemStorelocation := Jq("select#storelocation").Select2Data()[0]
-		storage.StoreLocation = StoreLocation{}
+		types.CurrentStorage.StoreLocation = StoreLocation{}
 		var storelocationId int
 		if storelocationId, err = strconv.Atoi(select2ItemStorelocation.Id); err != nil {
 			fmt.Println(err)
 			return nil
 		}
-		storage.StoreLocation.StoreLocationID = sql.NullInt64{
+		types.CurrentStorage.StoreLocation.StoreLocationID = sql.NullInt64{
 			Int64: int64(storelocationId),
 			Valid: true,
 		}
-		storage.StoreLocation.StoreLocationName = sql.NullString{
+		types.CurrentStorage.StoreLocation.StoreLocationName = sql.NullString{
 			String: select2ItemStorelocation.Text,
 			Valid:  true,
 		}
@@ -202,7 +202,7 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		storage.StorageQuantity = sql.NullFloat64{
+		types.CurrentStorage.StorageQuantity = sql.NullFloat64{
 			Valid:   true,
 			Float64: float64(storageQuantity),
 		}
@@ -210,17 +210,17 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 
 	if len(Jq("select#unit_quantity").Select2Data()) > 0 {
 		select2ItemUnitQuantity := Jq("select#unit_quantity").Select2Data()[0]
-		storage.UnitQuantity = Unit{}
+		types.CurrentStorage.UnitQuantity = Unit{}
 		var unitId int
 		if unitId, err = strconv.Atoi(select2ItemUnitQuantity.Id); err != nil {
 			fmt.Println(err)
 			return nil
 		}
-		storage.UnitQuantity.UnitID = sql.NullInt64{
+		types.CurrentStorage.UnitQuantity.UnitID = sql.NullInt64{
 			Int64: int64(unitId),
 			Valid: true,
 		}
-		storage.UnitQuantity.UnitLabel = sql.NullString{
+		types.CurrentStorage.UnitQuantity.UnitLabel = sql.NullString{
 			String: select2ItemUnitQuantity.Text,
 			Valid:  true,
 		}
@@ -232,7 +232,7 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		storage.StorageConcentration = sql.NullInt64{
+		types.CurrentStorage.StorageConcentration = sql.NullInt64{
 			Valid: true,
 			Int64: int64(storageConcentration),
 		}
@@ -240,17 +240,17 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 
 	if len(Jq("select#unit_concentration").Select2Data()) > 0 {
 		select2ItemUnitConcentration := Jq("select#unit_concentration").Select2Data()[0]
-		storage.UnitConcentration = Unit{}
+		types.CurrentStorage.UnitConcentration = Unit{}
 		var unitId int
 		if unitId, err = strconv.Atoi(select2ItemUnitConcentration.Id); err != nil {
 			fmt.Println(err)
 			return nil
 		}
-		storage.UnitConcentration.UnitID = sql.NullInt64{
+		types.CurrentStorage.UnitConcentration.UnitID = sql.NullInt64{
 			Int64: int64(unitId),
 			Valid: true,
 		}
-		storage.UnitConcentration.UnitLabel = sql.NullString{
+		types.CurrentStorage.UnitConcentration.UnitLabel = sql.NullString{
 			String: select2ItemUnitConcentration.Text,
 			Valid:  true,
 		}
@@ -258,7 +258,7 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 
 	if len(Jq("select#supplier").Select2Data()) > 0 {
 		select2ItemSupplier := Jq("select#supplier").Select2Data()[0]
-		storage.Supplier = Supplier{}
+		types.CurrentStorage.Supplier = Supplier{}
 		var supplierId = -1
 
 		if select2ItemSupplier.IDIsDigit() {
@@ -268,11 +268,11 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			}
 		}
 
-		storage.Supplier.SupplierID = sql.NullInt64{
+		types.CurrentStorage.Supplier.SupplierID = sql.NullInt64{
 			Int64: int64(supplierId),
 			Valid: true,
 		}
-		storage.Supplier.SupplierLabel = sql.NullString{
+		types.CurrentStorage.Supplier.SupplierLabel = sql.NullString{
 			String: select2ItemSupplier.Text,
 			Valid:  true,
 		}
@@ -284,7 +284,7 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		storage.StorageEntryDate = sql.NullTime{
+		types.CurrentStorage.StorageEntryDate = sql.NullTime{
 			Valid: true,
 			Time:  storageEntryDate,
 		}
@@ -295,7 +295,7 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		storage.StorageExitDate = sql.NullTime{
+		types.CurrentStorage.StorageExitDate = sql.NullTime{
 			Valid: true,
 			Time:  storageExitDate,
 		}
@@ -306,7 +306,7 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		storage.StorageOpeningDate = sql.NullTime{
+		types.CurrentStorage.StorageOpeningDate = sql.NullTime{
 			Valid: true,
 			Time:  storageOpeningDate,
 		}
@@ -317,39 +317,39 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		storage.StorageExpirationDate = sql.NullTime{
+		types.CurrentStorage.StorageExpirationDate = sql.NullTime{
 			Valid: true,
 			Time:  storageExpirationDate,
 		}
 	}
 
 	if Jq("input#storage_reference").GetVal().Truthy() {
-		storage.StorageReference = sql.NullString{
+		types.CurrentStorage.StorageReference = sql.NullString{
 			Valid:  true,
 			String: Jq("input#storage_reference").GetVal().String(),
 		}
 	}
 	if Jq("input#storage_batchnumber").GetVal().Truthy() {
-		storage.StorageBatchNumber = sql.NullString{
+		types.CurrentStorage.StorageBatchNumber = sql.NullString{
 			Valid:  true,
 			String: Jq("input#storage_batchnumber").GetVal().String(),
 		}
 	}
 	if Jq("input#storage_barecode").GetVal().Truthy() {
-		storage.StorageBarecode = sql.NullString{
+		types.CurrentStorage.StorageBarecode = sql.NullString{
 			Valid:  true,
 			String: Jq("input#storage_barecode").GetVal().String(),
 		}
 	}
 	if Jq("input#storage_comment").GetVal().Truthy() {
-		storage.StorageComment = sql.NullString{
+		types.CurrentStorage.StorageComment = sql.NullString{
 			Valid:  true,
 			String: Jq("input#storage_comment").GetVal().String(),
 		}
 	}
 
 	if Jq("input#storage_todestroy:checked").Object.Length() > 0 {
-		storage.StorageToDestroy = sql.NullBool{
+		types.CurrentStorage.StorageToDestroy = sql.NullBool{
 			Bool:  true,
 			Valid: true,
 		}
@@ -357,7 +357,7 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 
 	if (!Jq("form#product input#storage_id").GetVal().IsUndefined()) && Jq("form#storage input#storage_id").GetVal().String() != "" {
 		fmt.Println("update")
-		ajaxURL = fmt.Sprintf("%sstorages/%d", ApplicationProxyPath, storage.StorageID.Int64)
+		ajaxURL = fmt.Sprintf("%sstorages/%d", ApplicationProxyPath, types.CurrentStorage.StorageID.Int64)
 		ajaxMethod = "put"
 	} else {
 		fmt.Println("create")
@@ -365,7 +365,7 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 		ajaxMethod = "post"
 	}
 
-	if dataBytes, err = json.Marshal(storage); err != nil {
+	if dataBytes, err = json.Marshal(types.CurrentStorage); err != nil {
 		fmt.Println(err)
 		return nil
 	}
@@ -377,17 +377,16 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 		Done: func(data js.Value) {
 
 			var (
-				storage Storage
-				err     error
+				err error
 			)
 
-			if err = json.Unmarshal([]byte(data.String()), &storage); err != nil {
+			if err = json.Unmarshal([]byte(data.String()), &CurrentStorage); err != nil {
 				utils.DisplayGenericErrorMessage()
 				fmt.Println(err)
 			} else {
 				href := fmt.Sprintf("%sv/storages", ApplicationProxyPath)
-				search.ClearSearch(js.Null(), nil)
-				utils.LoadContent("storage", href, Storage_SaveCallback, int(storage.StorageID.Int64))
+				search.ClearSearchExceptProduct(js.Null(), nil)
+				utils.LoadContent("storage", href, Storage_SaveCallback, int(types.CurrentStorage.StorageID.Int64))
 			}
 
 		},

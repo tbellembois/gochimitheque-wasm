@@ -1,6 +1,7 @@
 package search
 
 import (
+	"fmt"
 	"syscall/js"
 
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
@@ -19,7 +20,7 @@ func Search(this js.Value, args []js.Value) interface{} {
 
 }
 
-func ClearSearch(this js.Value, args []js.Value) interface{} {
+func clearSearchForm() {
 
 	if Jq("select#s_storelocation").Select2IsInitialized() {
 		Jq("select#s_storelocation").Select2Clear()
@@ -59,8 +60,26 @@ func ClearSearch(this js.Value, args []js.Value) interface{} {
 	Jq("#s_storage_barecode").SetVal("")
 	Jq("#s_custom_name_part_of").SetVal("")
 
-	BSTableQueryFilter.Clean()
+}
 
+func ClearSearch(this js.Value, args []js.Value) interface{} {
+
+	fmt.Println(CurrentView)
+
+	clearSearchForm()
+	BSTableQueryFilter.Clean()
+	Search(js.Null(), nil)
+
+	return nil
+
+}
+
+func ClearSearchExceptProduct(this js.Value, args []js.Value) interface{} {
+
+	fmt.Println(CurrentView)
+
+	clearSearchForm()
+	BSTableQueryFilter.CleanExceptProduct()
 	Search(js.Null(), nil)
 
 	return nil
