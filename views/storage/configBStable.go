@@ -35,7 +35,7 @@ func Storage_operateEventsRestore(this js.Value, args []js.Value) interface{} {
 			utils.DisplaySuccessMessage(locales.Translate("storage_restored_message", HTTPHeaderAcceptLanguage))
 			BSTableQueryFilter.Lock()
 			BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(int(types.CurrentStorage.StorageID.Int64))
-			BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("%s - %s", CurrentStorage.Product.Name.NameLabel, CurrentStorage.StoreLocation.StoreLocationFullPath)
+			BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d %s", CurrentStorage.StorageID.Int64, CurrentStorage.StoreLocation.StoreLocationFullPath)
 			Jq("#Storage_table").Bootstraptable(nil).Refresh(nil)
 
 		}
@@ -96,7 +96,7 @@ func Storage_operateEventsHistory(this js.Value, args []js.Value) interface{} {
 	BSTableQueryFilter.Lock()
 	BSTableQueryFilter.QueryFilter.StorageHistory = true
 	BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(int(types.CurrentStorage.StorageID.Int64))
-	BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("%s - %s", CurrentStorage.Product.Name.NameLabel, CurrentStorage.StoreLocation.StoreLocationFullPath)
+	BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d %s", CurrentStorage.StorageID.Int64, CurrentStorage.StoreLocation.StoreLocationFullPath)
 	Jq("#Storage_table").Bootstraptable(nil).Refresh(nil)
 
 	return nil
@@ -213,7 +213,7 @@ func Storage_operateEventsDelete(this js.Value, args []js.Value) interface{} {
 			utils.DisplaySuccessMessage(locales.Translate("storage_deleted_message", HTTPHeaderAcceptLanguage))
 			BSTableQueryFilter.Lock()
 			BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(int(types.CurrentStorage.StorageID.Int64))
-			BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("%s - %s", CurrentStorage.Product.Name.NameLabel, CurrentStorage.StoreLocation.StoreLocationFullPath)
+			BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d %s", CurrentStorage.StorageID.Int64, CurrentStorage.StoreLocation.StoreLocationFullPath)
 			Jq("#Storage_table").Bootstraptable(nil).Refresh(nil)
 
 		}

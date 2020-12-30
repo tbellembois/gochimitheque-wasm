@@ -11,6 +11,8 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/locales"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/utils"
+	"github.com/tbellembois/gochimitheque-wasm/views/person"
+	"github.com/tbellembois/gochimitheque-wasm/views/storelocation"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
 	"honnef.co/go/js/dom/v2"
@@ -18,11 +20,15 @@ import (
 
 func OperateEventsStorelocations(this js.Value, args []js.Value) interface{} {
 
+	storelocationCallbackWrapper := func(args ...interface{}) {
+		storelocation.StoreLocation_listCallback(js.Null(), nil)
+	}
+
 	row := args[2]
 	entity := Entity{}.FromJsJSONValue(row).(Entity)
 
 	href := fmt.Sprintf("%sv/storelocations?entity=%d", ApplicationProxyPath, entity.EntityID)
-	utils.RedirectTo(href)
+	utils.LoadContent("storelocation", href, storelocationCallbackWrapper)
 
 	return nil
 
@@ -30,11 +36,15 @@ func OperateEventsStorelocations(this js.Value, args []js.Value) interface{} {
 
 func OperateEventsMembers(this js.Value, args []js.Value) interface{} {
 
+	personCallbackWrapper := func(args ...interface{}) {
+		person.Person_listCallback(js.Null(), nil)
+	}
+
 	row := args[2]
 	entity := Entity{}.FromJsJSONValue(row).(Entity)
 
 	href := fmt.Sprintf("%sv/people?entity=%d", ApplicationProxyPath, entity.EntityID)
-	utils.RedirectTo(href)
+	utils.LoadContent("person", href, personCallbackWrapper)
 
 	return nil
 

@@ -18,7 +18,7 @@ import (
 )
 
 // populatePermission checks the permissions checkboxes in the person edition page
-func populatePermission(permissions []types.Permission) {
+func populatePermission(permissions []types.Permission, managedEntitiesIds map[int]string) {
 
 	Doc := dom.GetWindow().Document()
 
@@ -36,6 +36,9 @@ func populatePermission(permissions []types.Permission) {
 	for _, p := range permissions {
 
 		pentityid := strconv.Itoa(p.PermissionEntityID)
+		if _, ok := managedEntitiesIds[p.PermissionEntityID]; ok {
+			continue
+		}
 
 		switch p.PermissionItemName {
 		case "products":
@@ -279,7 +282,7 @@ func FillInPersonForm(p Person, id string) {
 	}
 
 	// Populating the permissions widget.
-	populatePermission(permissions)
+	populatePermission(permissions, managedEntitiesIds)
 
 }
 

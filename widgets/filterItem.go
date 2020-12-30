@@ -17,19 +17,22 @@ func FilterItem(title, value string) string {
 	colTitle = NewDiv(DivAttributes{
 		BaseAttributes: BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-auto", "iconlabel"},
+			Classes: []string{"col-sm-2", "iconlabel"},
 		},
 	})
 	colTitle.AppendChild(NewSpan(SpanAttributes{
 		BaseAttributes: BaseAttributes{
 			Visible: true,
+			Classes: []string{"text-end"},
 		},
 		Text: title,
 	}))
 
-	classes := []string{"col-sm-auto"}
+	var classes []string
 	if title == "" {
-		classes = append(classes, "badge", "badge-secondary")
+		classes = []string{"col-sm-2", "badge", "badge-dark", "mt-sm-2"}
+	} else {
+		classes = []string{"col-sm-10"}
 	}
 	colValue = NewDiv(DivAttributes{
 		BaseAttributes: BaseAttributes{
@@ -40,6 +43,7 @@ func FilterItem(title, value string) string {
 	colValue.AppendChild(NewSpan(SpanAttributes{
 		BaseAttributes: BaseAttributes{
 			Visible: true,
+			Classes: []string{"text-start"},
 		},
 		Text: value,
 	}))
