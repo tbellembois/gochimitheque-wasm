@@ -27,7 +27,10 @@ func OperateEventsStorelocations(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	entity := Entity{}.FromJsJSONValue(row).(Entity)
 
-	href := fmt.Sprintf("%sv/storelocations?entity=%d", ApplicationProxyPath, entity.EntityID)
+	BSTableQueryFilter.Lock()
+	BSTableQueryFilter.QueryFilter.Entity = strconv.Itoa(entity.EntityID)
+
+	href := fmt.Sprintf("%sv/storelocations", ApplicationProxyPath)
 	utils.LoadContent("storelocation", href, storelocationCallbackWrapper)
 
 	return nil
@@ -43,7 +46,10 @@ func OperateEventsMembers(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	entity := Entity{}.FromJsJSONValue(row).(Entity)
 
-	href := fmt.Sprintf("%sv/people?entity=%d", ApplicationProxyPath, entity.EntityID)
+	BSTableQueryFilter.Lock()
+	BSTableQueryFilter.QueryFilter.Entity = strconv.Itoa(entity.EntityID)
+
+	href := fmt.Sprintf("%sv/people", ApplicationProxyPath)
 	utils.LoadContent("person", href, personCallbackWrapper)
 
 	return nil

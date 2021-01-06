@@ -93,7 +93,7 @@ func OperateEventsStorages(this js.Value, args []js.Value) interface{} {
 	BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", types.CurrentProduct.Name.NameLabel, types.CurrentProduct.ProductSpecificity.String)
 
 	href := fmt.Sprintf("%sv/storages", ApplicationProxyPath)
-	utils.LoadContent("storage", href, storageCallbackWrapper, types.CurrentProduct)
+	utils.LoadContent("storage", href, storageCallbackWrapper)
 
 	return nil
 

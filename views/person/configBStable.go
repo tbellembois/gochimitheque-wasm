@@ -145,12 +145,12 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 
 	params := args[0]
 
-	entity := URLParameters.Get("entity")
-	if entity != "" {
-		params.Set("entity", entity)
-	}
+	queryFilter := QueryFilterFromJsJSONValue(params)
 
-	return params
+	queryFilter.Entity = BSTableQueryFilter.Entity
+	BSTableQueryFilter.Unlock()
+
+	return queryFilter.ToJsValue()
 
 }
 
