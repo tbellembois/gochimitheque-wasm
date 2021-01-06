@@ -233,6 +233,7 @@ func main() {
 
 	// Person bootstraptable functions.
 	js.Global().Set("Person_operateEventsEdit", js.FuncOf(person.OperateEventsEdit))
+	js.Global().Set("Person_operateEventsDelete", js.FuncOf(person.OperateEventsDelete))
 	js.Global().Set("Person_getTableData", js.FuncOf(person.GetTableData))
 	js.Global().Set("Person_savePerson", js.FuncOf(person.SavePerson))
 	js.Global().Set("Person_dataQueryParams", js.FuncOf(person.DataQueryParams))

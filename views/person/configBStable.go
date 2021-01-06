@@ -16,6 +16,37 @@ import (
 	"honnef.co/go/js/dom/v2"
 )
 
+func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
+
+	row := args[2]
+	person := Person{}.FromJsJSONValue(row).(Person)
+
+	url := fmt.Sprintf("%speople/%d", ApplicationProxyPath, person.PersonId)
+	method := "delete"
+
+	done := func(data js.Value) {
+
+		utils.DisplaySuccessMessage(locales.Translate("person_deleted_message", HTTPHeaderAcceptLanguage))
+		Jq("#Person_table").Bootstraptable(nil).Refresh(nil)
+
+	}
+	fail := func(data js.Value) {
+
+		utils.DisplayGenericErrorMessage()
+
+	}
+
+	Ajax{
+		Method: method,
+		URL:    url,
+		Done:   done,
+		Fail:   fail,
+	}.Send()
+
+	return nil
+
+}
+
 func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]

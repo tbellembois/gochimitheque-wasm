@@ -61,7 +61,7 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 	done := func(data js.Value) {
 
 		utils.DisplaySuccessMessage(locales.Translate("entity_deleted_message", HTTPHeaderAcceptLanguage))
-		Jq("#Entity_table").Bootstraptable(nil).ResetSearch("")
+		Jq("#Entity_table").Bootstraptable(nil).Refresh(nil)
 
 	}
 	fail := func(data js.Value) {
