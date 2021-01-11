@@ -21,27 +21,44 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	person := Person{}.FromJsJSONValue(row).(Person)
 
-	url := fmt.Sprintf("%speople/%d", ApplicationProxyPath, person.PersonId)
-	method := "delete"
+	Jq(fmt.Sprintf("button#delete%d", person.PersonId)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-	done := func(data js.Value) {
+		url := fmt.Sprintf("%speople/%d", ApplicationProxyPath, person.PersonId)
+		method := "delete"
 
-		utils.DisplaySuccessMessage(locales.Translate("person_deleted_message", HTTPHeaderAcceptLanguage))
-		Jq("#Person_table").Bootstraptable(nil).Refresh(nil)
+		done := func(data js.Value) {
 
-	}
-	fail := func(data js.Value) {
+			utils.DisplaySuccessMessage(locales.Translate("person_deleted_message", HTTPHeaderAcceptLanguage))
+			Jq("#Person_table").Bootstraptable(nil).Refresh(nil)
 
-		utils.DisplayGenericErrorMessage()
+		}
+		fail := func(data js.Value) {
 
-	}
+			utils.DisplayGenericErrorMessage()
 
-	Ajax{
-		Method: method,
-		URL:    url,
-		Done:   done,
-		Fail:   fail,
-	}.Send()
+		}
+
+		Ajax{
+			Method: method,
+			URL:    url,
+			Done:   done,
+			Fail:   fail,
+		}.Send()
+
+		return nil
+
+	}))
+
+	buttonTitle := widgets.NewIcon(widgets.IconAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"iconlabel"},
+		},
+		Icon: themes.NewMdiIcon(themes.MDI_CONFIRM, ""),
+		Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
+	})
+	Jq(fmt.Sprintf("button#delete%d", person.PersonId)).SetHtml("")
+	Jq(fmt.Sprintf("button#delete%d", person.PersonId)).Append(buttonTitle.OuterHTML())
 
 	return nil
 

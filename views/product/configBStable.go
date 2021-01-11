@@ -223,27 +223,44 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	types.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
 
-	url := fmt.Sprintf("%sproducts/%d", ApplicationProxyPath, types.CurrentProduct.ProductID)
-	method := "delete"
+	Jq(fmt.Sprintf("button#delete%d", types.CurrentProduct.ProductID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-	done := func(data js.Value) {
+		url := fmt.Sprintf("%sproducts/%d", ApplicationProxyPath, types.CurrentProduct.ProductID)
+		method := "delete"
 
-		utils.DisplaySuccessMessage(locales.Translate("product_deleted_message", HTTPHeaderAcceptLanguage))
-		Jq("#Product_table").Bootstraptable(nil).Refresh(nil)
+		done := func(data js.Value) {
 
-	}
-	fail := func(data js.Value) {
+			utils.DisplaySuccessMessage(locales.Translate("product_deleted_message", HTTPHeaderAcceptLanguage))
+			Jq("#Product_table").Bootstraptable(nil).Refresh(nil)
 
-		utils.DisplayGenericErrorMessage()
+		}
+		fail := func(data js.Value) {
 
-	}
+			utils.DisplayGenericErrorMessage()
 
-	Ajax{
-		Method: method,
-		URL:    url,
-		Done:   done,
-		Fail:   fail,
-	}.Send()
+		}
+
+		Ajax{
+			Method: method,
+			URL:    url,
+			Done:   done,
+			Fail:   fail,
+		}.Send()
+
+		return nil
+
+	}))
+
+	buttonTitle := widgets.NewIcon(widgets.IconAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"iconlabel"},
+		},
+		Icon: themes.NewMdiIcon(themes.MDI_CONFIRM, ""),
+		Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
+	})
+	Jq(fmt.Sprintf("button#delete%d", types.CurrentProduct.ProductID)).SetHtml("")
+	Jq(fmt.Sprintf("button#delete%d", types.CurrentProduct.ProductID)).Append(buttonTitle.OuterHTML())
 
 	return nil
 
@@ -1458,7 +1475,7 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 		[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
 	).OuterHTML()
 
-	collapseDiv := widgets.NewDiv(widgets.DivAttributes{
+	ostoragesDiv := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
 			Id:      "ostorages-collapse-" + strconv.Itoa(types.CurrentProduct.ProductID),
@@ -1476,7 +1493,7 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 		}).OuterHTML()
 	}
 
-	return spanCasCMR + spanHSCMR + imgSGH02 + buttonStorages + buttonOStorages + buttonStore + buttonEdit + buttonDelete + buttonBookmark + collapseDiv + iconRestricted
+	return spanCasCMR + spanHSCMR + imgSGH02 + buttonStorages + buttonOStorages + buttonStore + buttonEdit + buttonDelete + buttonBookmark + ostoragesDiv + iconRestricted
 
 }
 

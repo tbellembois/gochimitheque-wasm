@@ -305,7 +305,7 @@ func Storage_SaveCallback(args ...interface{}) {
 
 	BSTableQueryFilter.Lock()
 	BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(args[0].(int))
-	BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d %s", CurrentStorage.StorageID.Int64, CurrentStorage.StoreLocation.StoreLocationFullPath)
+	BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d", CurrentStorage.StorageID.Int64)
 	BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", types.CurrentProduct.Name.NameLabel, types.CurrentProduct.ProductSpecificity.String)
 	Jq("#Storage_table").Bootstraptable(nil).Refresh(nil)
 

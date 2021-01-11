@@ -22,27 +22,44 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	storeLocation := StoreLocation{}.FromJsJSONValue(row).(StoreLocation)
 
-	url := fmt.Sprintf("%sstorelocations/%d", ApplicationProxyPath, storeLocation.StoreLocationID.Int64)
-	method := "delete"
+	Jq(fmt.Sprintf("button#delete%d", storeLocation.StoreLocationID.Int64)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-	done := func(data js.Value) {
+		url := fmt.Sprintf("%sstorelocations/%d", ApplicationProxyPath, storeLocation.StoreLocationID.Int64)
+		method := "delete"
 
-		utils.DisplaySuccessMessage(locales.Translate("storelocation_deleted_message", HTTPHeaderAcceptLanguage))
-		Jq("#StoreLocation_table").Bootstraptable(nil).Refresh(nil)
+		done := func(data js.Value) {
 
-	}
-	fail := func(data js.Value) {
+			utils.DisplaySuccessMessage(locales.Translate("storelocation_deleted_message", HTTPHeaderAcceptLanguage))
+			Jq("#StoreLocation_table").Bootstraptable(nil).Refresh(nil)
 
-		utils.DisplayGenericErrorMessage()
+		}
+		fail := func(data js.Value) {
 
-	}
+			utils.DisplayGenericErrorMessage()
 
-	Ajax{
-		Method: method,
-		URL:    url,
-		Done:   done,
-		Fail:   fail,
-	}.Send()
+		}
+
+		Ajax{
+			Method: method,
+			URL:    url,
+			Done:   done,
+			Fail:   fail,
+		}.Send()
+
+		return nil
+
+	}))
+
+	buttonTitle := widgets.NewIcon(widgets.IconAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"iconlabel"},
+		},
+		Icon: themes.NewMdiIcon(themes.MDI_CONFIRM, ""),
+		Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
+	})
+	Jq(fmt.Sprintf("button#delete%d", storeLocation.StoreLocationID.Int64)).SetHtml("")
+	Jq(fmt.Sprintf("button#delete%d", storeLocation.StoreLocationID.Int64)).Append(buttonTitle.OuterHTML())
 
 	return nil
 

@@ -10,6 +10,6 @@ replace (
 require (
 	github.com/rocketlaunchr/react v1.0.9
 	github.com/tbellembois/gochimitheque v2.0.6+incompatible
-	golang.org/x/text v0.3.4
+	golang.org/x/text v0.3.5
 	honnef.co/go/js/dom/v2 v2.0.0-20200509013220-d4405f7ab4d8
 )
