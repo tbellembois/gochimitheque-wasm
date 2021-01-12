@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"strconv"
 	"syscall/js"
 )
 
@@ -60,6 +61,26 @@ type Select2Pagination struct {
 type Select2Item struct {
 	Id   string `json:"id"`
 	Text string `json:"text"`
+}
+
+func (s *Select2Item) UnmarshalJSON(data []byte) error {
+
+	var v map[string]interface{}
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+
+	switch reflect.ValueOf(v["id"]).Kind() {
+	case reflect.String:
+		s.Id = v["id"].(string)
+	case reflect.Float64:
+		s.Id = strconv.Itoa(int(v["id"].(float64)))
+	}
+
+	s.Text = v["text"].(string)
+
+	return nil
+
 }
 
 func (s Select2Item) IDIsDigit() bool {
