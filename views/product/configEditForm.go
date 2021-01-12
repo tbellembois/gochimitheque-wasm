@@ -544,7 +544,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		types.CurrentProduct.ProducerRef = ProducerRef{}
 		var producerrefId = -1
 
-		if select2ItemProducerRef.IDIsDigit() {
+		if select2ItemProducerRef.IDIsDigit() && !(select2ItemProducerRef.Id == select2ItemProducerRef.Text) {
 			if producerrefId, err = strconv.Atoi(select2ItemProducerRef.Id); err != nil {
 				fmt.Println(err)
 				return nil
@@ -659,7 +659,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		supplierref := SupplierRef{}
 		var supplierrefId = -1
 
-		if select2Item.IDIsDigit() {
+		if select2Item.IDIsDigit() && !strings.HasPrefix(select2Item.Text, fmt.Sprintf("%s@", select2Item.Id)) {
 			if supplierrefId, err = strconv.Atoi(select2Item.Id); err != nil {
 				fmt.Println(err)
 				return nil
