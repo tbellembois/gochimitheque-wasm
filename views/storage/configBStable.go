@@ -651,18 +651,69 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	// Qrcode.
 	colQrcode := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
+			Id:      fmt.Sprintf("qrcode%d", types.CurrentStorage.StorageID.Int64),
 			Visible: true,
-			Classes: []string{"col-sm-4"},
+			Classes: []string{"border", "col-sm-auto", "p-sm-3", "ml-sm-3"},
 		},
 	})
-	colQrcode.AppendChild(widgets.NewImg(widgets.ImgAttributes{
+
+	qrcodeLayoutRow1 := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"iconlabel", "row"},
+		},
+	})
+	qrcodeLayoutRow2 := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"iconlabel", "row"},
+		},
+	})
+
+	qrcodeImgAndProductNameCol := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"col"},
+		},
+	})
+	qrcodeImg := widgets.NewImg(widgets.ImgAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
 		},
 		Height: "128px",
 		Width:  "128px",
 		Src:    fmt.Sprintf("data:image/png;base64,%s", qrCode),
-	}))
+	})
+	qrcodeProductNameSpan := widgets.NewSpan(widgets.SpanAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"iconlabel verticaltext"},
+		},
+		Text: CurrentStorage.Product.Name.NameLabel,
+	})
+	qrcodeImgAndProductNameCol.AppendChild(qrcodeImg)
+	qrcodeImgAndProductNameCol.AppendChild(qrcodeProductNameSpan)
+
+	qrcodeStoreLocationNameCol := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"col-sm-12"},
+		},
+	})
+	qrcodeStoreLocationNameSpan := widgets.NewSpan(widgets.SpanAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"iconlabel"},
+		},
+		Text: CurrentStorage.StoreLocation.StoreLocationFullPath,
+	})
+	qrcodeStoreLocationNameCol.AppendChild(qrcodeStoreLocationNameSpan)
+
+	qrcodeLayoutRow1.AppendChild(qrcodeImgAndProductNameCol)
+	qrcodeLayoutRow2.AppendChild(qrcodeStoreLocationNameCol)
+
+	colQrcode.AppendChild(qrcodeLayoutRow1)
+	colQrcode.AppendChild(qrcodeLayoutRow2)
 	// To destroy.
 	colToDestroy := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
@@ -737,10 +788,16 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Visible: true,
 			Classes: []string{"iconlabel"},
 		},
-		Title:   locales.Translate("storage_print_qrcode", HTTPHeaderAcceptLanguage),
-		Onclick: "PrintImage('" + fmt.Sprintf("data:image/png;base64,%s", qrCode) + "', '" + fmt.Sprintf("%s - %s", types.CurrentStorage.Product.Name.NameLabel, types.CurrentStorage.StoreLocation.StoreLocationFullPath) + "'); return false;",
-		Href:    "#",
-		Label:   icon,
+		Title: locales.Translate("storage_print_qrcode", HTTPHeaderAcceptLanguage),
+		Onclick: fmt.Sprintf(`printJS({
+			printable: 'qrcode%d',
+			type: 'html',
+			documentTitle: ' ',
+			css: '../css/chimitheque.css',
+			scanStyles: false,
+			})`, types.CurrentStorage.StorageID.Int64),
+		Href:  "#",
+		Label: icon,
 	}))
 
 	rowPrintQrcode.AppendChild(colPrint)
