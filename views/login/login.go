@@ -153,7 +153,7 @@ func ResetPassword(this js.Value, args []js.Value) interface{} {
 		Data:   dataBytes,
 		Done: func(data js.Value) {
 
-			utils.DisplaySuccessMessage(locales.Translate("resetpassword_message_mailsentto", HTTPHeaderAcceptLanguage))
+			utils.DisplaySuccessMessage(fmt.Sprintf(locales.Translate("resetpassword_message_mailsentto", HTTPHeaderAcceptLanguage), person.PersonEmail))
 
 			Jq("#person_email").SetVal("")
 			Jq("#captcha_text").SetVal("")

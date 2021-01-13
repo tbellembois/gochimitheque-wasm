@@ -118,7 +118,7 @@ func Test(this js.Value, args []js.Value) interface{} {
 
 func main() {
 
-	// Common actions for all pages.
+	// Common actions for all logged pages.
 	types.Jq("#table").On("load-success.bs.table",
 		js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			search := URLParameters.Get("search")
@@ -268,7 +268,12 @@ func main() {
 	types.Jq("#loading").Empty()
 	types.Jq("div.container").RemoveClass("invisible")
 
+	// Startup messages
 	utils.DisplaySuccessMessage(locales.Translate("wasm_loaded", HTTPHeaderAcceptLanguage))
+	message := URLParameters.Get("message")
+	if message != "" {
+		utils.DisplaySuccessMessage(message)
+	}
 
 	// For the login and home pages, calling the callback
 	// function manually.
