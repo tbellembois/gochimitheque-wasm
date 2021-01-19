@@ -299,6 +299,13 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		}
 	}
 
+	if Jq("input#hidden_product_twodformula_content").Html() != "" {
+		types.CurrentProduct.ProductTwoDFormula = sql.NullString{
+			String: Jq("input#hidden_product_twodformula_content").Html(),
+			Valid:  true,
+		}
+	}
+
 	if Jq("input#product_threedformula").GetVal().Truthy() {
 		types.CurrentProduct.ProductThreeDFormula = sql.NullString{
 			String: Jq("input#product_threedformula").GetVal().String(),

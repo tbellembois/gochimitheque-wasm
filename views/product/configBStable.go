@@ -458,7 +458,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	})
 
 	//
-	// Synonyms, ID and person.
+	// 2dImage, synonyms, ID and person.
 	//
 	rowSynonymAndID := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
@@ -466,11 +466,27 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"row", "mt-sm-3"},
 		},
 	})
+	// 2dimage.
+	col2dimage := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"col-sm-4"},
+		},
+	})
+	if types.CurrentProduct.ProductTwoDFormula.Valid {
+		col2dimage.AppendChild(widgets.NewImg(widgets.ImgAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+			},
+			Width: "200",
+			Src:   types.CurrentProduct.ProductTwoDFormula.String,
+		}))
+	}
 	// Synonym.
 	colSynonym := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-8"},
+			Classes: []string{"col-sm-4"},
 		},
 	})
 	colSynonym.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
@@ -516,7 +532,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			},
 			Text: types.CurrentProduct.Person.PersonEmail,
 		}))
-
+	rowSynonymAndID.AppendChild(col2dimage)
 	rowSynonymAndID.AppendChild(colSynonym)
 	rowSynonymAndID.AppendChild(colID)
 	rowSynonymAndID.AppendChild(colPerson)

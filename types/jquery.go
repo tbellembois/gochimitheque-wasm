@@ -25,6 +25,12 @@ func (jq Jquery) Append(i ...interface{}) Jquery {
 
 }
 
+func (jq Jquery) Html() string {
+
+	return jq.Object.Call("html").String()
+
+}
+
 func (jq Jquery) SetHtml(i interface{}) Jquery {
 
 	switch i.(type) {

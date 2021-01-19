@@ -612,6 +612,11 @@ func product_common() {
 		},
 	})
 
+	Jq("#product_twodformula").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		js.Global().Call("load2dimage")
+		return nil
+	}))
+
 }
 
 func ShowIfAuthorizedMenuItems(args ...interface{}) {

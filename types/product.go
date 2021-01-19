@@ -32,6 +32,7 @@ type Product struct {
 	ProductRestricted      sql.NullBool   `json:"product_restricted"`
 	ProductRadioactive     sql.NullBool   `json:"product_radioactive"`
 	ProductThreeDFormula   sql.NullString `json:"product_threedformula"`
+	ProductTwoDFormula     sql.NullString `json:"product_twodformula"`
 	ProductMolFormula      sql.NullString `json:"product_molformula"`
 	ProductDisposalComment sql.NullString `json:"product_disposalcomment"`
 	ProductRemark          sql.NullString `json:"product_remark"`
