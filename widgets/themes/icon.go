@@ -34,6 +34,7 @@ const (
 	MDI_CHECK         IconFace = "mdi-checkbox-marked-outline"
 	MDI_NO_CHECK      IconFace = "mdi-checkbox-blank-outline"
 	MDI_INFO          IconFace = "mdi-information-outline"
+	MDI_CLOSE         IconFace = "mdi-close-box"
 	MDI_TOW_TRUCK     IconFace = "mdi-tow-truck"
 	MDI_NO_BOOKMARK   IconFace = "mdi-bookmark-outline"
 	MDI_BOOKMARK      IconFace = "mdi-bookmark"

@@ -79,8 +79,6 @@ func OperateEventsStore(this js.Value, args []js.Value) interface{} {
 
 func OperateEventsStorages(this js.Value, args []js.Value) interface{} {
 
-	// TODO: stock
-
 	storageCallbackWrapper := func(args ...interface{}) {
 		storage.Storage_listCallback(js.Null(), nil)
 	}
@@ -170,7 +168,6 @@ func OperateEventsOStorages(this js.Value, args []js.Value) interface{} {
 func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	index := args[3].Int()
 	types.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
 
 	BSTableQueryFilter.Lock()
@@ -178,41 +175,8 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 	BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", types.CurrentProduct.Name.NameLabel, types.CurrentProduct.ProductSpecificity.String)
 	BSTableQueryFilter.Unlock()
 
-	url := fmt.Sprintf("%sproducts/%d", ApplicationProxyPath, types.CurrentProduct.ProductID)
-	method := "get"
-
-	done := func(data js.Value) {
-
-		var (
-			product Product
-			err     error
-		)
-
-		if err = json.Unmarshal([]byte(data.String()), &product); err != nil {
-			fmt.Println(err)
-		}
-
-		FillInProductForm(product, "edit-collapse")
-
-		Jq("input#index").SetVal(index)
-
-		Jq("#edit-collapse").Show()
-		Jq("#search").Hide()
-		Jq("#actions").Hide()
-
-	}
-	fail := func(data js.Value) {
-
-		utils.DisplayGenericErrorMessage()
-
-	}
-
-	Ajax{
-		Method: method,
-		URL:    url,
-		Done:   done,
-		Fail:   fail,
-	}.Send()
+	href := fmt.Sprintf("%svc/products", ApplicationProxyPath)
+	utils.LoadContent("storage", href, Product_createCallback, types.CurrentProduct)
 
 	return nil
 
@@ -694,8 +658,9 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Href:  types.CurrentProduct.ProductSheet.String,
-			Label: icon,
+			Target: "_blank",
+			Href:   types.CurrentProduct.ProductSheet.String,
+			Label:  icon,
 		}))
 	}
 
@@ -811,8 +776,9 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Href:  types.CurrentProduct.ProductMSDS.String,
-			Label: icon,
+			Target: "_blank",
+			Href:   types.CurrentProduct.ProductMSDS.String,
+			Label:  icon,
 		}))
 	}
 
@@ -939,8 +905,9 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Href:  types.CurrentProduct.ProductThreeDFormula.String,
-			Label: icon,
+			Target: "_blank",
+			Href:   types.CurrentProduct.ProductThreeDFormula.String,
+			Label:  icon,
 		}))
 	}
 
@@ -1509,7 +1476,7 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 		}).OuterHTML()
 	}
 
-	return spanCasCMR + spanHSCMR + imgSGH02 + buttonStorages + buttonOStorages + buttonStore + buttonEdit + buttonDelete + buttonBookmark + ostoragesDiv + iconRestricted
+	return buttonStorages + buttonOStorages + buttonStore + buttonEdit + buttonDelete + buttonBookmark + ostoragesDiv + iconRestricted + spanCasCMR + spanHSCMR + imgSGH02
 
 }
 

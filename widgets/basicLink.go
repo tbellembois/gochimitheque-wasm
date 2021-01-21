@@ -12,6 +12,7 @@ type LinkAttributes struct {
 	BaseAttributes
 	Title   string
 	Href    string
+	Target  string
 	Onclick string
 	Label   dom.HTMLElement
 }
@@ -23,6 +24,7 @@ func NewLink(args LinkAttributes) *Link {
 
 	l.SetAttribute("href", args.Href)
 	l.SetAttribute("onclick", args.Onclick)
+	l.SetAttribute("target", args.Target)
 	l.SetTitle(args.Title)
 	l.SetInnerHTML(args.Label.OuterHTML())
 

@@ -177,6 +177,12 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			return nil
 		}
 	}
+	if Jq("input#storage_identicalbarecode:checked").Object.Length() > 0 {
+		types.CurrentStorage.StorageIdenticalBarecode = sql.NullBool{
+			Bool:  true,
+			Valid: true,
+		}
+	}
 
 	if len(Jq("select#storelocation").Select2Data()) > 0 {
 		select2ItemStorelocation := Jq("select#storelocation").Select2Data()[0]
@@ -197,14 +203,14 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 	}
 
 	if Jq("input#storage_quantity").GetVal().Truthy() {
-		var storageQuantity int
-		if storageQuantity, err = strconv.Atoi(Jq("#storage_quantity").GetVal().String()); err != nil {
+		var storageQuantity float64
+		if storageQuantity, err = strconv.ParseFloat(Jq("#storage_quantity").GetVal().String(), 64); err != nil {
 			fmt.Println(err)
 			return nil
 		}
 		types.CurrentStorage.StorageQuantity = sql.NullFloat64{
 			Valid:   true,
-			Float64: float64(storageQuantity),
+			Float64: storageQuantity,
 		}
 	}
 

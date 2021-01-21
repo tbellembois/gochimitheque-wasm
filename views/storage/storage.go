@@ -124,11 +124,17 @@ func storage_common() {
 		Rules: map[string]ValidateRule{
 			"storelocation": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
+				Remote: ValidateRemote{
+					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
+				},
 			},
 			"unit_concentration": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 					return Jq("#storage_concentration").GetVal().Truthy()
 				}),
+				Remote: ValidateRemote{
+					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
+				},
 			},
 		},
 		Messages: map[string]ValidateMessage{
@@ -142,6 +148,9 @@ func storage_common() {
 		Rules: map[string]ValidateRule{
 			"borrower": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
+				Remote: ValidateRemote{
+					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
+				},
 			},
 		},
 		Messages: map[string]ValidateMessage{
@@ -240,6 +249,7 @@ func Storage_createCallback(args ...interface{}) {
 		FillInStorageForm(storage, "storage")
 
 		Jq("input#storage_nbitem").SetProp("disabled", "disabled")
+		Jq("input#storage_identicalbarecode").SetProp("disabled", "disabled")
 
 	}
 
@@ -294,6 +304,10 @@ func Storage_listCallback(this js.Value, args []js.Value) interface{} {
 	Jq("#search").Show()
 	Jq("#actions").Show()
 	Jq("#s_storage_archive_button").Show()
+
+	if BSTableQueryFilter.QueryFilter.Product != "" {
+		Jq("#s_storage_stock_button").Show()
+	}
 
 	changeSwitchButtonToProduct()
 

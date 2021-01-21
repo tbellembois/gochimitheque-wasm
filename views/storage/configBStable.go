@@ -144,6 +144,11 @@ func Storage_operateEventsEdit(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	types.CurrentStorage = Storage{}.FromJsJSONValue(row)
 
+	BSTableQueryFilter.Lock()
+	BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(int(types.CurrentStorage.StorageID.Int64))
+	BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d", CurrentStorage.StorageID.Int64)
+	BSTableQueryFilter.Unlock()
+
 	href := fmt.Sprintf("%svc/storages", ApplicationProxyPath)
 	utils.LoadContent("storage", href, Storage_createCallback, types.CurrentStorage)
 
@@ -617,7 +622,7 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 			Visible: true,
 			Classes: []string{"iconlabel"},
 		},
-		Text: strconv.Itoa(int(types.CurrentStorage.StorageID.Int64)),
+		Text: fmt.Sprintf("#%d", types.CurrentStorage.StorageID.Int64),
 	}).OuterHTML()
 
 	return buttonClone + buttonRestore + buttonDelete + buttonArchive + buttonBorrow + buttonEdit + buttonHistory + spanId

@@ -19,6 +19,9 @@ func PersonPass_listCallback(this js.Value, args []js.Value) interface{} {
 			"person_password": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
 				EqualTo:  "#person_passwordagain",
+				Remote: ValidateRemote{
+					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
+				},
 			},
 			"person_passwordagain": {
 				EqualTo: "#person_password",

@@ -1,7 +1,9 @@
 package product
 
 import (
+	"encoding/json"
 	"fmt"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -259,14 +261,23 @@ func product_common() {
 		Rules: map[string]ValidateRule{
 			"name": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
+				Remote: ValidateRemote{
+					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
+				},
 			},
 			"producerref": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
+				Remote: ValidateRemote{
+					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
+				},
 			},
 			"unit_temperature": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 					return Jq("#product_temperature").GetVal().Truthy()
 				}),
+				Remote: ValidateRemote{
+					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
+				},
 			},
 			"empiricalformula": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
@@ -706,6 +717,139 @@ func LoadUser() {
 
 }
 
+func showStockRecursive(storelocation *StoreLocation, depth int) {
+
+	// Checking if there is a stock or not for the store location.
+	hasStock := false
+	for _, stock := range storelocation.Stocks {
+		if stock.Total != 0 || stock.Current != 0 {
+			hasStock = true
+			break
+		}
+	}
+
+	if hasStock {
+
+		// Depth.
+		depthSep := ""
+		for i := 0; i <= depth; i++ {
+			depthSep += "_"
+		}
+
+		rowButtonClose := widgets.NewDiv(widgets.DivAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+				Classes: []string{"row"},
+			},
+		})
+		buttonClose := widgets.NewBSButtonWithIcon(
+			widgets.ButtonAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+					Attributes: map[string]string{
+						"onclick": "$('#stock').html('')",
+					},
+				},
+				Title: locales.Translate("close", HTTPHeaderAcceptLanguage),
+			},
+			widgets.IconAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+					Classes: []string{"iconlabel"},
+				},
+				Text: locales.Translate("close", HTTPHeaderAcceptLanguage),
+				Icon: themes.NewMdiIcon(themes.MDI_CLOSE, ""),
+			},
+			[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
+		)
+		rowButtonClose.AppendChild(buttonClose)
+
+		rowProduct := widgets.NewDiv(widgets.DivAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+				Classes: []string{"row", "iconlabel"},
+			},
+		})
+		rowProduct.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+				Classes: []string{"col", "iconlabel"},
+			},
+			Text: CurrentProduct.Name.NameLabel,
+		}))
+
+		rowStorelocation := widgets.NewDiv(widgets.DivAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+				Classes: []string{"row", "iconlabel"},
+			},
+		})
+		rowStorelocation.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+				Classes: []string{"col", "iconlabel"},
+			},
+			Text: fmt.Sprintf("%s %s", depthSep, storelocation.StoreLocationName.String),
+		}))
+
+		Jq("#stock").Append(rowButtonClose.OuterHTML())
+		Jq("#stock").Append(rowProduct.OuterHTML())
+		Jq("#stock").Append(rowStorelocation.OuterHTML())
+
+		for _, stock := range storelocation.Stocks {
+
+			rowStocks := widgets.NewDiv(widgets.DivAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+					Classes: []string{"row", "iconlabel"},
+				},
+			})
+
+			if !(stock.Total == 0 && stock.Current == 0) {
+
+				rowStock := widgets.NewDiv(widgets.DivAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+						Classes: []string{"col-sm-12", "iconlabel"},
+					},
+				})
+
+				rowStock.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+						Classes: []string{"iconlabel"},
+					},
+					Text: fmt.Sprintf("%s %s: %f %s %s: %f %s",
+						depthSep,
+						locales.Translate("stock_storelocation_title", HTTPHeaderAcceptLanguage),
+						stock.Current,
+						stock.Unit.UnitLabel.String,
+						locales.Translate("stock_storelocation_sub_title", HTTPHeaderAcceptLanguage),
+						stock.Total,
+						stock.Unit.UnitLabel.String),
+				}))
+
+				rowStocks.AppendChild(rowStock)
+
+				Jq("#stock").Append(rowStocks.OuterHTML())
+
+			}
+
+		}
+
+	}
+
+	if len(storelocation.Children) > 0 {
+		depth++
+		for _, child := range storelocation.Children {
+
+			showStockRecursive(child, depth)
+
+		}
+	}
+
+}
+
 func LoadSearch() {
 
 	bindSearchButtons := func(args ...interface{}) {
@@ -720,6 +864,53 @@ func LoadSearch() {
 				search.Search(js.Null(), nil)
 
 			}
+
+			return nil
+
+		}))
+
+		// Stock.
+		Jq("#s_storage_stock_button").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+
+			Jq("#stock").Append(widgets.NewSpan(widgets.SpanAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+					Classes: []string{"mdi", "mdi-loading", "mdi-spin"},
+				},
+			}).OuterHTML())
+
+			url := fmt.Sprintf("%sentities/stocks/%d", ApplicationProxyPath, types.CurrentProduct.ProductID)
+			method := "get"
+
+			done := func(data js.Value) {
+
+				var (
+					storelocations []StoreLocation
+					err            error
+				)
+
+				if err = json.Unmarshal([]byte(data.String()), &storelocations); err != nil {
+					fmt.Println(err)
+				}
+
+				Jq("#stock").SetHtml("")
+				for _, storelocation := range storelocations {
+					showStockRecursive(&storelocation, 0)
+				}
+
+			}
+			fail := func(data js.Value) {
+
+				utils.DisplayGenericErrorMessage()
+
+			}
+
+			Ajax{
+				Method: method,
+				URL:    url,
+				Done:   done,
+				Fail:   fail,
+			}.Send()
 
 			return nil
 
@@ -810,6 +1001,7 @@ func Product_listCallback(this js.Value, args []js.Value) interface{} {
 	Jq("#search").Show()
 	Jq("#actions").Show()
 	Jq("#s_storage_archive_button").Hide()
+	Jq("#s_storage_stock_button").Hide()
 
 	btnLabel := locales.Translate("switchstorageview_text", HTTPHeaderAcceptLanguage)
 	buttonTitle := widgets.NewIcon(widgets.IconAttributes{
@@ -828,19 +1020,37 @@ func Product_listCallback(this js.Value, args []js.Value) interface{} {
 
 }
 
-func Product_createCallback(this js.Value, args []js.Value) interface{} {
+var ProductCreateCallbackWrapper = func(this js.Value, args []js.Value) interface{} {
+	Product_createCallback(nil)
+	return nil
+}
+
+func Product_createCallback(args ...interface{}) {
 
 	product_common()
 
+	switch reflect.TypeOf(args[0]) {
+	case reflect.TypeOf(Product{}):
+
+		product := args[0].(Product)
+
+		FillInProductForm(product, "product")
+
+		Jq("#search").Hide()
+		Jq("#actions").Hide()
+
+	}
+
 	// Chemical product by default on creation.
-	if Jq("input#product_id").Object.Length() == 0 {
+	if Jq("input#product_id").GetVal().String() == "" {
 		Chemify()
+	} else {
+		Jq("input#showchem").SetProp("disabled", "disabled")
+		Jq("input#showbio").SetProp("disabled", "disabled")
 	}
 
 	Jq("#search").Hide()
 	Jq("#actions").Hide()
-
-	return nil
 
 }
 

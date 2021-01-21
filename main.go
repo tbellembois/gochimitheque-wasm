@@ -175,7 +175,7 @@ func main() {
 	// Product page load callbacks.
 	js.Global().Set("Product_listBookmark", js.FuncOf(product.Product_listBookmarkCallback))
 	js.Global().Set("Product_list", js.FuncOf(product.Product_listCallback))
-	js.Global().Set("Product_create", js.FuncOf(product.Product_createCallback))
+	js.Global().Set("Product_create", js.FuncOf(product.ProductCreateCallbackWrapper))
 
 	// Storage bootstraptable functions.
 	js.Global().Set("Storage_getTableData", js.FuncOf(storage.GetTableData))

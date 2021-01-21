@@ -179,6 +179,9 @@ func Login_listCallback(this js.Value, args []js.Value) interface{} {
 			"person_email": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
 				Email:    true,
+				Remote: ValidateRemote{
+					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
+				},
 			},
 		},
 		Messages: map[string]ValidateMessage{

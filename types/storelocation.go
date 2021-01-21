@@ -20,6 +20,15 @@ type StoreLocation struct {
 	Entity                `json:"entity"`
 	StoreLocation         *StoreLocation `json:"storelocation"`
 	StoreLocationFullPath string         `json:"storelocation_fullpath"`
+
+	Children []*StoreLocation `json:"children"`
+	Stocks   []Stock          `json:"stock"`
+}
+
+type Stock struct {
+	Total   float64 `json:"total"`
+	Current float64 `json:"current"`
+	Unit    Unit    `json:"unit"`
 }
 
 func (elems StoreLocations) IsExactMatch() bool {

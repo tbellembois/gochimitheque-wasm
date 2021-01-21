@@ -4,6 +4,7 @@ import (
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/utils"
+	"github.com/tbellembois/gochimitheque-wasm/views/about"
 	"github.com/tbellembois/gochimitheque-wasm/views/entity"
 	"github.com/tbellembois/gochimitheque-wasm/views/person"
 	"github.com/tbellembois/gochimitheque-wasm/views/product"
@@ -38,6 +39,9 @@ func LoadContentWrapper(this js.Value, args []js.Value) interface{} {
 	personCreateCallbackWrapper := func(args ...interface{}) {
 		person.Person_createCallBack(js.Null(), nil)
 	}
+	aboutListCallbackWrapper := func(args ...interface{}) {
+		about.About_listCallback(js.Null(), nil)
+	}
 
 	var callbackFunc func(args ...interface{})
 
@@ -59,11 +63,11 @@ func LoadContentWrapper(this js.Value, args []js.Value) interface{} {
 	case "Person_create":
 		callbackFunc = personCreateCallbackWrapper
 	case "PersonPass_list":
-		callbackFunc = nil
+		callbackFunc = aboutListCallbackWrapper
 	case "WelcomeAnnounce_list":
-		callbackFunc = nil
+		callbackFunc = aboutListCallbackWrapper
 	case "About_list":
-		callbackFunc = nil
+		callbackFunc = aboutListCallbackWrapper
 	}
 
 	utils.LoadContent(args[0].String(), args[1].String(), callbackFunc, nil)

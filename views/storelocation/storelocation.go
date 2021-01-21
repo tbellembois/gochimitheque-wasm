@@ -17,9 +17,15 @@ func storelocation_common() {
 		Rules: map[string]ValidateRule{
 			"storelocation_name": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
+				Remote: ValidateRemote{
+					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
+				},
 			},
 			"entity": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
+				Remote: ValidateRemote{
+					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
+				},
 			},
 		},
 		Messages: map[string]ValidateMessage{
