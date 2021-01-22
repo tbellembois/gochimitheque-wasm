@@ -736,48 +736,6 @@ func showStockRecursive(storelocation *StoreLocation, depth int) {
 			depthSep += "_"
 		}
 
-		rowButtonClose := widgets.NewDiv(widgets.DivAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Visible: true,
-				Classes: []string{"row"},
-			},
-		})
-		buttonClose := widgets.NewBSButtonWithIcon(
-			widgets.ButtonAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-					Attributes: map[string]string{
-						"onclick": "$('#stock').html('')",
-					},
-				},
-				Title: locales.Translate("close", HTTPHeaderAcceptLanguage),
-			},
-			widgets.IconAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-					Classes: []string{"iconlabel"},
-				},
-				Text: locales.Translate("close", HTTPHeaderAcceptLanguage),
-				Icon: themes.NewMdiIcon(themes.MDI_CLOSE, ""),
-			},
-			[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
-		)
-		rowButtonClose.AppendChild(buttonClose)
-
-		rowProduct := widgets.NewDiv(widgets.DivAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Visible: true,
-				Classes: []string{"row", "iconlabel"},
-			},
-		})
-		rowProduct.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Visible: true,
-				Classes: []string{"col", "iconlabel"},
-			},
-			Text: CurrentProduct.Name.NameLabel,
-		}))
-
 		rowStorelocation := widgets.NewDiv(widgets.DivAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -792,8 +750,6 @@ func showStockRecursive(storelocation *StoreLocation, depth int) {
 			Text: fmt.Sprintf("%s %s", depthSep, storelocation.StoreLocationName.String),
 		}))
 
-		Jq("#stock").Append(rowButtonClose.OuterHTML())
-		Jq("#stock").Append(rowProduct.OuterHTML())
 		Jq("#stock").Append(rowStorelocation.OuterHTML())
 
 		for _, stock := range storelocation.Stocks {
@@ -894,6 +850,52 @@ func LoadSearch() {
 				}
 
 				Jq("#stock").SetHtml("")
+
+				rowButtonClose := widgets.NewDiv(widgets.DivAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+						Classes: []string{"row"},
+					},
+				})
+				buttonClose := widgets.NewBSButtonWithIcon(
+					widgets.ButtonAttributes{
+						BaseAttributes: widgets.BaseAttributes{
+							Visible: true,
+							Attributes: map[string]string{
+								"onclick": "$('#stock').html('')",
+							},
+						},
+						Title: locales.Translate("close", HTTPHeaderAcceptLanguage),
+					},
+					widgets.IconAttributes{
+						BaseAttributes: widgets.BaseAttributes{
+							Visible: true,
+							Classes: []string{"iconlabel"},
+						},
+						Text: locales.Translate("close", HTTPHeaderAcceptLanguage),
+						Icon: themes.NewMdiIcon(themes.MDI_CLOSE, ""),
+					},
+					[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
+				)
+				rowButtonClose.AppendChild(buttonClose)
+
+				rowProduct := widgets.NewDiv(widgets.DivAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+						Classes: []string{"row", "iconlabel"},
+					},
+				})
+				rowProduct.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+						Classes: []string{"col", "iconlabel"},
+					},
+					Text: CurrentProduct.Name.NameLabel,
+				}))
+
+				Jq("#stock").Append(rowButtonClose.OuterHTML())
+				Jq("#stock").Append(rowProduct.OuterHTML())
+
 				for _, storelocation := range storelocations {
 					showStockRecursive(&storelocation, 0)
 				}
