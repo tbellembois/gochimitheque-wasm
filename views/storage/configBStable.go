@@ -1190,7 +1190,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	rowComment.AppendChild(colComment)
 
 	//
-	// Creation date and person
+	// Creation and modification date and person
 	//
 	rowCreationDateAndPerson := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
@@ -1202,7 +1202,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	colCreationDate := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-6"},
+			Classes: []string{"col-sm-4"},
 		},
 	})
 	colCreationDate.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
@@ -1217,13 +1217,34 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: CurrentStorage.StorageCreationDate.String(),
+			Text: CurrentStorage.StorageCreationDate.Format("2006-01-02"),
+		}))
+	// Modification date.
+	colModificationDate := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"col-sm-4"},
+		},
+	})
+	colModificationDate.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"iconlabel", "mr-sm-2"},
+		},
+		Text: locales.Translate("modified", HTTPHeaderAcceptLanguage),
+	}))
+	colModificationDate.AppendChild(
+		widgets.NewSpan(widgets.SpanAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+			},
+			Text: CurrentStorage.StorageModificationDate.Format("2006-01-02"),
 		}))
 	// Person.
 	colPerson := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-6"},
+			Classes: []string{"col-sm-4"},
 		},
 	})
 	colPerson.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
@@ -1235,6 +1256,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	}))
 
 	rowCreationDateAndPerson.AppendChild(colCreationDate)
+	rowCreationDateAndPerson.AppendChild(colModificationDate)
 	rowCreationDateAndPerson.AppendChild(colPerson)
 
 	return rowQrcodeAndID.OuterHTML() +
