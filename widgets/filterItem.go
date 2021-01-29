@@ -30,7 +30,7 @@ func FilterItem(title, value string) string {
 
 	var classes []string
 	if title == "" {
-		classes = []string{"col-sm-2", "badge", "badge-dark", "mt-sm-2"}
+		classes = []string{"col-sm-10", "badge", "badge-dark", "mt-sm-2"}
 	} else {
 		classes = []string{"col-sm-10"}
 	}

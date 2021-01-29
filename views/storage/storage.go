@@ -19,101 +19,101 @@ func storage_common() {
 	//
 	// search form
 	//
-	Jq("select#s_storelocation").Select2(Select2Config{
-		Placeholder:    locales.Translate("s_storelocation", HTTPHeaderAcceptLanguage),
-		TemplateResult: js.FuncOf(Select2StoreLocationTemplateResults),
-		AllowClear:     true,
-		Ajax: Select2Ajax{
-			URL:            ApplicationProxyPath + "storelocations",
-			DataType:       "json",
-			Data:           js.FuncOf(Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(Select2GenericAjaxProcessResults(StoreLocations{})),
-		},
-	})
+	// Jq("select#s_storelocation").Select2(Select2Config{
+	// 	Placeholder:    locales.Translate("s_storelocation", HTTPHeaderAcceptLanguage),
+	// 	TemplateResult: js.FuncOf(Select2StoreLocationTemplateResults),
+	// 	AllowClear:     true,
+	// 	Ajax: Select2Ajax{
+	// 		URL:            ApplicationProxyPath + "storelocations",
+	// 		DataType:       "json",
+	// 		Data:           js.FuncOf(Select2GenericAjaxData),
+	// 		ProcessResults: js.FuncOf(Select2GenericAjaxProcessResults(StoreLocations{})),
+	// 	},
+	// })
 
-	Jq("select#s_casnumber").Select2(Select2Config{
-		Placeholder:    locales.Translate("s_casnumber", HTTPHeaderAcceptLanguage),
-		TemplateResult: js.FuncOf(Select2GenericTemplateResults(CasNumber{})),
-		AllowClear:     true,
-		Ajax: Select2Ajax{
-			URL:            ApplicationProxyPath + "products/casnumbers/",
-			DataType:       "json",
-			Data:           js.FuncOf(Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(Select2GenericAjaxProcessResults(CasNumbers{})),
-		},
-	})
+	// Jq("select#s_casnumber").Select2(Select2Config{
+	// 	Placeholder:    locales.Translate("s_casnumber", HTTPHeaderAcceptLanguage),
+	// 	TemplateResult: js.FuncOf(Select2GenericTemplateResults(CasNumber{})),
+	// 	AllowClear:     true,
+	// 	Ajax: Select2Ajax{
+	// 		URL:            ApplicationProxyPath + "products/casnumbers/",
+	// 		DataType:       "json",
+	// 		Data:           js.FuncOf(Select2GenericAjaxData),
+	// 		ProcessResults: js.FuncOf(Select2GenericAjaxProcessResults(CasNumbers{})),
+	// 	},
+	// })
 
-	Jq("select#s_name").Select2(Select2Config{
-		Placeholder:    locales.Translate("s_name", HTTPHeaderAcceptLanguage),
-		TemplateResult: js.FuncOf(Select2GenericTemplateResults(Name{})),
-		AllowClear:     true,
-		Ajax: Select2Ajax{
-			URL:            ApplicationProxyPath + "products/names/",
-			DataType:       "json",
-			Data:           js.FuncOf(Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(Select2GenericAjaxProcessResults(Names{})),
-		},
-	})
+	// Jq("select#s_name").Select2(Select2Config{
+	// 	Placeholder:    locales.Translate("s_name", HTTPHeaderAcceptLanguage),
+	// 	TemplateResult: js.FuncOf(Select2GenericTemplateResults(Name{})),
+	// 	AllowClear:     true,
+	// 	Ajax: Select2Ajax{
+	// 		URL:            ApplicationProxyPath + "products/names/",
+	// 		DataType:       "json",
+	// 		Data:           js.FuncOf(Select2GenericAjaxData),
+	// 		ProcessResults: js.FuncOf(Select2GenericAjaxProcessResults(Names{})),
+	// 	},
+	// })
 
-	Jq("select#s_empiricalformula").Select2(Select2Config{
-		Placeholder:    locales.Translate("s_empiricalformula", HTTPHeaderAcceptLanguage),
-		TemplateResult: js.FuncOf(Select2GenericTemplateResults(EmpiricalFormula{})),
-		AllowClear:     true,
-		Ajax: Select2Ajax{
-			URL:            ApplicationProxyPath + "products/empiricalformulas/",
-			DataType:       "json",
-			Data:           js.FuncOf(Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(Select2GenericAjaxProcessResults(EmpiricalFormulas{})),
-		},
-	})
+	// Jq("select#s_empiricalformula").Select2(Select2Config{
+	// 	Placeholder:    locales.Translate("s_empiricalformula", HTTPHeaderAcceptLanguage),
+	// 	TemplateResult: js.FuncOf(Select2GenericTemplateResults(EmpiricalFormula{})),
+	// 	AllowClear:     true,
+	// 	Ajax: Select2Ajax{
+	// 		URL:            ApplicationProxyPath + "products/empiricalformulas/",
+	// 		DataType:       "json",
+	// 		Data:           js.FuncOf(Select2GenericAjaxData),
+	// 		ProcessResults: js.FuncOf(Select2GenericAjaxProcessResults(EmpiricalFormulas{})),
+	// 	},
+	// })
 
-	Jq("select#s_signalword").Select2(Select2Config{
-		Placeholder:    locales.Translate("s_signalword", HTTPHeaderAcceptLanguage),
-		TemplateResult: js.FuncOf(Select2GenericTemplateResults(SignalWord{})),
-		AllowClear:     true,
-		Ajax: Select2Ajax{
-			URL:            ApplicationProxyPath + "products/signalwords/",
-			DataType:       "json",
-			Data:           js.FuncOf(Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(Select2GenericAjaxProcessResults(SignalWords{})),
-		},
-	})
+	// Jq("select#s_signalword").Select2(Select2Config{
+	// 	Placeholder:    locales.Translate("s_signalword", HTTPHeaderAcceptLanguage),
+	// 	TemplateResult: js.FuncOf(Select2GenericTemplateResults(SignalWord{})),
+	// 	AllowClear:     true,
+	// 	Ajax: Select2Ajax{
+	// 		URL:            ApplicationProxyPath + "products/signalwords/",
+	// 		DataType:       "json",
+	// 		Data:           js.FuncOf(Select2GenericAjaxData),
+	// 		ProcessResults: js.FuncOf(Select2GenericAjaxProcessResults(SignalWords{})),
+	// 	},
+	// })
 
-	Jq("select#s_symbols").Select2(Select2Config{
-		Placeholder:    locales.Translate("s_symbols", HTTPHeaderAcceptLanguage),
-		TemplateResult: js.FuncOf(Select2SymbolTemplateResults),
-		AllowClear:     true,
-		Ajax: Select2Ajax{
-			URL:            ApplicationProxyPath + "products/symbols/",
-			DataType:       "json",
-			Data:           js.FuncOf(Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(Select2GenericAjaxProcessResults(Symbols{})),
-		},
-	})
+	// Jq("select#s_symbols").Select2(Select2Config{
+	// 	Placeholder:    locales.Translate("s_symbols", HTTPHeaderAcceptLanguage),
+	// 	TemplateResult: js.FuncOf(Select2SymbolTemplateResults),
+	// 	AllowClear:     true,
+	// 	Ajax: Select2Ajax{
+	// 		URL:            ApplicationProxyPath + "products/symbols/",
+	// 		DataType:       "json",
+	// 		Data:           js.FuncOf(Select2GenericAjaxData),
+	// 		ProcessResults: js.FuncOf(Select2GenericAjaxProcessResults(Symbols{})),
+	// 	},
+	// })
 
-	Jq("select#s_hazardstatements").Select2(Select2Config{
-		Placeholder:    locales.Translate("s_hazardstatements", HTTPHeaderAcceptLanguage),
-		TemplateResult: js.FuncOf(Select2GenericTemplateResults(HazardStatement{})),
-		AllowClear:     true,
-		Ajax: Select2Ajax{
-			URL:            ApplicationProxyPath + "products/hazardstatements/",
-			DataType:       "json",
-			Data:           js.FuncOf(Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(Select2GenericAjaxProcessResults(HazardStatements{})),
-		},
-	})
+	// Jq("select#s_hazardstatements").Select2(Select2Config{
+	// 	Placeholder:    locales.Translate("s_hazardstatements", HTTPHeaderAcceptLanguage),
+	// 	TemplateResult: js.FuncOf(Select2GenericTemplateResults(HazardStatement{})),
+	// 	AllowClear:     true,
+	// 	Ajax: Select2Ajax{
+	// 		URL:            ApplicationProxyPath + "products/hazardstatements/",
+	// 		DataType:       "json",
+	// 		Data:           js.FuncOf(Select2GenericAjaxData),
+	// 		ProcessResults: js.FuncOf(Select2GenericAjaxProcessResults(HazardStatements{})),
+	// 	},
+	// })
 
-	Jq("select#s_precautionarystatements").Select2(Select2Config{
-		Placeholder:    locales.Translate("s_precautionarystatements", HTTPHeaderAcceptLanguage),
-		TemplateResult: js.FuncOf(Select2GenericTemplateResults(PrecautionaryStatement{})),
-		AllowClear:     true,
-		Ajax: Select2Ajax{
-			URL:            ApplicationProxyPath + "products/precautionarystatements/",
-			DataType:       "json",
-			Data:           js.FuncOf(Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(Select2GenericAjaxProcessResults(PrecautionaryStatements{})),
-		},
-	})
+	// Jq("select#s_precautionarystatements").Select2(Select2Config{
+	// 	Placeholder:    locales.Translate("s_precautionarystatements", HTTPHeaderAcceptLanguage),
+	// 	TemplateResult: js.FuncOf(Select2GenericTemplateResults(PrecautionaryStatement{})),
+	// 	AllowClear:     true,
+	// 	Ajax: Select2Ajax{
+	// 		URL:            ApplicationProxyPath + "products/precautionarystatements/",
+	// 		DataType:       "json",
+	// 		Data:           js.FuncOf(Select2GenericAjaxData),
+	// 		ProcessResults: js.FuncOf(Select2GenericAjaxProcessResults(PrecautionaryStatements{})),
+	// 	},
+	// })
 
 	//
 	// create form
