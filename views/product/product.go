@@ -9,6 +9,7 @@ import (
 	"strings"
 	"syscall/js"
 
+	"github.com/tbellembois/gochimitheque-utils/convert"
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
 	"github.com/tbellembois/gochimitheque-wasm/locales"
 	"github.com/tbellembois/gochimitheque-wasm/types"
@@ -36,7 +37,7 @@ func LinearToEmpirical(this js.Value, args []js.Value) interface{} {
 		return ""
 	}
 
-	Jq("#convertedEmpiricalFormula").Append(utils.LinearToEmpiricalFormula(select2LinearFormula[0].Text))
+	Jq("#convertedEmpiricalFormula").Append(convert.LinearToEmpiricalFormula(select2LinearFormula[0].Text))
 
 	return nil
 

@@ -10,7 +10,7 @@ replace (
 require (
 	github.com/rocketlaunchr/react v1.0.9
 	github.com/tbellembois/gochimitheque v2.0.6+incompatible
+	github.com/tbellembois/gochimitheque-utils v0.0.0-20210130182605-75000d2f72a5
 	golang.org/x/text v0.3.5
-	golang.org/x/tools v0.0.0-20191118222007-07fc4c7f2b98
 	honnef.co/go/js/dom/v2 v2.0.0-20200509013220-d4405f7ab4d8
 )
