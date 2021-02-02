@@ -1,13 +1,16 @@
-package types
+package bstable
 
 import (
 	"encoding/json"
 	"fmt"
 	"syscall/js"
+
+	"github.com/tbellembois/gochimitheque-wasm/ajax"
+	"github.com/tbellembois/gochimitheque-wasm/jquery"
 )
 
 type Bootstraptable struct {
-	Jquery
+	jquery.Jquery
 }
 
 type BootstraptableParams struct {
@@ -16,15 +19,15 @@ type BootstraptableParams struct {
 
 type BootstraptableRefreshQuery struct {
 	// Query map[string]string `json:"query"`
-	Query QueryFilter `json:"query"`
+	Query ajax.QueryFilter `json:"query"`
 }
 
 // QueryParamsFromJsJSONValue converts a JS JSON into a
 // Go queryParams.
-func QueryParamsFromJsJSONValue(jsvalue js.Value) QueryParams {
+func QueryParamsFromJsJSONValue(jsvalue js.Value) ajax.QueryParams {
 
 	var (
-		queryParams QueryParams
+		queryParams ajax.QueryParams
 		err         error
 	)
 
@@ -73,7 +76,7 @@ func (p BootstraptableParams) ToJsValue() js.Value {
 
 }
 
-func (jq Jquery) Bootstraptable(params *BootstraptableParams) Bootstraptable {
+func NewBootstraptable(jq jquery.Jquery, params *BootstraptableParams) Bootstraptable {
 
 	if params != nil {
 		jq.Object = jq.Object.Call("bootstrapTable", params.ToJsValue())

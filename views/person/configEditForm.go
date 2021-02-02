@@ -7,12 +7,15 @@ import (
 	"syscall/js"
 
 	"github.com/rocketlaunchr/react/forks/encoding/json"
+	"github.com/tbellembois/gochimitheque-wasm/ajax"
+	"github.com/tbellembois/gochimitheque-wasm/globals"
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
-	"github.com/tbellembois/gochimitheque-wasm/localStorage"
+	"github.com/tbellembois/gochimitheque-wasm/jquery"
+	"github.com/tbellembois/gochimitheque-wasm/jsutils"
+	"github.com/tbellembois/gochimitheque-wasm/select2"
 	"github.com/tbellembois/gochimitheque-wasm/types"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
-	"github.com/tbellembois/gochimitheque-wasm/utils"
-	"github.com/tbellembois/gochimitheque-wasm/views/search"
+	"github.com/tbellembois/gochimitheque-wasm/validate"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"honnef.co/go/js/dom/v2"
 )
@@ -169,20 +172,22 @@ func FillInPersonForm(p Person, id string) {
 
 	managedEntitiesIds = make(map[int]string)
 
-	Jq("select#entities").Select2Clear()
-	Jq("#permissions").Empty()
+	select2Entities := select2.NewSelect2(jquery.Jq("select#entities"), nil)
+	select2Entities.Select2Clear()
+
+	jquery.Jq("#permissions").Empty()
 
 	// Getting the entities the person is manager of.
 	wg.Add(1)
 	go func() {
 
-		Ajax{
+		ajax.Ajax{
 			URL:    fmt.Sprintf("%speople/%d/manageentities", ApplicationProxyPath, p.PersonId),
 			Method: "get",
 			Done: func(data js.Value) {
 				if err = json.Unmarshal([]byte(data.String()), &managedEntities); err != nil {
 					fmt.Println(err)
-					utils.DisplayGenericErrorMessage()
+					jsutils.DisplayGenericErrorMessage()
 				}
 				for _, entity := range managedEntities {
 					managedEntitiesIds[entity.EntityID] = entity.EntityName
@@ -190,7 +195,7 @@ func FillInPersonForm(p Person, id string) {
 				wg.Done()
 			},
 			Fail: func(jqXHR js.Value) {
-				utils.DisplayGenericErrorMessage()
+				jsutils.DisplayGenericErrorMessage()
 				wg.Done()
 			},
 		}.Send()
@@ -201,18 +206,18 @@ func FillInPersonForm(p Person, id string) {
 	wg.Add(1)
 	go func() {
 
-		Ajax{
+		ajax.Ajax{
 			URL:    fmt.Sprintf("%speople/%d/permissions", ApplicationProxyPath, p.PersonId),
 			Method: "get",
 			Done: func(data js.Value) {
 				if err = json.Unmarshal([]byte(data.String()), &permissions); err != nil {
 					fmt.Println(err)
-					utils.DisplayGenericErrorMessage()
+					jsutils.DisplayGenericErrorMessage()
 				}
 				wg.Done()
 			},
 			Fail: func(jqXHR js.Value) {
-				utils.DisplayGenericErrorMessage()
+				jsutils.DisplayGenericErrorMessage()
 				wg.Done()
 			},
 		}.Send()
@@ -223,18 +228,18 @@ func FillInPersonForm(p Person, id string) {
 	wg.Add(1)
 	go func() {
 
-		Ajax{
+		ajax.Ajax{
 			URL:    fmt.Sprintf("%speople/%d/entities", ApplicationProxyPath, p.PersonId),
 			Method: "get",
 			Done: func(data js.Value) {
 				if err = json.Unmarshal([]byte(data.String()), &entities); err != nil {
 					fmt.Println(err)
-					utils.DisplayGenericErrorMessage()
+					jsutils.DisplayGenericErrorMessage()
 				}
 				wg.Done()
 			},
 			Fail: func(jqXHR js.Value) {
-				utils.DisplayGenericErrorMessage()
+				jsutils.DisplayGenericErrorMessage()
 				wg.Done()
 			},
 		}.Send()
@@ -243,12 +248,12 @@ func FillInPersonForm(p Person, id string) {
 
 	wg.Wait()
 
-	Jq(fmt.Sprintf("#%s #person_id", id)).SetVal(p.PersonId)
-	Jq(fmt.Sprintf("#%s #person_email", id)).SetVal(p.PersonEmail)
-	Jq(fmt.Sprintf("#%s #person_password", id)).SetVal("")
+	jquery.Jq(fmt.Sprintf("#%s #person_id", id)).SetVal(p.PersonId)
+	jquery.Jq(fmt.Sprintf("#%s #person_email", id)).SetVal(p.PersonEmail)
+	jquery.Jq(fmt.Sprintf("#%s #person_password", id)).SetVal("")
 
 	// Appending managed entities in hidden inputs for further use.
-	Jq(fmt.Sprintf("#%s option.manageentities", id)).Remove()
+	jquery.Jq(fmt.Sprintf("#%s option.manageentities", id)).Remove()
 	for _, entity := range managedEntities {
 		option := widgets.NewOption(widgets.OptionAttributes{
 			BaseAttributes: widgets.BaseAttributes{
@@ -259,12 +264,12 @@ func FillInPersonForm(p Person, id string) {
 			},
 			Value: strconv.Itoa(entity.EntityID),
 		})
-		Jq("form#person").Append(option.OuterHTML())
+		jquery.Jq("form#person").Append(option.OuterHTML())
 	}
 
 	// Populating the entities select2.
 	for _, entity := range entities {
-		Jq("select#entities").Select2AppendOption(
+		select2Entities.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            entity.EntityName,
 				Value:           strconv.Itoa(entity.EntityID),
@@ -277,7 +282,7 @@ func FillInPersonForm(p Person, id string) {
 	// except for managed entities.
 	for _, entity := range entities {
 		if _, ok := managedEntitiesIds[entity.EntityID]; !ok {
-			Jq("#permissions").Append(widgets.Permission(entity.EntityID, entity.EntityName, false))
+			jquery.Jq("#permissions").Append(widgets.Permission(entity.EntityID, entity.EntityName, false))
 		}
 	}
 
@@ -295,22 +300,24 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 		err                 error
 	)
 
-	if !Jq("#person").Valid() {
+	if !validate.NewValidate(jquery.Jq("#person"), nil).Valid() {
 		return nil
 	}
 
 	person = &Person{}
-	if Jq("input#person_id").GetVal().Truthy() {
-		if person.PersonId, err = strconv.Atoi(Jq("input#person_id").GetVal().String()); err != nil {
+	if jquery.Jq("input#person_id").GetVal().Truthy() {
+		if person.PersonId, err = strconv.Atoi(jquery.Jq("input#person_id").GetVal().String()); err != nil {
 			fmt.Println(err)
 			return nil
 		}
 	}
 
-	person.PersonEmail = Jq("input#person_email").GetVal().String()
-	person.PersonPassword = Jq("input#person_password").GetVal().String()
+	person.PersonEmail = jquery.Jq("input#person_email").GetVal().String()
+	person.PersonPassword = jquery.Jq("input#person_password").GetVal().String()
 
-	for _, select2Item := range Jq("select#entities").Select2Data() {
+	select2Entities := select2.NewSelect2(jquery.Jq("select#entities"), nil)
+
+	for _, select2Item := range select2Entities.Select2Data() {
 		entity := &Entity{}
 		if entity.EntityID, err = strconv.Atoi(select2Item.Id); err != nil {
 			fmt.Println(err)
@@ -321,7 +328,7 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 		person.Entities = append(person.Entities, entity)
 	}
 
-	permissions := Jq("input[type=radio]:checked").Object
+	permissions := jquery.Jq("input[type=radio]:checked").Object
 	for i := 0; i < permissions.Length(); i++ {
 		permission := &Permission{}
 
@@ -342,7 +349,7 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	if Jq("form#person input#person_id").Object.Length() > 0 {
+	if jquery.Jq("form#person input#person_id").Object.Length() > 0 {
 		ajaxURL = fmt.Sprintf("%speople/%d", ApplicationProxyPath, person.PersonId)
 		ajaxMethod = "put"
 	} else {
@@ -350,13 +357,13 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 		ajaxMethod = "post"
 	}
 
-	Ajax{
+	ajax.Ajax{
 		URL:    ajaxURL,
 		Method: ajaxMethod,
 		Data:   dataBytes,
 		Done: func(data js.Value) {
 
-			localStorage.Clear()
+			globals.LocalStorage.Clear()
 
 			var (
 				person Person
@@ -370,13 +377,13 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 
 			// TODO: use personId for redirection
 			href := fmt.Sprintf("%sv/people", ApplicationProxyPath)
-			search.ClearSearch(js.Null(), nil)
-			utils.LoadContent("person", href, Person_SaveCallback, person.PersonEmail)
+			jsutils.ClearSearch(js.Null(), nil)
+			jsutils.LoadContent("div#content", "person", href, Person_SaveCallback, person.PersonEmail)
 
 		},
 		Fail: func(jqXHR js.Value) {
 
-			utils.DisplayGenericErrorMessage()
+			jsutils.DisplayGenericErrorMessage()
 
 		},
 	}.Send()

@@ -4,22 +4,23 @@ import (
 	"fmt"
 	"syscall/js"
 
-	. "github.com/tbellembois/gochimitheque-wasm/globals"
-	. "github.com/tbellembois/gochimitheque-wasm/types"
-	. "github.com/tbellembois/gochimitheque-wasm/utils"
+	"github.com/tbellembois/gochimitheque-wasm/bstable"
+	"github.com/tbellembois/gochimitheque-wasm/globals"
+	"github.com/tbellembois/gochimitheque-wasm/jquery"
+	"github.com/tbellembois/gochimitheque-wasm/jsutils"
 	"github.com/tbellembois/gochimitheque-wasm/views/product"
 	"github.com/tbellembois/gochimitheque-wasm/views/storage"
 )
 
 func Export(this js.Value, args []js.Value) interface{} {
 
-	BSTableQueryFilter.Lock()
-	BSTableQueryFilter.QueryFilter.Export = true
+	globals.BSTableQueryFilter.Lock()
+	globals.BSTableQueryFilter.QueryFilter.Export = true
 
-	if CurrentView != "storage" {
-		Jq("#Product_table").Bootstraptable(nil).Refresh(nil)
+	if globals.CurrentView != "storage" {
+		bstable.NewBootstraptable(jquery.Jq("#Product_table"), nil).Refresh(nil)
 	} else {
-		Jq("#Storage_table").Bootstraptable(nil).Refresh(nil)
+		bstable.NewBootstraptable(jquery.Jq("#Storage_table"), nil).Refresh(nil)
 	}
 
 	return nil
@@ -35,10 +36,10 @@ func SwitchProductStorageWrapper(this js.Value, args []js.Value) interface{} {
 		product.Product_listCallback(js.Null(), nil)
 	}
 
-	if CurrentView != "storage" {
-		LoadContent("storage", fmt.Sprintf("%sv/storages", ApplicationProxyPath), storageCallbackWrapper, nil)
+	if globals.CurrentView != "storage" {
+		jsutils.LoadContent("div#content", "storage", fmt.Sprintf("%sv/storages", globals.ApplicationProxyPath), storageCallbackWrapper, nil)
 	} else {
-		LoadContent("product", fmt.Sprintf("%sv/products", ApplicationProxyPath), productCallbackWrapper, nil)
+		jsutils.LoadContent("div#content", "product", fmt.Sprintf("%sv/products", globals.ApplicationProxyPath), productCallbackWrapper, nil)
 	}
 
 	return nil

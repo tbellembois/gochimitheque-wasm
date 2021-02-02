@@ -3,59 +3,59 @@ package home
 import (
 	"syscall/js"
 
-	. "github.com/tbellembois/gochimitheque-wasm/types"
-	"github.com/tbellembois/gochimitheque-wasm/utils"
+	"github.com/tbellembois/gochimitheque-wasm/jquery"
+	"github.com/tbellembois/gochimitheque-wasm/jsutils"
 )
 
 func Home_listCallback(this js.Value, args []js.Value) interface{} {
 
 	email := js.Global().Call("readCookie", "email").String()
-	Jq("#logged").SetHtml(email)
+	jquery.Jq("#logged").SetHtml(email)
 
-	utils.HasPermission("products", "-2", "get", func() {
-		Jq("#menu_scan_qrcode").FadeIn()
-		Jq("#menu_list_products").FadeIn()
-		Jq("#menu_list_bookmarks").FadeIn()
+	jsutils.HasPermission("products", "-2", "get", func() {
+		jquery.Jq("#menu_scan_qrcode").FadeIn()
+		jquery.Jq("#menu_list_products").FadeIn()
+		jquery.Jq("#menu_list_bookmarks").FadeIn()
 	}, func() {
 	})
 
-	utils.HasPermission("products", "", "post", func() {
-		Jq("#menu_create_product").FadeIn()
+	jsutils.HasPermission("products", "", "post", func() {
+		jquery.Jq("#menu_create_product").FadeIn()
 	}, func() {
 	})
 
-	utils.HasPermission("entities", "-2", "get", func() {
-		Jq("#menu_entities").FadeIn()
+	jsutils.HasPermission("entities", "-2", "get", func() {
+		jquery.Jq("#menu_entities").FadeIn()
 	}, func() {
 	})
 
-	utils.HasPermission("entities", "", "post", func() {
-		Jq("#menu_create_entity").FadeIn()
+	jsutils.HasPermission("entities", "", "post", func() {
+		jquery.Jq("#menu_create_entity").FadeIn()
 	}, func() {
 	})
 
-	utils.HasPermission("entities", "-2", "put", func() {
-		Jq("#menu_update_welcomeannounce").FadeIn()
+	jsutils.HasPermission("entities", "-2", "put", func() {
+		jquery.Jq("#menu_update_welcomeannounce").FadeIn()
 	}, func() {
 	})
 
-	utils.HasPermission("storages", "-2", "get", func() {
-		Jq("#menu_storelocations").FadeIn()
+	jsutils.HasPermission("storages", "-2", "get", func() {
+		jquery.Jq("#menu_storelocations").FadeIn()
 	}, func() {
 	})
 
-	utils.HasPermission("storelocations", "", "post", func() {
-		Jq("#menu_create_storelocation").FadeIn()
+	jsutils.HasPermission("storelocations", "", "post", func() {
+		jquery.Jq("#menu_create_storelocation").FadeIn()
 	}, func() {
 	})
 
-	utils.HasPermission("people", "-2", "get", func() {
-		Jq("#menu_people").FadeIn()
+	jsutils.HasPermission("people", "-2", "get", func() {
+		jquery.Jq("#menu_people").FadeIn()
 	}, func() {
 	})
 
-	utils.HasPermission("people", "", "post", func() {
-		Jq("#menu_create_person").FadeIn()
+	jsutils.HasPermission("people", "", "post", func() {
+		jquery.Jq("#menu_create_person").FadeIn()
 	}, func() {
 	})
 

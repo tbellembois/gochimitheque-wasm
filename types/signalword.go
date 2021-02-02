@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"syscall/js"
+
+	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
 type SignalWords struct {
@@ -38,7 +40,7 @@ func (s *SignalWord) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (SignalWords) FromJsJSONValue(jsvalue js.Value) Select2ResultAble {
+func (SignalWords) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 
 	var (
 		signalWords SignalWords
@@ -54,9 +56,9 @@ func (SignalWords) FromJsJSONValue(jsvalue js.Value) Select2ResultAble {
 
 }
 
-func (s SignalWords) GetRows() []Select2ItemAble {
+func (s SignalWords) GetRows() []select2.Select2ItemAble {
 
-	var select2ItemAble []Select2ItemAble = make([]Select2ItemAble, len(s.Rows))
+	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(s.Rows))
 
 	for i, row := range s.Rows {
 		select2ItemAble[i] = row
@@ -72,7 +74,7 @@ func (s SignalWords) GetTotal() int {
 
 }
 
-func (s SignalWord) FromJsJSONValue(jsvalue js.Value) Select2ItemAble {
+func (s SignalWord) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 
 	var (
 		signalWord SignalWord

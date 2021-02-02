@@ -3,47 +3,51 @@ package entity
 import (
 	"syscall/js"
 
+	"github.com/tbellembois/gochimitheque-wasm/bstable"
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
+	"github.com/tbellembois/gochimitheque-wasm/jquery"
 	"github.com/tbellembois/gochimitheque-wasm/locales"
+	"github.com/tbellembois/gochimitheque-wasm/select2"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
+	"github.com/tbellembois/gochimitheque-wasm/validate"
 )
 
 func entity_common() {
 
 	// validate
-	Jq("#entity").Validate(ValidateConfig{
+	validate.NewValidate(jquery.Jq("#entity"), &validate.ValidateConfig{
 		ErrorClass: "alert alert-danger",
-		Rules: map[string]ValidateRule{
+		Rules: map[string]validate.ValidateRule{
 			"entity_name": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
-				Remote: ValidateRemote{
+				Remote: validate.ValidateRemote{
 					URL:        "",
 					Type:       "post",
 					BeforeSend: js.FuncOf(ValidateEntityNameBeforeSend),
 				},
 			},
 		},
-		Messages: map[string]ValidateMessage{
+		Messages: map[string]validate.ValidateMessage{
 			"entity_name": {
 				Required: locales.Translate("required_input", HTTPHeaderAcceptLanguage),
 			},
 		},
-	})
+	}).Validate()
 
 	// select2
-	Jq("select#managers").Select2(Select2Config{
+	select2.NewSelect2(jquery.Jq("select#managers"), &select2.Select2Config{
 		Placeholder:    locales.Translate("entity_manager_placeholder", HTTPHeaderAcceptLanguage),
-		TemplateResult: js.FuncOf(Select2GenericTemplateResults(Person{})),
-		Ajax: Select2Ajax{
+		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Person{})),
+		Ajax: select2.Select2Ajax{
 			URL:            ApplicationProxyPath + "people",
 			DataType:       "json",
 			Data:           js.FuncOf(Select2ManagerAjaxData),
-			ProcessResults: js.FuncOf(Select2GenericAjaxProcessResults(People{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(People{})),
 		},
-	})
+	}).Select2ify()
 
-	Jq("#search").Hide()
-	Jq("#actions").Hide()
+	jquery.Jq("#search").Hide()
+	jquery.Jq("#actions").Hide()
 
 }
 
@@ -59,8 +63,8 @@ func Entity_listCallback(this js.Value, args []js.Value) interface{} {
 
 	entity_common()
 
-	Jq("#Entity_table").Bootstraptable(&BootstraptableParams{Ajax: "Entity_getTableData"})
-	Jq("#Entity_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
+	bstable.NewBootstraptable(jquery.Jq("#Entity_table"), &bstable.BootstraptableParams{Ajax: "Entity_getTableData"})
+	jquery.Jq("#Entity_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
 
 	return nil
 
@@ -70,8 +74,8 @@ func Entity_SaveCallback(args ...interface{}) {
 
 	search := args[0].(string)
 
-	Jq("#Entity_table").Bootstraptable(nil).ResetSearch(search)
-	Jq("#Entity_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
+	bstable.NewBootstraptable(jquery.Jq("#Entity_table"), nil).ResetSearch(search)
+	jquery.Jq("#Entity_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
 
 	entity_common()
 

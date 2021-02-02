@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"syscall/js"
+
+	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
 type ProducerRefs struct {
@@ -62,7 +64,7 @@ func (r ProducerRef) MarshalJSON() ([]byte, error) {
 
 }
 
-func (ProducerRefs) FromJsJSONValue(jsvalue js.Value) Select2ResultAble {
+func (ProducerRefs) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 
 	var (
 		producerRefs ProducerRefs
@@ -78,9 +80,9 @@ func (ProducerRefs) FromJsJSONValue(jsvalue js.Value) Select2ResultAble {
 
 }
 
-func (r ProducerRefs) GetRows() []Select2ItemAble {
+func (r ProducerRefs) GetRows() []select2.Select2ItemAble {
 
-	var select2ItemAble []Select2ItemAble = make([]Select2ItemAble, len(r.Rows))
+	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(r.Rows))
 
 	for i, row := range r.Rows {
 		select2ItemAble[i] = row
@@ -96,7 +98,7 @@ func (r ProducerRefs) GetTotal() int {
 
 }
 
-func (r ProducerRef) FromJsJSONValue(jsvalue js.Value) Select2ItemAble {
+func (r ProducerRef) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 
 	var (
 		producerRef ProducerRef

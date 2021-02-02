@@ -1,87 +1,357 @@
 package search
 
 import (
+	"encoding/json"
 	"fmt"
 	"syscall/js"
 
+	"github.com/tbellembois/gochimitheque-wasm/ajax"
+	"github.com/tbellembois/gochimitheque-wasm/bstable"
+	"github.com/tbellembois/gochimitheque-wasm/globals"
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
+	"github.com/tbellembois/gochimitheque-wasm/jquery"
+	"github.com/tbellembois/gochimitheque-wasm/jsutils"
+	"github.com/tbellembois/gochimitheque-wasm/locales"
+	"github.com/tbellembois/gochimitheque-wasm/select2"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
+	"github.com/tbellembois/gochimitheque-wasm/views/storage"
+	"github.com/tbellembois/gochimitheque-wasm/widgets"
+	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
 )
 
-func Search(this js.Value, args []js.Value) interface{} {
+func showStockRecursive(storelocation *StoreLocation, depth int) {
 
-	if CurrentView == "storage" {
-		Jq("#Storage_table").Bootstraptable(nil).Refresh(nil)
-	} else {
-		Jq("#Product_table").Bootstraptable(nil).Refresh(nil)
+	// Checking if there is a stock or not for the store location.
+	hasStock := false
+	for _, stock := range storelocation.Stocks {
+		if stock.Total != 0 || stock.Current != 0 {
+			hasStock = true
+			break
+		}
 	}
 
-	return nil
+	if hasStock {
+
+		// Depth.
+		depthSep := ""
+		for i := 0; i <= depth; i++ {
+			depthSep += "<span class='mdi mdi-microsoft'></span>"
+		}
+
+		rowStorelocation := widgets.NewDiv(widgets.DivAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+				Classes: []string{"row", "iconlabel"},
+			},
+		})
+		rowStorelocation.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+				Classes: []string{"col", "iconlabel"},
+			},
+			Text: fmt.Sprintf("%s %s", depthSep, storelocation.StoreLocationName.String),
+		}))
+
+		jquery.Jq("#stock").Append(rowStorelocation.OuterHTML())
+
+		for _, stock := range storelocation.Stocks {
+
+			rowStocks := widgets.NewDiv(widgets.DivAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+					Classes: []string{"row", "iconlabel"},
+				},
+			})
+
+			if !(stock.Total == 0 && stock.Current == 0) {
+
+				rowStock := widgets.NewDiv(widgets.DivAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+						Classes: []string{"col-sm-12", "iconlabel"},
+					},
+				})
+
+				rowStock.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+						Classes: []string{"iconlabel"},
+					},
+					Text: fmt.Sprintf("%s %s: %f %s %s: %f %s",
+						depthSep,
+						locales.Translate("stock_storelocation_title", HTTPHeaderAcceptLanguage),
+						stock.Current,
+						stock.Unit.UnitLabel.String,
+						locales.Translate("stock_storelocation_sub_title", HTTPHeaderAcceptLanguage),
+						stock.Total,
+						stock.Unit.UnitLabel.String),
+				}))
+
+				rowStocks.AppendChild(rowStock)
+
+				jquery.Jq("#stock").Append(rowStocks.OuterHTML())
+
+			}
+
+		}
+
+	}
+
+	if len(storelocation.Children) > 0 {
+		depth++
+		for _, child := range storelocation.Children {
+
+			showStockRecursive(child, depth)
+
+		}
+	}
 
 }
 
-func clearSearchForm() {
+func Search_listCallback(args ...interface{}) {
 
-	if Jq("select#s_storelocation").Select2IsInitialized() {
-		Jq("select#s_storelocation").Select2Clear()
-	}
-	if Jq("select#s_name").Select2IsInitialized() {
-		Jq("select#s_name").Select2Clear()
-	}
-	if Jq("select#s_empiricalformula").Select2IsInitialized() {
-		Jq("select#s_empiricalformula").Select2Clear()
-	}
-	if Jq("select#s_casnumber").Select2IsInitialized() {
-		Jq("select#s_casnumber").Select2Clear()
-	}
-	if Jq("select#s_signalword").Select2IsInitialized() {
-		Jq("select#s_signalword").Select2Clear()
-	}
-	if Jq("select#s_symbols").Select2IsInitialized() {
-		Jq("select#s_symbols").Select2Clear()
-	}
-	if Jq("select#s_hazardstatements").Select2IsInitialized() {
-		Jq("select#s_hazardstatements").Select2Clear()
-	}
-	if Jq("select#s_precautionarystatements").Select2IsInitialized() {
-		Jq("select#s_precautionarystatements").Select2Clear()
-	}
+	select2.NewSelect2(jquery.Jq("select#s_storelocation"), &select2.Select2Config{
+		Placeholder:    locales.Translate("s_storelocation", HTTPHeaderAcceptLanguage),
+		TemplateResult: js.FuncOf(Select2StoreLocationTemplateResults),
+		AllowClear:     true,
+		Ajax: select2.Select2Ajax{
+			URL:            ApplicationProxyPath + "storelocations",
+			DataType:       "json",
+			Data:           js.FuncOf(select2.Select2GenericAjaxData),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(StoreLocations{})),
+		},
+	}).Select2ify()
 
-	if Jq("#s_casnumber_cmr:checked").Object.Length() > 0 {
-		Jq("#s_casnumber_cmr:checked").SetProp("checked", false)
-	}
-	if Jq("#s_borrowing:checked").Object.Length() > 0 {
-		Jq("#s_borrowing:checked").SetProp("checked", false)
-	}
-	if Jq("#s_storage_to_destroy:checked").Object.Length() > 0 {
-		Jq("#s_storage_to_destroy:checked").SetProp("checked", false)
-	}
+	select2.NewSelect2(jquery.Jq("select#s_casnumber"), &select2.Select2Config{
+		Placeholder:    locales.Translate("s_casnumber", HTTPHeaderAcceptLanguage),
+		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(CasNumber{})),
+		AllowClear:     true,
+		Ajax: select2.Select2Ajax{
+			URL:            ApplicationProxyPath + "products/casnumbers/",
+			DataType:       "json",
+			Data:           js.FuncOf(select2.Select2GenericAjaxData),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(CasNumbers{})),
+		},
+	}).Select2ify()
 
-	Jq("#s_storage_barecode").SetVal("")
-	Jq("#s_custom_name_part_of").SetVal("")
+	select2.NewSelect2(jquery.Jq("select#s_name"), &select2.Select2Config{
+		Placeholder:    locales.Translate("s_name", HTTPHeaderAcceptLanguage),
+		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Name{})),
+		AllowClear:     true,
+		Ajax: select2.Select2Ajax{
+			URL:            ApplicationProxyPath + "products/names/",
+			DataType:       "json",
+			Data:           js.FuncOf(select2.Select2GenericAjaxData),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Names{})),
+		},
+	}).Select2ify()
 
-}
+	select2.NewSelect2(jquery.Jq("select#s_empiricalformula"), &select2.Select2Config{
+		Placeholder:    locales.Translate("s_empiricalformula", HTTPHeaderAcceptLanguage),
+		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(EmpiricalFormula{})),
+		AllowClear:     true,
+		Ajax: select2.Select2Ajax{
+			URL:            ApplicationProxyPath + "products/empiricalformulas/",
+			DataType:       "json",
+			Data:           js.FuncOf(select2.Select2GenericAjaxData),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(EmpiricalFormulas{})),
+		},
+	}).Select2ify()
 
-func ClearSearch(this js.Value, args []js.Value) interface{} {
+	select2.NewSelect2(jquery.Jq("select#s_signalword"), &select2.Select2Config{
+		Placeholder:    locales.Translate("s_signalword", HTTPHeaderAcceptLanguage),
+		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(SignalWord{})),
+		AllowClear:     true,
+		Ajax: select2.Select2Ajax{
+			URL:            ApplicationProxyPath + "products/signalwords/",
+			DataType:       "json",
+			Data:           js.FuncOf(select2.Select2GenericAjaxData),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(SignalWords{})),
+		},
+	}).Select2ify()
 
-	fmt.Println(CurrentView)
+	select2.NewSelect2(jquery.Jq("select#s_symbols"), &select2.Select2Config{
+		Placeholder:    locales.Translate("s_symbols", HTTPHeaderAcceptLanguage),
+		TemplateResult: js.FuncOf(Select2SymbolTemplateResults),
+		AllowClear:     true,
+		Ajax: select2.Select2Ajax{
+			URL:            ApplicationProxyPath + "products/symbols/",
+			DataType:       "json",
+			Data:           js.FuncOf(select2.Select2GenericAjaxData),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Symbols{})),
+		},
+	}).Select2ify()
 
-	clearSearchForm()
-	BSTableQueryFilter.Clean()
-	Search(js.Null(), nil)
+	select2.NewSelect2(jquery.Jq("select#s_hazardstatements"), &select2.Select2Config{
+		Placeholder:    locales.Translate("s_hazardstatements", HTTPHeaderAcceptLanguage),
+		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(HazardStatement{})),
+		AllowClear:     true,
+		Ajax: select2.Select2Ajax{
+			URL:            ApplicationProxyPath + "products/hazardstatements/",
+			DataType:       "json",
+			Data:           js.FuncOf(select2.Select2GenericAjaxData),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(HazardStatements{})),
+		},
+	}).Select2ify()
 
-	return nil
+	select2.NewSelect2(jquery.Jq("select#s_precautionarystatements"), &select2.Select2Config{
+		Placeholder:    locales.Translate("s_precautionarystatements", HTTPHeaderAcceptLanguage),
+		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(PrecautionaryStatement{})),
+		AllowClear:     true,
+		Ajax: select2.Select2Ajax{
+			URL:            ApplicationProxyPath + "products/precautionarystatements/",
+			DataType:       "json",
+			Data:           js.FuncOf(select2.Select2GenericAjaxData),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(PrecautionaryStatements{})),
+		},
+	}).Select2ify()
 
-}
+	// Works only with no select2.
+	jquery.Jq("#search input").On("keyup", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-func ClearSearchExceptProduct(this js.Value, args []js.Value) interface{} {
+		event := args[0]
+		if event.Get("which").Int() == 13 {
 
-	fmt.Println(CurrentView)
+			event.Call("preventDefault")
+			jsutils.Search(js.Null(), nil)
 
-	clearSearchForm()
-	BSTableQueryFilter.CleanExceptProduct()
-	Search(js.Null(), nil)
+		}
 
-	return nil
+		return nil
+
+	}))
+
+	// Stock.
+	jquery.Jq("#s_storage_stock_button").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+
+		jquery.Jq("#stock").Append(widgets.NewSpan(widgets.SpanAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+				Classes: []string{"mdi", "mdi-loading", "mdi-spin"},
+			},
+		}).OuterHTML())
+
+		url := fmt.Sprintf("%sentities/stocks/%d", ApplicationProxyPath, globals.CurrentProduct.ProductID)
+		method := "get"
+
+		done := func(data js.Value) {
+
+			var (
+				storelocations []StoreLocation
+				err            error
+			)
+
+			if err = json.Unmarshal([]byte(data.String()), &storelocations); err != nil {
+				fmt.Println(err)
+			}
+
+			jquery.Jq("#stock").SetHtml("")
+
+			rowButtonClose := widgets.NewDiv(widgets.DivAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+					Classes: []string{"row"},
+				},
+			})
+			buttonClose := widgets.NewBSButtonWithIcon(
+				widgets.ButtonAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+						Attributes: map[string]string{
+							"onclick": "$('#stock').html('')",
+						},
+					},
+					Title: locales.Translate("close", HTTPHeaderAcceptLanguage),
+				},
+				widgets.IconAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+						Classes: []string{"iconlabel"},
+					},
+					Text: locales.Translate("close", HTTPHeaderAcceptLanguage),
+					Icon: themes.NewMdiIcon(themes.MDI_CLOSE, ""),
+				},
+				[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
+			)
+			rowButtonClose.AppendChild(buttonClose)
+
+			rowProduct := widgets.NewDiv(widgets.DivAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+					Classes: []string{"row", "iconlabel"},
+				},
+			})
+			rowProduct.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+					Classes: []string{"col", "iconlabel"},
+				},
+				Text: CurrentProduct.Name.NameLabel,
+			}))
+
+			jquery.Jq("#stock").Append(rowButtonClose.OuterHTML())
+			jquery.Jq("#stock").Append(rowProduct.OuterHTML())
+
+			for _, storelocation := range storelocations {
+				showStockRecursive(&storelocation, 0)
+			}
+
+		}
+		fail := func(data js.Value) {
+
+			jsutils.DisplayGenericErrorMessage()
+
+		}
+
+		ajax.Ajax{
+			Method: method,
+			URL:    url,
+			Done:   done,
+			Fail:   fail,
+		}.Send()
+
+		return nil
+
+	}))
+
+	// Show/Hide archives.
+	jquery.Jq("#s_storage_archive_button").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+
+		var (
+			btnIcon  themes.IconFace
+			btnLabel string
+		)
+
+		BSTableQueryFilter.Lock()
+
+		if jquery.Jq("#s_storage_archive_button > span").HasClass(themes.MDI_SHOW_DELETED.ToString()) {
+			BSTableQueryFilter.QueryFilter.StorageArchive = true
+			btnIcon = themes.MDI_HIDE_DELETED
+			btnLabel = locales.Translate("hidedeleted_text", HTTPHeaderAcceptLanguage)
+		} else {
+			BSTableQueryFilter.QueryFilter.StorageArchive = false
+			btnIcon = themes.MDI_SHOW_DELETED
+			btnLabel = locales.Translate("showdeleted_text", HTTPHeaderAcceptLanguage)
+		}
+
+		buttonTitle := widgets.NewIcon(widgets.IconAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+				Classes: []string{"iconlabel"},
+			},
+			Icon: themes.NewMdiIcon(btnIcon, ""),
+			Text: btnLabel,
+		})
+
+		jquery.Jq("#s_storage_archive_button").SetProp("title", btnLabel)
+		jquery.Jq("#s_storage_archive_button").SetHtml("")
+		jquery.Jq("#s_storage_archive_button").Append(buttonTitle.OuterHTML())
+
+		bstable.NewBootstraptable(jquery.Jq("#Storage_table"), nil).Refresh(nil)
+		jquery.Jq("#Storage_table").On("load-success.bs.table", js.FuncOf(storage.ShowIfAuthorizedActionButtons))
+
+		return nil
+
+	}))
 
 }

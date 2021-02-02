@@ -1,104 +1,18 @@
-package storage
+package search
 
 import (
 	"fmt"
 	"syscall/js"
 
-	"github.com/tbellembois/gochimitheque-wasm/ajax"
+	"honnef.co/go/js/dom/v2"
+
 	"github.com/tbellembois/gochimitheque-wasm/jsutils"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
-	"honnef.co/go/js/dom/v2"
 )
 
-func Select2StoreLocationAjaxData(this js.Value, args []js.Value) interface{} {
-
-	params := args[0]
-
-	search := ""
-	if params.Get("term").Truthy() {
-		search = params.Get("term").String()
-	}
-	page := 1
-	if params.Get("page").Truthy() {
-		page = params.Get("page").Int()
-	}
-	offset := (page - 1) * 10
-	limit := 10
-
-	if offset < 0 {
-		offset = 0
-	}
-
-	return ajax.QueryFilter{
-		StoreLocationCanStore: true,
-		Search:                search,
-		Offset:                offset,
-		Page:                  page,
-		Limit:                 limit,
-	}.ToJsValue()
-
-}
-
-func Select2UnitQuantityAjaxData(this js.Value, args []js.Value) interface{} {
-
-	params := args[0]
-
-	search := ""
-	if params.Get("term").Truthy() {
-		search = params.Get("term").String()
-	}
-	page := 1
-	if params.Get("page").Truthy() {
-		page = params.Get("page").Int()
-	}
-	offset := (page - 1) * 10
-	limit := 10
-
-	if offset < 0 {
-		offset = 0
-	}
-
-	return ajax.QueryFilter{
-		UnitType: "quantity",
-		Search:   search,
-		Offset:   offset,
-		Page:     page,
-		Limit:    limit,
-	}.ToJsValue()
-
-}
-
-func Select2UnitConcentrationAjaxData(this js.Value, args []js.Value) interface{} {
-
-	params := args[0]
-
-	search := ""
-	if params.Get("term").Truthy() {
-		search = params.Get("term").String()
-	}
-	page := 1
-	if params.Get("page").Truthy() {
-		page = params.Get("page").Int()
-	}
-	offset := (page - 1) * 10
-	limit := 10
-
-	if offset < 0 {
-		offset = 0
-	}
-
-	return ajax.QueryFilter{
-		UnitType: "concentration",
-		Search:   search,
-		Offset:   offset,
-		Page:     page,
-		Limit:    limit,
-	}.ToJsValue()
-
-}
-
+// TODO: move me
 func Select2SymbolTemplateResults(this js.Value, args []js.Value) interface{} {
 
 	data := args[0]
@@ -131,6 +45,7 @@ func Select2SymbolTemplateResults(this js.Value, args []js.Value) interface{} {
 
 }
 
+// TODO: move me
 func Select2StoreLocationTemplateResults(this js.Value, args []js.Value) interface{} {
 
 	var (

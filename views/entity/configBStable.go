@@ -7,15 +7,19 @@ import (
 	"strconv"
 	"syscall/js"
 
+	"honnef.co/go/js/dom/v2"
+
+	"github.com/tbellembois/gochimitheque-wasm/ajax"
+	"github.com/tbellembois/gochimitheque-wasm/bstable"
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
+	"github.com/tbellembois/gochimitheque-wasm/jquery"
+	"github.com/tbellembois/gochimitheque-wasm/jsutils"
 	"github.com/tbellembois/gochimitheque-wasm/locales"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
-	"github.com/tbellembois/gochimitheque-wasm/utils"
 	"github.com/tbellembois/gochimitheque-wasm/views/person"
 	"github.com/tbellembois/gochimitheque-wasm/views/storelocation"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
-	"honnef.co/go/js/dom/v2"
 )
 
 func OperateEventsStorelocations(this js.Value, args []js.Value) interface{} {
@@ -31,7 +35,7 @@ func OperateEventsStorelocations(this js.Value, args []js.Value) interface{} {
 	BSTableQueryFilter.QueryFilter.Entity = strconv.Itoa(entity.EntityID)
 
 	href := fmt.Sprintf("%sv/storelocations", ApplicationProxyPath)
-	utils.LoadContent("storelocation", href, storelocationCallbackWrapper)
+	jsutils.LoadContent("div#content", "storelocation", href, storelocationCallbackWrapper)
 
 	return nil
 
@@ -50,7 +54,7 @@ func OperateEventsMembers(this js.Value, args []js.Value) interface{} {
 	BSTableQueryFilter.QueryFilter.Entity = strconv.Itoa(entity.EntityID)
 
 	href := fmt.Sprintf("%sv/people", ApplicationProxyPath)
-	utils.LoadContent("person", href, personCallbackWrapper)
+	jsutils.LoadContent("div#content", "person", href, personCallbackWrapper)
 
 	return nil
 
@@ -61,24 +65,24 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	entity := Entity{}.FromJsJSONValue(row).(Entity)
 
-	Jq(fmt.Sprintf("button#delete%d", entity.EntityID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq(fmt.Sprintf("button#delete%d", entity.EntityID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
 		url := fmt.Sprintf("%sentities/%d", ApplicationProxyPath, entity.EntityID)
 		method := "delete"
 
 		done := func(data js.Value) {
 
-			utils.DisplaySuccessMessage(locales.Translate("entity_deleted_message", HTTPHeaderAcceptLanguage))
-			Jq("#Entity_table").Bootstraptable(nil).Refresh(nil)
+			jsutils.DisplaySuccessMessage(locales.Translate("entity_deleted_message", HTTPHeaderAcceptLanguage))
+			bstable.NewBootstraptable(jquery.Jq("#Entity_table"), nil).Refresh(nil)
 
 		}
 		fail := func(data js.Value) {
 
-			utils.DisplayGenericErrorMessage()
+			jsutils.DisplayGenericErrorMessage()
 
 		}
 
-		Ajax{
+		ajax.Ajax{
 			Method: method,
 			URL:    url,
 			Done:   done,
@@ -97,8 +101,8 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 		Icon: themes.NewMdiIcon(themes.MDI_CONFIRM, ""),
 		Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
 	})
-	Jq(fmt.Sprintf("button#delete%d", entity.EntityID)).SetHtml("")
-	Jq(fmt.Sprintf("button#delete%d", entity.EntityID)).Append(buttonTitle.OuterHTML())
+	jquery.Jq(fmt.Sprintf("button#delete%d", entity.EntityID)).SetHtml("")
+	jquery.Jq(fmt.Sprintf("button#delete%d", entity.EntityID)).Append(buttonTitle.OuterHTML())
 
 	return nil
 
@@ -126,17 +130,17 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 
 		FillInEntityForm(entity, "edit-collapse")
 
-		Jq("input#index").SetVal(index)
-		Jq("#edit-collapse").Show()
+		jquery.Jq("input#index").SetVal(index)
+		jquery.Jq("#edit-collapse").Show()
 
 	}
 	fail := func(data js.Value) {
 
-		utils.DisplayGenericErrorMessage()
+		jsutils.DisplayGenericErrorMessage()
 
 	}
 
-	Ajax{
+	ajax.Ajax{
 		Method: method,
 		URL:    url,
 		Done:   done,
@@ -269,14 +273,14 @@ func ManagersFormatter(this js.Value, args []js.Value) interface{} {
 func GetTableData(this js.Value, args []js.Value) interface{} {
 
 	row := args[0]
-	params := QueryParamsFromJsJSONValue(row)
+	params := bstable.QueryParamsFromJsJSONValue(row)
 
 	go func() {
 
 		u := url.URL{Path: ApplicationProxyPath + "entities"}
 		u.RawQuery = params.Data.ToRawQuery()
 
-		ajax := Ajax{
+		ajax := ajax.Ajax{
 			URL:    u.String(),
 			Method: "get",
 			Done: func(data js.Value) {
@@ -286,7 +290,7 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 			},
 			Fail: func(jqXHR js.Value) {
 
-				utils.DisplayGenericErrorMessage()
+				jsutils.DisplayGenericErrorMessage()
 
 			},
 		}
@@ -309,20 +313,20 @@ func ShowIfAuthorizedActionButtons(this js.Value, args []js.Value) interface{} {
 		if button.Class().Contains("storelocations") {
 			entityId := button.GetAttribute("eid")
 
-			utils.HasPermission("storelocations", entityId, "get", func() {
-				Jq("#storelocations" + entityId).FadeIn()
+			jsutils.HasPermission("storelocations", entityId, "get", func() {
+				jquery.Jq("#storelocations" + entityId).FadeIn()
 			}, func() {
 			})
-			utils.HasPermission("people", entityId, "get", func() {
-				Jq("#members" + entityId).FadeIn()
+			jsutils.HasPermission("people", entityId, "get", func() {
+				jquery.Jq("#members" + entityId).FadeIn()
 			}, func() {
 			})
-			utils.HasPermission("entities", entityId, "put", func() {
-				Jq("#edit" + entityId).FadeIn()
+			jsutils.HasPermission("entities", entityId, "put", func() {
+				jquery.Jq("#edit" + entityId).FadeIn()
 			}, func() {
 			})
-			utils.HasPermission("entities", entityId, "delete", func() {
-				Jq("#delete" + entityId).FadeIn()
+			jsutils.HasPermission("entities", entityId, "delete", func() {
+				jquery.Jq("#delete" + entityId).FadeIn()
 			}, func() {
 			})
 		}

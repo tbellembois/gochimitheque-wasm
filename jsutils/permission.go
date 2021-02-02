@@ -1,19 +1,20 @@
-package utils
+package jsutils
 
 import (
 	"fmt"
 	"syscall/js"
 
+	"github.com/tbellembois/gochimitheque-wasm/ajax"
+	"github.com/tbellembois/gochimitheque-wasm/globals"
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
-	localStorage "github.com/tbellembois/gochimitheque-wasm/localStorage"
-	. "github.com/tbellembois/gochimitheque-wasm/types"
 )
 
 func HasPermission(item, id, method string, done, fail func()) {
 
 	go func() {
+
 		cacheKey := fmt.Sprintf("%s:%s:%s", item, id, method)
-		cachedPermission := localStorage.GetItem(cacheKey)
+		cachedPermission := globals.LocalStorage.GetItem(cacheKey)
 
 		if !DisableCache && cachedPermission != "" {
 			if cachedPermission == "true" {
@@ -30,14 +31,14 @@ func HasPermission(item, id, method string, done, fail func()) {
 			}
 
 			ajaxDone := func(js.Value) {
-				localStorage.SetItem(cacheKey, "true")
+				globals.LocalStorage.SetItem(cacheKey, "true")
 				done()
 			}
 			ajaxFail := func(js.Value) {
-				localStorage.SetItem(cacheKey, "false")
+				globals.LocalStorage.SetItem(cacheKey, "false")
 				fail()
 			}
-			ajax := Ajax{
+			ajax := ajax.Ajax{
 				URL:    url,
 				Method: method,
 				Done:   ajaxDone,

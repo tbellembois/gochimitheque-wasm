@@ -1,4 +1,4 @@
-package types
+package select2
 
 import (
 	"encoding/json"
@@ -6,10 +6,79 @@ import (
 	"reflect"
 	"regexp"
 	"strconv"
+	"strings"
 	"syscall/js"
+
+	"github.com/tbellembois/gochimitheque-wasm/ajax"
+	"github.com/tbellembois/gochimitheque-wasm/jquery"
 )
 
-// Select2ResultAble represents a type that can
+func structToMap(item interface{}) map[string]interface{} {
+
+	res := map[string]interface{}{}
+	if item == nil {
+		return res
+	}
+	v := reflect.TypeOf(item)
+	reflectValue := reflect.ValueOf(item)
+	reflectValue = reflect.Indirect(reflectValue)
+
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+
+	var (
+		omitempty bool
+	)
+
+	for i := 0; i < v.NumField(); i++ {
+
+		tag := v.Field(i).Tag.Get("json")
+		if strings.Contains(tag, "omitempty") {
+			omitempty = true
+			tag = strings.Replace(tag, ",omitempty", "", 1)
+		} else {
+			omitempty = false
+		}
+
+		field := reflectValue.Field(i).Interface()
+
+		if tag != "" && tag != "-" {
+			if v.Field(i).Type.Kind() == reflect.String {
+				if !omitempty && len(field.(string)) > 0 {
+					res[tag] = field
+				}
+			} else if v.Field(i).Type.Kind() == reflect.Bool {
+				res[tag] = field
+			} else if v.Field(i).Type.Kind() == reflect.Struct {
+				res[tag] = structToMap(field)
+			} else if v.Field(i).Type.Kind() == reflect.Map {
+
+				m := field.(map[string]interface{})
+
+				res2 := map[string]interface{}{}
+				for k, v := range m {
+					res2[k] = v
+				}
+				res[tag] = res2
+			} else if v.Field(i).Type.Kind() == reflect.Interface {
+				if !reflectValue.Field(i).IsNil() {
+					res[tag] = field
+				}
+			} else {
+				res[tag] = field
+			}
+		}
+	}
+	return res
+}
+
+type Select2 struct {
+	jquery.Jquery
+	config *Select2Config
+}
+
+// select2.Select2ResultAble represents a type that can
 // fill in select2 data as defined
 // https://select2.org/data-sources/ajax#transforming-response-data
 type Select2ResultAble interface {
@@ -97,25 +166,34 @@ func (s Select2Item) IsEmpty() bool {
 
 }
 
-func (jq Jquery) Select2(config Select2Config) {
+func NewSelect2(jq jquery.Jquery, config *Select2Config) Select2 {
 
-	configMap := StructToMap(config)
-	jq.Object.Call("select2", configMap)
+	// configMap := StructToMap(config)
+	// jq.Object.Call("select2", configMap)
 
 	// Can not use:
 	// jq.Object.Call("select2", config.ToJsValue())
 	// because Select2Config contains functions.
 
+	return Select2{Jquery: jq, config: config}
+
 }
 
-func (jq Jquery) Select2Data() []Select2Item {
+func (s Select2) Select2ify() {
+
+	configMap := structToMap(s.config)
+	s.Jquery.Object.Call("select2", configMap)
+
+}
+
+func (s Select2) Select2Data() []Select2Item {
 
 	var (
 		select2Items []Select2Item
 		err          error
 	)
 
-	select2Data := jq.Object.Call("select2", "data")
+	select2Data := s.Jquery.Object.Call("select2", "data")
 
 	jsSelect2ItemsString := js.Global().Get("JSON").Call("stringify", select2Data).String()
 	if err = json.Unmarshal([]byte(jsSelect2ItemsString), &select2Items); err != nil {
@@ -126,22 +204,22 @@ func (jq Jquery) Select2Data() []Select2Item {
 
 }
 
-func (jq Jquery) Select2IsInitialized() bool {
+func (s Select2) Select2IsInitialized() bool {
 
-	return jq.HasClass("select2-hidden-accessible")
-
-}
-
-func (jq Jquery) Select2AppendOption(o interface{}) {
-
-	jq.Object.Call("append", js.ValueOf(o)).Call("trigger", "change")
+	return s.Jquery.HasClass("select2-hidden-accessible")
 
 }
 
-func (jq Jquery) Select2Clear() {
+func (s Select2) Select2AppendOption(o interface{}) {
 
-	jq.SetVal(nil).Object.Call("trigger", "change")
-	jq.Find("option").Remove()
+	s.Jquery.Object.Call("append", js.ValueOf(o)).Call("trigger", "change")
+
+}
+
+func (s Select2) Select2Clear() {
+
+	s.Jquery.SetVal(nil).Object.Call("trigger", "change")
+	s.Jquery.Find("option").Remove()
 
 }
 
@@ -215,7 +293,7 @@ func Select2GenericAjaxData(this js.Value, args []js.Value) interface{} {
 		offset = 0
 	}
 
-	return QueryFilter{
+	return ajax.QueryFilter{
 		Search: search,
 		Offset: offset,
 		Page:   page,
@@ -244,16 +322,14 @@ func Select2GenericAjaxProcessResults(select2ResultAble Select2ResultAble) func(
 			rowTypeName := rowType.Name()
 
 			if objects.IsExactMatch() {
-				Jq(fmt.Sprintf("input#exactMatch%s", rowTypeName)).SetVal(true)
+				jquery.Jq(fmt.Sprintf("input#exactMatch%s", rowTypeName)).SetVal(true)
 			} else {
-				Jq(fmt.Sprintf("input#exactMatch%s", rowTypeName)).SetVal(false)
+				jquery.Jq(fmt.Sprintf("input#exactMatch%s", rowTypeName)).SetVal(false)
 			}
 		}
 
 		var select2ItemAbles []Select2ItemAble
-		for _, object := range objects.GetRows() {
-			select2ItemAbles = append(select2ItemAbles, object)
-		}
+		select2ItemAbles = append(select2ItemAbles, objects.GetRows()...)
 
 		// Needed to avoid a Jquery exception. Don't know why.
 		if len(select2ItemAbles) == 0 {
@@ -294,7 +370,7 @@ func Select2GenericCreateTag(select2ItemAble Select2ItemAble) func(this js.Value
 
 		objectName := reflect.TypeOf(select2ItemAble).Name()
 
-		if Jq(fmt.Sprintf("input#exactMatch%s", objectName)).GetVal().String() == "true" {
+		if jquery.Jq(fmt.Sprintf("input#exactMatch%s", objectName)).GetVal().String() == "true" {
 			return nil
 		}
 

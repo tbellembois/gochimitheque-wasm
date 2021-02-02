@@ -5,10 +5,13 @@ import (
 	"strconv"
 	"syscall/js"
 
+	"github.com/tbellembois/gochimitheque-wasm/ajax"
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
+	"github.com/tbellembois/gochimitheque-wasm/jquery"
+	"github.com/tbellembois/gochimitheque-wasm/jsutils"
 	"github.com/tbellembois/gochimitheque-wasm/locales"
+	"github.com/tbellembois/gochimitheque-wasm/select2"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
-	"github.com/tbellembois/gochimitheque-wasm/utils"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
 	"honnef.co/go/js/dom/v2"
@@ -73,7 +76,7 @@ func Select2StoreLocationTemplateResults(this js.Value, args []js.Value) interfa
 	d.AppendChild(spanLabel)
 	d.AppendChild(iconCanStore)
 
-	return utils.CreateJsHTMLElementFromString(d.OuterHTML())
+	return jsutils.CreateJsHTMLElementFromString(d.OuterHTML())
 
 }
 
@@ -106,7 +109,7 @@ func Select2SymbolTemplateResults(this js.Value, args []js.Value) interface{} {
 	d.AppendChild(image)
 	d.AppendChild(spanLabel)
 
-	return utils.CreateJsHTMLElementFromString(d.OuterHTML())
+	return jsutils.CreateJsHTMLElementFromString(d.OuterHTML())
 
 }
 
@@ -137,7 +140,7 @@ func Select2HazardStatementTemplateResults(this js.Value, args []js.Value) inter
 	d.AppendChild(spanReference)
 	d.AppendChild(spanLabel)
 
-	return utils.CreateJsHTMLElementFromString(d.OuterHTML())
+	return jsutils.CreateJsHTMLElementFromString(d.OuterHTML())
 
 }
 
@@ -168,7 +171,7 @@ func Select2PrecautionaryStatementTemplateResults(this js.Value, args []js.Value
 	d.AppendChild(spanReference)
 	d.AppendChild(spanLabel)
 
-	return utils.CreateJsHTMLElementFromString(d.OuterHTML())
+	return jsutils.CreateJsHTMLElementFromString(d.OuterHTML())
 
 }
 
@@ -181,24 +184,24 @@ func Select2ProducerRefCreateTag(this js.Value, args []js.Value) interface{} {
 
 	params := args[0]
 
-	if Jq("input#exactMatchProducerRefs").GetVal().String() == "true" {
+	if jquery.Jq("input#exactMatchProducerRefs").GetVal().String() == "true" {
 		return nil
 	}
 
-	if len(Jq("select#producer").Select2Data()) == 0 {
-		utils.DisplayErrorMessage(locales.Translate("producerref_create_needproducer", HTTPHeaderAcceptLanguage))
+	if len(select2.NewSelect2(jquery.Jq("select#producer"), nil).Select2Data()) == 0 {
+		jsutils.DisplayErrorMessage(locales.Translate("producerref_create_needproducer", HTTPHeaderAcceptLanguage))
 		return nil
 	}
 
-	// select2ProducerId := Jq("select#producer").Select2Data()[0].Id
-	// select2ProducerText := Jq("select#producer").Select2Data()[0].Text
+	// select2ProducerId := jquery.Jq("select#producer").Select2Data()[0].Id
+	// select2ProducerText := jquery.Jq("select#producer").Select2Data()[0].Text
 
 	// if producerId, err = strconv.Atoi(select2ProducerId); err != nil {
 	// 	fmt.Println(err)
 	// 	return nil
 	// }
 
-	return Select2Item{
+	return select2.Select2Item{
 		Id:   params.Get("term").String(),
 		Text: params.Get("term").String(),
 	}.ToJsValue()
@@ -246,7 +249,7 @@ func Select2ProducerRefTemplateSelection(this js.Value, args []js.Value) interfa
 
 	d.AppendChild(spanLabel)
 
-	return utils.CreateJsHTMLElementFromString(d.OuterHTML())
+	return jsutils.CreateJsHTMLElementFromString(d.OuterHTML())
 
 }
 
@@ -256,8 +259,9 @@ func Select2ProducerRefAjaxData(this js.Value, args []js.Value) interface{} {
 
 	var producerId string
 
-	if len(Jq("select#producer").Select2Data()) > 0 {
-		select2ItemProducer := Jq("select#producer").Select2Data()[0]
+	select2Producer := select2.NewSelect2(jquery.Jq("select#producer"), nil)
+	if len(select2Producer.Select2Data()) > 0 {
+		select2ItemProducer := select2Producer.Select2Data()[0]
 		if !select2ItemProducer.IsEmpty() {
 			producerId = select2ItemProducer.Id
 		}
@@ -278,7 +282,7 @@ func Select2ProducerRefAjaxData(this js.Value, args []js.Value) interface{} {
 		offset = 0
 	}
 
-	return QueryFilter{
+	return ajax.QueryFilter{
 		Producer: producerId,
 		Search:   search,
 		Offset:   offset,
@@ -294,7 +298,7 @@ func Select2SupplierRefTemplateSelection(this js.Value, args []js.Value) interfa
 
 	data := args[0]
 
-	utils.DumpJsObject(data)
+	jsutils.DumpJsObject(data)
 
 	supplierRef := SupplierRef{}.FromJsJSONValue(data).(SupplierRef)
 
@@ -318,7 +322,7 @@ func Select2SupplierRefTemplateSelection(this js.Value, args []js.Value) interfa
 		Text: text,
 	})
 
-	return utils.CreateJsHTMLElementFromString(spanLabel.OuterHTML())
+	return jsutils.CreateJsHTMLElementFromString(spanLabel.OuterHTML())
 
 }
 
@@ -331,26 +335,27 @@ func Select2SupplierRefCreateTag(this js.Value, args []js.Value) interface{} {
 
 	params := args[0]
 
-	if Jq("input#exactMatchSupplierRefs").GetVal().String() == "true" {
+	if jquery.Jq("input#exactMatchSupplierRefs").GetVal().String() == "true" {
 		return nil
 	}
 
-	if len(Jq("select#supplier").Select2Data()) == 0 {
-		utils.DisplayErrorMessage(locales.Translate("supplierref_create_needsupplier", HTTPHeaderAcceptLanguage))
+	select2Supplier := select2.NewSelect2(jquery.Jq("select#supplier"), nil)
+
+	if len(select2Supplier.Select2Data()) == 0 {
+		jsutils.DisplayErrorMessage(locales.Translate("supplierref_create_needsupplier", HTTPHeaderAcceptLanguage))
 		return nil
 	}
 
-	select2Supplier := Jq("select#supplier").Select2Data()[0]
-	if select2SupplierId, err = strconv.Atoi(select2Supplier.Id); err != nil {
+	if select2SupplierId, err = strconv.Atoi(select2Supplier.Select2Data()[0].Id); err != nil {
 		fmt.Println(err)
 		return nil
 	}
 
 	supplierrefToSupplier[params.Get("term").String()] = int64(select2SupplierId)
 
-	return Select2Item{
+	return select2.Select2Item{
 		Id:   params.Get("term").String(),
-		Text: fmt.Sprintf("%s@%s", params.Get("term").String(), select2Supplier.Text),
+		Text: fmt.Sprintf("%s@%s", params.Get("term").String(), select2Supplier.Select2Data()[0].Text),
 	}.ToJsValue()
 
 }
@@ -361,8 +366,9 @@ func Select2SupplierRefAjaxData(this js.Value, args []js.Value) interface{} {
 
 	var supplierId string
 
-	if len(Jq("select#supplier").Select2Data()) > 0 {
-		select2ItemSupplier := Jq("select#supplier").Select2Data()[0]
+	select2Supplier := select2.NewSelect2(jquery.Jq("select#supplier"), nil)
+	if len(select2Supplier.Select2Data()) > 0 {
+		select2ItemSupplier := select2Supplier.Select2Data()[0]
 		if !select2ItemSupplier.IsEmpty() {
 			supplierId = select2ItemSupplier.Id
 		}
@@ -383,7 +389,7 @@ func Select2SupplierRefAjaxData(this js.Value, args []js.Value) interface{} {
 		offset = 0
 	}
 
-	return QueryFilter{
+	return ajax.QueryFilter{
 		Supplier: supplierId,
 		Search:   search,
 		Offset:   offset,
@@ -413,7 +419,7 @@ func Select2UnitTemperatureAjaxData(this js.Value, args []js.Value) interface{} 
 		offset = 0
 	}
 
-	return QueryFilter{
+	return ajax.QueryFilter{
 		UnitType: "temperature",
 		Search:   search,
 		Offset:   offset,

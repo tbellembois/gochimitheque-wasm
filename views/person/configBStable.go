@@ -7,10 +7,13 @@ import (
 	"strconv"
 	"syscall/js"
 
+	"github.com/tbellembois/gochimitheque-wasm/ajax"
+	"github.com/tbellembois/gochimitheque-wasm/bstable"
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
+	"github.com/tbellembois/gochimitheque-wasm/jquery"
+	"github.com/tbellembois/gochimitheque-wasm/jsutils"
 	"github.com/tbellembois/gochimitheque-wasm/locales"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
-	"github.com/tbellembois/gochimitheque-wasm/utils"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
 	"honnef.co/go/js/dom/v2"
@@ -21,24 +24,24 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	person := Person{}.FromJsJSONValue(row).(Person)
 
-	Jq(fmt.Sprintf("button#delete%d", person.PersonId)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq(fmt.Sprintf("button#delete%d", person.PersonId)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
 		url := fmt.Sprintf("%speople/%d", ApplicationProxyPath, person.PersonId)
 		method := "delete"
 
 		done := func(data js.Value) {
 
-			utils.DisplaySuccessMessage(locales.Translate("person_deleted_message", HTTPHeaderAcceptLanguage))
-			Jq("#Person_table").Bootstraptable(nil).Refresh(nil)
+			jsutils.DisplaySuccessMessage(locales.Translate("person_deleted_message", HTTPHeaderAcceptLanguage))
+			bstable.NewBootstraptable(jquery.Jq("#Person_table"), nil).Refresh(nil)
 
 		}
 		fail := func(data js.Value) {
 
-			utils.DisplayGenericErrorMessage()
+			jsutils.DisplayGenericErrorMessage()
 
 		}
 
-		Ajax{
+		ajax.Ajax{
 			Method: method,
 			URL:    url,
 			Done:   done,
@@ -57,8 +60,8 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 		Icon: themes.NewMdiIcon(themes.MDI_CONFIRM, ""),
 		Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
 	})
-	Jq(fmt.Sprintf("button#delete%d", person.PersonId)).SetHtml("")
-	Jq(fmt.Sprintf("button#delete%d", person.PersonId)).Append(buttonTitle.OuterHTML())
+	jquery.Jq(fmt.Sprintf("button#delete%d", person.PersonId)).SetHtml("")
+	jquery.Jq(fmt.Sprintf("button#delete%d", person.PersonId)).Append(buttonTitle.OuterHTML())
 
 	return nil
 
@@ -86,17 +89,17 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 
 		FillInPersonForm(person, "edit-collapse")
 
-		Jq("input#index").SetVal(index)
-		Jq("#edit-collapse").Show()
+		jquery.Jq("input#index").SetVal(index)
+		jquery.Jq("#edit-collapse").Show()
 
 	}
 	fail := func(data js.Value) {
 
-		utils.DisplayGenericErrorMessage()
+		jsutils.DisplayGenericErrorMessage()
 
 	}
 
-	Ajax{
+	ajax.Ajax{
 		Method: method,
 		URL:    url,
 		Done:   done,
@@ -162,7 +165,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 
 	params := args[0]
 
-	queryFilter := QueryFilterFromJsJSONValue(params)
+	queryFilter := ajax.QueryFilterFromJsJSONValue(params)
 
 	queryFilter.Entity = BSTableQueryFilter.Entity
 	BSTableQueryFilter.Unlock()
@@ -176,14 +179,14 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 func GetTableData(this js.Value, args []js.Value) interface{} {
 
 	row := args[0]
-	params := QueryParamsFromJsJSONValue(row)
+	params := bstable.QueryParamsFromJsJSONValue(row)
 
 	go func() {
 
 		u := url.URL{Path: ApplicationProxyPath + "people"}
 		u.RawQuery = params.Data.ToRawQuery()
 
-		ajax := Ajax{
+		ajax := ajax.Ajax{
 			URL:    u.String(),
 			Method: "get",
 			Done: func(data js.Value) {
@@ -193,7 +196,7 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 			},
 			Fail: func(jqXHR js.Value) {
 
-				utils.DisplayGenericErrorMessage()
+				jsutils.DisplayGenericErrorMessage()
 
 			},
 		}
@@ -216,12 +219,12 @@ func ShowIfAuthorizedActionButtons(this js.Value, args []js.Value) interface{} {
 		if button.Class().Contains("edit") {
 			personId := button.GetAttribute("pid")
 
-			utils.HasPermission("people", personId, "put", func() {
-				Jq("#edit" + personId).FadeIn()
+			jsutils.HasPermission("people", personId, "put", func() {
+				jquery.Jq("#edit" + personId).FadeIn()
 			}, func() {
 			})
-			utils.HasPermission("people", personId, "delete", func() {
-				Jq("#delete" + personId).FadeIn()
+			jsutils.HasPermission("people", personId, "delete", func() {
+				jquery.Jq("#delete" + personId).FadeIn()
 			}, func() {
 			})
 		}

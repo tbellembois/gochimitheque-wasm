@@ -6,23 +6,28 @@ import (
 	"strconv"
 	"syscall/js"
 
+	"github.com/tbellembois/gochimitheque-wasm/ajax"
+	"github.com/tbellembois/gochimitheque-wasm/globals"
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
-	"github.com/tbellembois/gochimitheque-wasm/localStorage"
+	"github.com/tbellembois/gochimitheque-wasm/jquery"
+	"github.com/tbellembois/gochimitheque-wasm/jsutils"
+	"github.com/tbellembois/gochimitheque-wasm/select2"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
-	"github.com/tbellembois/gochimitheque-wasm/utils"
-	"github.com/tbellembois/gochimitheque-wasm/views/search"
+	"github.com/tbellembois/gochimitheque-wasm/validate"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 )
 
 func FillInEntityForm(e Entity, id string) {
 
-	Jq(fmt.Sprintf("#%s #entity_id", id)).SetVal(e.EntityID)
-	Jq(fmt.Sprintf("#%s #entity_name", id)).SetVal(e.EntityName)
-	Jq(fmt.Sprintf("#%s #entity_description", id)).SetVal(e.EntityDescription)
-	Jq("select#managers").Select2Clear()
+	jquery.Jq(fmt.Sprintf("#%s #entity_id", id)).SetVal(e.EntityID)
+	jquery.Jq(fmt.Sprintf("#%s #entity_name", id)).SetVal(e.EntityName)
+	jquery.Jq(fmt.Sprintf("#%s #entity_description", id)).SetVal(e.EntityDescription)
 
+	select2Managers := select2.NewSelect2(jquery.Jq("select#managers"), nil)
+
+	select2Managers.Select2Clear()
 	for _, manager := range e.Managers {
-		Jq("select#managers").Select2AppendOption(
+		select2Managers.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            manager.PersonEmail,
 				Value:           strconv.Itoa(manager.PersonId),
@@ -42,21 +47,22 @@ func SaveEntity(this js.Value, args []js.Value) interface{} {
 		err                 error
 	)
 
-	if !Jq("#entity").Valid() {
+	if !validate.NewValidate(jquery.Jq("#entity"), nil).Valid() {
 		return nil
 	}
 
 	entity = &Entity{}
-	if Jq("input#entity_id").GetVal().Truthy() {
-		if entity.EntityID, err = strconv.Atoi(Jq("input#entity_id").GetVal().String()); err != nil {
+	if jquery.Jq("input#entity_id").GetVal().Truthy() {
+		if entity.EntityID, err = strconv.Atoi(jquery.Jq("input#entity_id").GetVal().String()); err != nil {
 			fmt.Println(err)
 			return nil
 		}
 	}
-	entity.EntityName = Jq("input#entity_name").GetVal().String()
-	entity.EntityDescription = Jq("input#entity_description").GetVal().String()
+	entity.EntityName = jquery.Jq("input#entity_name").GetVal().String()
+	entity.EntityDescription = jquery.Jq("input#entity_description").GetVal().String()
 
-	for _, select2Item := range Jq("select#managers").Select2Data() {
+	select2Managers := select2.NewSelect2(jquery.Jq("select#managers"), nil)
+	for _, select2Item := range select2Managers.Select2Data() {
 		person := &Person{}
 		if person.PersonId, err = strconv.Atoi(select2Item.Id); err != nil {
 			fmt.Println(err)
@@ -72,7 +78,7 @@ func SaveEntity(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	if Jq("form#entity input#entity_id").Object.Length() > 0 {
+	if jquery.Jq("form#entity input#entity_id").Object.Length() > 0 {
 		ajaxURL = fmt.Sprintf("%sentities/%d", ApplicationProxyPath, entity.EntityID)
 		ajaxMethod = "put"
 	} else {
@@ -80,13 +86,13 @@ func SaveEntity(this js.Value, args []js.Value) interface{} {
 		ajaxMethod = "post"
 	}
 
-	Ajax{
+	ajax.Ajax{
 		URL:    ajaxURL,
 		Method: ajaxMethod,
 		Data:   dataBytes,
 		Done: func(data js.Value) {
 
-			localStorage.Clear()
+			globals.LocalStorage.Clear()
 
 			var (
 				entity Entity
@@ -100,13 +106,13 @@ func SaveEntity(this js.Value, args []js.Value) interface{} {
 
 			// TODO: use entityId for redirection
 			href := fmt.Sprintf("%sv/entities", ApplicationProxyPath)
-			search.ClearSearch(js.Null(), nil)
-			utils.LoadContent("entity", href, Entity_SaveCallback, entity.EntityName)
+			jsutils.ClearSearch(js.Null(), nil)
+			jsutils.LoadContent("div#content", "entity", href, Entity_SaveCallback, entity.EntityName)
 
 		},
 		Fail: func(jqXHR js.Value) {
 
-			utils.DisplayGenericErrorMessage()
+			jsutils.DisplayGenericErrorMessage()
 
 		},
 	}.Send()

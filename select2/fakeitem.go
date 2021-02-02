@@ -1,4 +1,4 @@
-package types
+package select2
 
 import (
 	"encoding/json"

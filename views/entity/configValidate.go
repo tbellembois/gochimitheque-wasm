@@ -5,7 +5,7 @@ import (
 	"syscall/js"
 
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
-	. "github.com/tbellembois/gochimitheque-wasm/types"
+	"github.com/tbellembois/gochimitheque-wasm/jquery"
 )
 
 func ValidateEntityNameBeforeSend(this js.Value, args []js.Value) interface{} {
@@ -13,7 +13,7 @@ func ValidateEntityNameBeforeSend(this js.Value, args []js.Value) interface{} {
 	settings := args[1]
 
 	id := "-1"
-	eid := Jq("input#entity_id")
+	eid := jquery.Jq("input#entity_id")
 
 	if eid.Object.Length() > 0 {
 		id = eid.GetVal().String()

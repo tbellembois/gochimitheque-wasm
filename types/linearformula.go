@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"syscall/js"
+
+	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
 type LinearFormulas struct {
@@ -44,7 +46,7 @@ func (e *LinearFormula) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (LinearFormulas) FromJsJSONValue(jsvalue js.Value) Select2ResultAble {
+func (LinearFormulas) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 
 	var (
 		linearFormulas LinearFormulas
@@ -60,7 +62,7 @@ func (LinearFormulas) FromJsJSONValue(jsvalue js.Value) Select2ResultAble {
 
 }
 
-func (e LinearFormula) FromJsJSONValue(jsvalue js.Value) Select2ItemAble {
+func (e LinearFormula) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 
 	var (
 		linearFormula LinearFormula
@@ -76,9 +78,9 @@ func (e LinearFormula) FromJsJSONValue(jsvalue js.Value) Select2ItemAble {
 
 }
 
-func (e LinearFormulas) GetRows() []Select2ItemAble {
+func (e LinearFormulas) GetRows() []select2.Select2ItemAble {
 
-	var select2ItemAble []Select2ItemAble = make([]Select2ItemAble, len(e.Rows))
+	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(e.Rows))
 
 	for i, row := range e.Rows {
 		select2ItemAble[i] = row

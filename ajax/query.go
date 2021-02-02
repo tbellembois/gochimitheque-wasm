@@ -1,31 +1,11 @@
-package types
+package ajax
 
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
-	"sync"
 	"syscall/js"
-
-	"github.com/tbellembois/gochimitheque-wasm/globals"
-	"github.com/tbellembois/gochimitheque-wasm/locales"
-	"github.com/tbellembois/gochimitheque-wasm/widgets"
-)
-
-// TODO: move this
-var (
-	BSTableQueryFilter SafeQueryFilter
-	// CurrentProduct is the current viewed or edited product, or the product of
-	// the listed storages.
-	CurrentProduct Product
-	// CurrentStorage is the current viewed or edited storage.
-	CurrentStorage            Storage
-	DBPrecautionaryStatements []PrecautionaryStatement // for magic selector
-	DBHazardStatements        []HazardStatement        // for magic selector
 )
 
 // QueryParams is the data sent while requesting
@@ -80,118 +60,6 @@ type QueryFilter struct {
 	Offset int    `json:"offset,omitempty"`
 	Limit  int    `json:"limit,omitempty"`
 }
-
-func (q QueryFilter) DisplayFilter() {
-
-	var isFilter bool
-
-	Jq("#filter-item").SetHtml("")
-
-	if q.Product != "" {
-		isFilter = true
-		Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("storage_product_table_header", globals.HTTPHeaderAcceptLanguage), q.ProductFilterLabel))
-	}
-	if q.Storage != "" {
-		isFilter = true
-		Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("storage", globals.HTTPHeaderAcceptLanguage), q.StorageFilterLabel))
-	}
-
-	if q.CustomNamePartOf != "" {
-		isFilter = true
-		Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_custom_name_part_of", globals.HTTPHeaderAcceptLanguage), q.CustomNamePartOf))
-	}
-	if q.CasNumber != "" {
-		isFilter = true
-		Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_casnumber", globals.HTTPHeaderAcceptLanguage), q.CasNumberFilterLabel))
-	}
-	if q.EmpiricalFormula != "" {
-		isFilter = true
-		Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_empiricalformula", globals.HTTPHeaderAcceptLanguage), q.EmpiricalFormulaFilterLabel))
-	}
-	if q.StorageBarecode != "" {
-		isFilter = true
-		Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_storage_barecode", globals.HTTPHeaderAcceptLanguage), q.StorageBarecode))
-	}
-	if q.StoreLocation != "" {
-		isFilter = true
-		Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_storelocation", globals.HTTPHeaderAcceptLanguage), q.StoreLocationFilterLabel))
-	}
-	if q.Name != "" {
-		isFilter = true
-		Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_name", globals.HTTPHeaderAcceptLanguage), q.NameFilterLabel))
-	}
-
-	if q.ProductBookmark {
-		isFilter = true
-		Jq("#filter-item").Append(widgets.FilterItem("", locales.Translate("menu_bookmark", globals.HTTPHeaderAcceptLanguage)))
-	}
-	if q.StorageArchive {
-		isFilter = true
-		Jq("#filter-item").Append(widgets.FilterItem("", locales.Translate("archives", globals.HTTPHeaderAcceptLanguage)))
-	}
-	if q.StorageHistory {
-		isFilter = true
-		Jq("#filter-item").Append(widgets.FilterItem("", locales.Translate("storage_history", globals.HTTPHeaderAcceptLanguage)))
-	}
-
-	if !isFilter {
-		Jq("#filter-item").Append(widgets.FilterItem("", locales.Translate("no_filter", globals.HTTPHeaderAcceptLanguage)))
-	}
-
-}
-
-// SafeQueryFilter is a concurent
-// query filter used in  Ajax requests.
-type SafeQueryFilter struct {
-	lock   sync.Mutex
-	locked bool
-	QueryFilter
-}
-
-func (s *SafeQueryFilter) Lock() {
-	s.locked = true
-	s.lock.Lock()
-}
-
-func (s *SafeQueryFilter) Unlock() {
-	if s.locked {
-		s.locked = false
-		s.lock.Unlock()
-	}
-}
-
-func (s *SafeQueryFilter) Clean() {
-	s.QueryFilter = QueryFilter{}
-}
-
-func (s *SafeQueryFilter) CleanExceptProduct() {
-
-	backupProduct := s.QueryFilter.Product
-	backupProductFilterLabel := s.QueryFilter.ProductFilterLabel
-	s.Clean()
-	s.QueryFilter.Product = backupProduct
-	s.QueryFilter.ProductFilterLabel = backupProductFilterLabel
-
-}
-
-// Response contains the data retrieved
-// from the query above.
-type Response struct {
-	Rows  js.Value `json:"rows"`
-	Total js.Value `json:"total"`
-}
-
-// Ajax represents a JQuery Ajax method.
-type Ajax struct {
-	URL    string
-	Method string
-	Data   []byte
-	Done   AjaxDone
-	Fail   AjaxFail
-}
-
-type AjaxDone func(data js.Value)
-type AjaxFail func(jqXHR js.Value)
 
 // QueryFilterFromJsJSONValue converts a JS JSON into a
 // Go queryFilter.
@@ -325,58 +193,5 @@ func (q QueryFilter) ToRawQuery() string {
 	}
 
 	return values.Encode()
-
-}
-
-func (ajax Ajax) Send() {
-
-	go func() {
-
-		var (
-			err    error
-			data   []byte
-			reqURL *url.URL
-			res    *http.Response
-		)
-		if reqURL, err = url.Parse(ajax.URL); err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		req := &http.Request{
-			Method: ajax.Method,
-			URL:    reqURL,
-			Header: map[string][]string{
-				"Content-Type": {"application/json; charset=UTF-8"},
-			},
-		}
-
-		if len(ajax.Data) > 0 {
-			req.Body = ioutil.NopCloser(strings.NewReader(string(ajax.Data)))
-		}
-
-		if res, err = http.DefaultClient.Do(req); err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		if data, err = ioutil.ReadAll(res.Body); err != nil {
-			fmt.Println(err)
-			return
-		}
-		res.Body.Close()
-
-		//jsResponse := js.Global().Get("JSON").Call("stringify", string(data))
-		jsResponse := js.ValueOf(string(data))
-
-		if res.StatusCode == 200 {
-			ajax.Done(jsResponse)
-		} else {
-			if ajax.Fail != nil {
-				ajax.Fail(jsResponse)
-			}
-		}
-
-	}()
 
 }

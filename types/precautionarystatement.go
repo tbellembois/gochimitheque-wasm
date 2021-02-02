@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"syscall/js"
+
+	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
 type PrecautionaryStatements struct {
@@ -39,7 +41,7 @@ func (s *PrecautionaryStatement) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (PrecautionaryStatements) FromJsJSONValue(jsvalue js.Value) Select2ResultAble {
+func (PrecautionaryStatements) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 
 	var (
 		PrecautionaryStatements PrecautionaryStatements
@@ -55,9 +57,9 @@ func (PrecautionaryStatements) FromJsJSONValue(jsvalue js.Value) Select2ResultAb
 
 }
 
-func (s PrecautionaryStatements) GetRows() []Select2ItemAble {
+func (s PrecautionaryStatements) GetRows() []select2.Select2ItemAble {
 
-	var select2ItemAble []Select2ItemAble = make([]Select2ItemAble, len(s.Rows))
+	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(s.Rows))
 
 	for i, row := range s.Rows {
 		select2ItemAble[i] = row
@@ -73,7 +75,7 @@ func (s PrecautionaryStatements) GetTotal() int {
 
 }
 
-func (s PrecautionaryStatement) FromJsJSONValue(jsvalue js.Value) Select2ItemAble {
+func (s PrecautionaryStatement) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 
 	var (
 		precautionaryStatement PrecautionaryStatement

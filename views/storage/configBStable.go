@@ -10,42 +10,68 @@ import (
 	"strconv"
 	"syscall/js"
 
+	"github.com/tbellembois/gochimitheque-wasm/ajax"
+	"github.com/tbellembois/gochimitheque-wasm/bstable"
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
+	"github.com/tbellembois/gochimitheque-wasm/jquery"
+	"github.com/tbellembois/gochimitheque-wasm/jsutils"
 	"github.com/tbellembois/gochimitheque-wasm/locales"
+	"github.com/tbellembois/gochimitheque-wasm/select2"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
-	"github.com/tbellembois/gochimitheque-wasm/utils"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
 	"honnef.co/go/js/dom/v2"
 )
+
+// https://stackoverflow.com/questions/25686109/split-string-by-length-in-golang
+func chunks(s string, chunkSize int) []string {
+	if chunkSize >= len(s) {
+		return []string{s}
+	}
+	var chunks []string
+	chunk := make([]rune, chunkSize)
+	len := 0
+	for _, r := range s {
+		chunk[len] = r
+		len++
+		if len == chunkSize {
+			chunks = append(chunks, string(chunk))
+			len = 0
+		}
+	}
+	if len > 0 {
+		chunks = append(chunks, string(chunk[:len]))
+	}
+	return chunks
+}
 
 func Storage_operateEventsRestore(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
 	CurrentStorage = Storage{}.FromJsJSONValue(row)
 
-	Jq(fmt.Sprintf("button#restore%d", CurrentStorage.StorageID.Int64)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq(fmt.Sprintf("button#restore%d", CurrentStorage.StorageID.Int64)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
 		url := fmt.Sprintf("%sstorages/%d/r", ApplicationProxyPath, CurrentStorage.StorageID.Int64)
 		method := "put"
 
 		done := func(data js.Value) {
 
-			utils.DisplaySuccessMessage(locales.Translate("storage_restored_message", HTTPHeaderAcceptLanguage))
+			jsutils.DisplaySuccessMessage(locales.Translate("storage_restored_message", HTTPHeaderAcceptLanguage))
 			BSTableQueryFilter.Lock()
 			BSTableQueryFilter.QueryFilter.StorageArchive = false
 			BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(int(CurrentStorage.StorageID.Int64))
 			BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d", CurrentStorage.StorageID.Int64)
-			Jq("#Storage_table").Bootstraptable(nil).Refresh(nil)
+			bstable.NewBootstraptable(jquery.Jq("#Storage_table"), nil).Refresh(nil)
 
 		}
 		fail := func(data js.Value) {
 
-			utils.DisplayGenericErrorMessage()
+			jsutils.DisplayGenericErrorMessage()
 
 		}
 
-		Ajax{
+		ajax.Ajax{
 			Method: method,
 			URL:    url,
 			Done:   done,
@@ -64,8 +90,8 @@ func Storage_operateEventsRestore(this js.Value, args []js.Value) interface{} {
 		Icon: themes.NewMdiIcon(themes.MDI_CONFIRM, ""),
 		Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
 	})
-	Jq(fmt.Sprintf("button#restore%d", CurrentStorage.StorageID.Int64)).SetHtml("")
-	Jq(fmt.Sprintf("button#restore%d", CurrentStorage.StorageID.Int64)).Append(buttonTitle.OuterHTML())
+	jquery.Jq(fmt.Sprintf("button#restore%d", CurrentStorage.StorageID.Int64)).SetHtml("")
+	jquery.Jq(fmt.Sprintf("button#restore%d", CurrentStorage.StorageID.Int64)).Append(buttonTitle.OuterHTML())
 
 	return nil
 
@@ -82,7 +108,7 @@ func Storage_operateEventsClone(this js.Value, args []js.Value) interface{} {
 	}
 
 	href := fmt.Sprintf("%svc/storages", ApplicationProxyPath)
-	utils.LoadContent("storage", href, Storage_createCallback, CurrentStorage)
+	jsutils.LoadContent("div#content", "storage", href, Storage_createCallback, CurrentStorage)
 
 	return nil
 
@@ -97,7 +123,7 @@ func Storage_operateEventsHistory(this js.Value, args []js.Value) interface{} {
 	BSTableQueryFilter.QueryFilter.StorageHistory = true
 	BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(int(CurrentStorage.StorageID.Int64))
 	BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d", CurrentStorage.StorageID.Int64)
-	Jq("#Storage_table").Bootstraptable(nil).Refresh(nil)
+	bstable.NewBootstraptable(jquery.Jq("#Storage_table"), nil).Refresh(nil)
 
 	return nil
 
@@ -108,7 +134,7 @@ func Storage_operateEventsBorrow(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	CurrentStorage = Storage{}.FromJsJSONValue(row)
 
-	Jq("input#bstorage_id").SetVal(CurrentStorage.StorageID.Int64)
+	jquery.Jq("input#bstorage_id").SetVal(CurrentStorage.StorageID.Int64)
 
 	if CurrentStorage.Borrowing.BorrowingID.Valid {
 
@@ -121,10 +147,11 @@ func Storage_operateEventsBorrow(this js.Value, args []js.Value) interface{} {
 
 		// The storage does not have a borrowing.
 		// Displaying the modal.
-		Jq("#borrow").Object.Call("modal", "show")
+		jquery.Jq("#borrow").Object.Call("modal", "show")
 
 		// Selecting the connected user.
-		Jq("select#borrower").Select2AppendOption(
+		select2Borrower := select2.NewSelect2(jquery.Jq("select#borrower"), nil)
+		select2Borrower.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            ConnectedUserEmail,
 				Value:           strconv.Itoa(ConnectedUserID),
@@ -149,7 +176,7 @@ func Storage_operateEventsEdit(this js.Value, args []js.Value) interface{} {
 	BSTableQueryFilter.Unlock()
 
 	href := fmt.Sprintf("%svc/storages", ApplicationProxyPath)
-	utils.LoadContent("storage", href, Storage_createCallback, CurrentStorage)
+	jsutils.LoadContent("div#content", "storage", href, Storage_createCallback, CurrentStorage)
 
 	return nil
 
@@ -160,24 +187,24 @@ func Storage_operateEventsArchive(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	CurrentStorage = Storage{}.FromJsJSONValue(row)
 
-	Jq(fmt.Sprintf("button#archive%d", CurrentStorage.StorageID.Int64)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq(fmt.Sprintf("button#archive%d", CurrentStorage.StorageID.Int64)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
 		url := fmt.Sprintf("%sstorages/%d/a", ApplicationProxyPath, CurrentStorage.StorageID.Int64)
 		method := "delete"
 
 		done := func(data js.Value) {
 
-			utils.DisplaySuccessMessage(locales.Translate("storage_trashed_message", HTTPHeaderAcceptLanguage))
-			Jq("#Storage_table").Bootstraptable(nil).Refresh(nil)
+			jsutils.DisplaySuccessMessage(locales.Translate("storage_trashed_message", HTTPHeaderAcceptLanguage))
+			bstable.NewBootstraptable(jquery.Jq("#Storage_table"), nil).Refresh(nil)
 
 		}
 		fail := func(data js.Value) {
 
-			utils.DisplayGenericErrorMessage()
+			jsutils.DisplayGenericErrorMessage()
 
 		}
 
-		Ajax{
+		ajax.Ajax{
 			Method: method,
 			URL:    url,
 			Done:   done,
@@ -196,8 +223,8 @@ func Storage_operateEventsArchive(this js.Value, args []js.Value) interface{} {
 		Icon: themes.NewMdiIcon(themes.MDI_CONFIRM, ""),
 		Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
 	})
-	Jq(fmt.Sprintf("button#archive%d", CurrentStorage.StorageID.Int64)).SetHtml("")
-	Jq(fmt.Sprintf("button#archive%d", CurrentStorage.StorageID.Int64)).Append(buttonTitle.OuterHTML())
+	jquery.Jq(fmt.Sprintf("button#archive%d", CurrentStorage.StorageID.Int64)).SetHtml("")
+	jquery.Jq(fmt.Sprintf("button#archive%d", CurrentStorage.StorageID.Int64)).Append(buttonTitle.OuterHTML())
 
 	return nil
 
@@ -208,27 +235,27 @@ func Storage_operateEventsDelete(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	CurrentStorage = Storage{}.FromJsJSONValue(row)
 
-	Jq(fmt.Sprintf("button#delete%d", CurrentStorage.StorageID.Int64)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq(fmt.Sprintf("button#delete%d", CurrentStorage.StorageID.Int64)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
 		url := fmt.Sprintf("%sstorages/%d", ApplicationProxyPath, CurrentStorage.StorageID.Int64)
 		method := "delete"
 
 		done := func(data js.Value) {
 
-			utils.DisplaySuccessMessage(locales.Translate("storage_deleted_message", HTTPHeaderAcceptLanguage))
+			jsutils.DisplaySuccessMessage(locales.Translate("storage_deleted_message", HTTPHeaderAcceptLanguage))
 			BSTableQueryFilter.Lock()
 			BSTableQueryFilter.QueryFilter.Storage = ""
 			BSTableQueryFilter.QueryFilter.StorageFilterLabel = ""
-			Jq("#Storage_table").Bootstraptable(nil).Refresh(nil)
+			bstable.NewBootstraptable(jquery.Jq("#Storage_table"), nil).Refresh(nil)
 
 		}
 		fail := func(data js.Value) {
 
-			utils.DisplayGenericErrorMessage()
+			jsutils.DisplayGenericErrorMessage()
 
 		}
 
-		Ajax{
+		ajax.Ajax{
 			Method: method,
 			URL:    url,
 			Done:   done,
@@ -247,8 +274,8 @@ func Storage_operateEventsDelete(this js.Value, args []js.Value) interface{} {
 		Icon: themes.NewMdiIcon(themes.MDI_CONFIRM, ""),
 		Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
 	})
-	Jq(fmt.Sprintf("button#delete%d", CurrentStorage.StorageID.Int64)).SetHtml("")
-	Jq(fmt.Sprintf("button#delete%d", CurrentStorage.StorageID.Int64)).Append(buttonTitle.OuterHTML())
+	jquery.Jq(fmt.Sprintf("button#delete%d", CurrentStorage.StorageID.Int64)).SetHtml("")
+	jquery.Jq(fmt.Sprintf("button#delete%d", CurrentStorage.StorageID.Int64)).Append(buttonTitle.OuterHTML())
 
 	return nil
 
@@ -264,19 +291,19 @@ func ShowIfAuthorizedActionButtons(this js.Value, args []js.Value) interface{} {
 		if button.Class().Contains("borrow") || button.Class().Contains("restore") {
 			storageId := button.GetAttribute("sid")
 
-			Jq("#history" + storageId).FadeIn()
+			jquery.Jq("#history" + storageId).FadeIn()
 
-			utils.HasPermission("storages", storageId, "put", func() {
-				Jq("#edit" + storageId).FadeIn()
-				Jq("#clone" + storageId).FadeIn()
-				Jq("#borrow" + storageId).FadeIn()
+			jsutils.HasPermission("storages", storageId, "put", func() {
+				jquery.Jq("#edit" + storageId).FadeIn()
+				jquery.Jq("#clone" + storageId).FadeIn()
+				jquery.Jq("#borrow" + storageId).FadeIn()
 			}, func() {
 			})
 
-			utils.HasPermission("storages", storageId, "delete", func() {
-				Jq("#delete" + storageId).FadeIn()
-				Jq("#archive" + storageId).FadeIn()
-				Jq("#restore" + storageId).FadeIn()
+			jsutils.HasPermission("storages", storageId, "delete", func() {
+				jquery.Jq("#delete" + storageId).FadeIn()
+				jquery.Jq("#archive" + storageId).FadeIn()
+				jquery.Jq("#restore" + storageId).FadeIn()
 			}, func() {
 			})
 		}
@@ -297,7 +324,7 @@ func Storage_productFormatter(this js.Value, args []js.Value) interface{} {
 		},
 	})
 
-	for _, chunk := range utils.Chunks(CurrentStorage.Product.Name.NameLabel, 40) {
+	for _, chunk := range chunks(CurrentStorage.Product.Name.NameLabel, 40) {
 		d.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -373,7 +400,7 @@ func Storage_barecodeFormatter(this js.Value, args []js.Value) interface{} {
 		},
 	})
 
-	for _, chunk := range utils.Chunks(CurrentStorage.StorageBarecode.String, 10) {
+	for _, chunk := range chunks(CurrentStorage.StorageBarecode.String, 10) {
 		d.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -1275,7 +1302,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 
 	params := args[0]
 
-	queryFilter := QueryFilterFromJsJSONValue(params)
+	queryFilter := ajax.QueryFilterFromJsJSONValue(params)
 
 	// Storage_SaveCallback storage id.
 	queryFilter.Product = BSTableQueryFilter.Product
@@ -1288,58 +1315,66 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 	BSTableQueryFilter.Export = false
 	BSTableQueryFilter.Unlock()
 
-	if Jq("select#s_storelocation").Select2IsInitialized() {
-		i := Jq("select#s_storelocation").Select2Data()
+	select2SStoreLocation := select2.NewSelect2(jquery.Jq("select#s_storelocation"), nil)
+	if select2SStoreLocation.Select2IsInitialized() {
+		i := select2SStoreLocation.Select2Data()
 		if len(i) > 0 {
 			queryFilter.StoreLocation = i[0].Id
 			queryFilter.StoreLocationFilterLabel = i[0].Text
 		}
 	}
-	if Jq("select#s_name").Select2IsInitialized() {
-		i := Jq("select#s_name").Select2Data()
+	select2SName := select2.NewSelect2(jquery.Jq("select#s_name"), nil)
+	if select2SName.Select2IsInitialized() {
+		i := select2SName.Select2Data()
 		if len(i) > 0 {
 			queryFilter.Name = i[0].Id
 			queryFilter.NameFilterLabel = i[0].Text
 		}
 	}
-	if Jq("select#s_casnumber").Select2IsInitialized() {
-		i := Jq("select#s_casnumber").Select2Data()
+	select2SCasNumber := select2.NewSelect2(jquery.Jq("select#s_casnumber"), nil)
+	if select2SCasNumber.Select2IsInitialized() {
+		i := select2SCasNumber.Select2Data()
 		if len(i) > 0 {
 			queryFilter.CasNumber = i[0].Id
 			queryFilter.CasNumberFilterLabel = i[0].Text
 		}
 	}
-	if Jq("select#s_empiricalformula").Select2IsInitialized() {
-		i := Jq("select#s_empiricalformula").Select2Data()
+	select2SEmpiricalFormula := select2.NewSelect2(jquery.Jq("select#s_empiricalformula"), nil)
+	if select2SEmpiricalFormula.Select2IsInitialized() {
+		i := select2SEmpiricalFormula.Select2Data()
 		if len(i) > 0 {
 			queryFilter.EmpiricalFormula = i[0].Id
 			queryFilter.EmpiricalFormulaFilterLabel = i[0].Text
 		}
 	}
-	if Jq("select#s_signalword").Select2IsInitialized() {
-		i := Jq("select#s_signalword").Select2Data()
+	select2SSignalWord := select2.NewSelect2(jquery.Jq("select#s_signalword"), nil)
+	if select2SSignalWord.Select2IsInitialized() {
+		i := select2SSignalWord.Select2Data()
 		if len(i) > 0 {
 			queryFilter.SignalWord = i[0].Id
 		}
 	}
-	if Jq("select#s_hazardstatements").Select2IsInitialized() {
-		i := Jq("select#s_hazardstatements").Select2Data()
+	select2SHS := select2.NewSelect2(jquery.Jq("select#s_hazardstatements"), nil)
+	if select2SHS.Select2IsInitialized() {
+		i := select2SHS.Select2Data()
 		if len(i) > 0 {
 			for _, hs := range i {
 				queryFilter.HazardStatements = append(queryFilter.HazardStatements, hs.Id)
 			}
 		}
 	}
-	if Jq("select#s_precautionarystatements").Select2IsInitialized() {
-		i := Jq("select#s_precautionarystatements").Select2Data()
+	select2SPS := select2.NewSelect2(jquery.Jq("select#s_precautionarystatements"), nil)
+	if select2SPS.Select2IsInitialized() {
+		i := select2SPS.Select2Data()
 		if len(i) > 0 {
 			for _, ps := range i {
 				queryFilter.PrecautionaryStatements = append(queryFilter.PrecautionaryStatements, ps.Id)
 			}
 		}
 	}
-	if Jq("select#s_symbols").Select2IsInitialized() {
-		i := Jq("select#s_symbols").Select2Data()
+	select2SSymbols := select2.NewSelect2(jquery.Jq("select#s_symbols"), nil)
+	if select2SSymbols.Select2IsInitialized() {
+		i := select2SSymbols.Select2Data()
 		if len(i) > 0 {
 			for _, s := range i {
 				queryFilter.Symbols = append(queryFilter.Symbols, s.Id)
@@ -1347,23 +1382,23 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 		}
 	}
 
-	if Jq("#s_storage_barecode").GetVal().Truthy() {
-		queryFilter.StorageBarecode = Jq("#s_storage_barecode").GetVal().String()
+	if jquery.Jq("#s_storage_barecode").GetVal().Truthy() {
+		queryFilter.StorageBarecode = jquery.Jq("#s_storage_barecode").GetVal().String()
 	}
-	if Jq("#s_custom_name_part_of").GetVal().Truthy() {
-		queryFilter.CustomNamePartOf = Jq("#s_custom_name_part_of").GetVal().String()
+	if jquery.Jq("#s_custom_name_part_of").GetVal().Truthy() {
+		queryFilter.CustomNamePartOf = jquery.Jq("#s_custom_name_part_of").GetVal().String()
 	}
-	if Jq("#s_casnumber_cmr:checked").Object.Length() > 0 {
+	if jquery.Jq("#s_casnumber_cmr:checked").Object.Length() > 0 {
 		queryFilter.CasNumberCMR = true
 	}
-	if Jq("#s_borrowing:checked").Object.Length() > 0 {
+	if jquery.Jq("#s_borrowing:checked").Object.Length() > 0 {
 		queryFilter.Borrowing = true
 	}
-	if Jq("#s_storage_to_destroy:checked").Object.Length() > 0 {
+	if jquery.Jq("#s_storage_to_destroy:checked").Object.Length() > 0 {
 		queryFilter.StorageToDestroy = true
 	}
 
-	queryFilter.DisplayFilter()
+	jsutils.DisplayFilter(queryFilter)
 
 	return queryFilter.ToJsValue()
 
@@ -1374,14 +1409,14 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 func GetTableData(this js.Value, args []js.Value) interface{} {
 
 	row := args[0]
-	params := QueryParamsFromJsJSONValue(row)
+	params := bstable.QueryParamsFromJsJSONValue(row)
 
 	go func() {
 
 		u := url.URL{Path: ApplicationProxyPath + "storages"}
 		u.RawQuery = params.Data.ToRawQuery()
 
-		ajax := Ajax{
+		ajax := ajax.Ajax{
 			URL:    u.String(),
 			Method: "get",
 			Done: func(data js.Value) {
@@ -1395,7 +1430,7 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 				}
 
 				if storages.GetExportFn() != "" {
-					utils.DisplaySuccessMessage(locales.Translate("export_done", HTTPHeaderAcceptLanguage))
+					jsutils.DisplaySuccessMessage(locales.Translate("export_done", HTTPHeaderAcceptLanguage))
 
 					var icon widgets.Widget
 					icon.HTMLElement = widgets.NewIcon(widgets.IconAttributes{
@@ -1417,22 +1452,22 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 						Label:   icon,
 					})
 
-					Jq("#export-body").SetHtml("")
-					Jq("#export-body").Append(downloadLink.OuterHTML())
-					Jq("#export").Show()
+					jquery.Jq("#export-body").SetHtml("")
+					jquery.Jq("#export-body").Append(downloadLink.OuterHTML())
+					jquery.Jq("#export").Show()
 
 				} else if storages.GetTotal() != 0 {
 					row.Call("success", js.ValueOf(js.Global().Get("JSON").Call("parse", data)))
 				} else {
 					// FIXME: Does not work
-					//Jq("#Product_table").Bootstraptable(nil).RemoveAll()
-					utils.DisplayErrorMessage(locales.Translate("no_result", HTTPHeaderAcceptLanguage))
+					//bstable.NewBootstraptable(jquery.Jq("#Product_table"),nil).RemoveAll()
+					jsutils.DisplayErrorMessage(locales.Translate("no_result", HTTPHeaderAcceptLanguage))
 				}
 
 			},
 			Fail: func(jqXHR js.Value) {
 
-				utils.DisplayGenericErrorMessage()
+				jsutils.DisplayGenericErrorMessage()
 
 			},
 		}

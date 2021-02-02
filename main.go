@@ -4,16 +4,21 @@ package main
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"net/url"
-	"strconv"
 	"strings"
 	"syscall/js"
 
+	"github.com/tbellembois/gochimitheque-wasm/ajax"
+	"github.com/tbellembois/gochimitheque-wasm/bstable"
+	"github.com/tbellembois/gochimitheque-wasm/globals"
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
+	"github.com/tbellembois/gochimitheque-wasm/jquery"
+	"github.com/tbellembois/gochimitheque-wasm/jsutils"
 	"github.com/tbellembois/gochimitheque-wasm/locales"
+	"github.com/tbellembois/gochimitheque-wasm/localstorage"
 	"github.com/tbellembois/gochimitheque-wasm/types"
-	"github.com/tbellembois/gochimitheque-wasm/utils"
 	"github.com/tbellembois/gochimitheque-wasm/views/about"
 	"github.com/tbellembois/gochimitheque-wasm/views/common"
 	"github.com/tbellembois/gochimitheque-wasm/views/entity"
@@ -22,12 +27,12 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/views/person"
 	"github.com/tbellembois/gochimitheque-wasm/views/personpass"
 	"github.com/tbellembois/gochimitheque-wasm/views/product"
-	"github.com/tbellembois/gochimitheque-wasm/views/search"
 	"github.com/tbellembois/gochimitheque-wasm/views/storage"
 	"github.com/tbellembois/gochimitheque-wasm/views/storelocation"
 	"github.com/tbellembois/gochimitheque-wasm/views/welcomeannounce"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque/data"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 var (
@@ -44,11 +49,6 @@ func keepAlive() {
 
 func init() {
 
-	types.Jq = types.NewJquery
-
-	Win = js.Global().Get("window")
-	Doc = js.Global().Get("document")
-
 	fullUrl, err = url.Parse(js.Global().Get("location").Get("href").String())
 	if err != nil {
 		panic(err)
@@ -58,20 +58,24 @@ func init() {
 		panic(err)
 	}
 
-	types.BSTableQueryFilter = types.SafeQueryFilter{
-		QueryFilter: types.QueryFilter{},
+	globals.LocalStorage = localstorage.NewLocalStorage()
+
+	globals.BSTableQueryFilter = ajax.SafeQueryFilter{
+		QueryFilter: ajax.QueryFilter{},
 	}
 
 	// TODO: factorize the js and wasm functions.
 	CurrentView = "product"
 
-	// TODO: get the variables from Go instead of JS
-	ApplicationProxyPath = js.Global().Get("container").Get("ProxyPath").String()
-	HTTPHeaderAcceptLanguage = js.Global().Get("container").Get("PersonLanguage").String()
-	DisableCache, err = strconv.ParseBool(js.Global().Get("disableCache").String())
-	if err != nil {
+	var c models.ViewContainer
+	cString := js.Global().Get("JSON").Call("stringify", js.Global().Get("c")).String()
+	if err = json.Unmarshal([]byte(cString), &c); err != nil {
 		panic(err)
 	}
+
+	ApplicationProxyPath = c.ProxyPath
+	HTTPHeaderAcceptLanguage = c.PersonLanguage
+	DisableCache = c.DisableCache
 
 	// Initializing the slices of statements for the magic selector.
 	var (
@@ -85,7 +89,7 @@ func init() {
 	}
 	// FIXME: we assume here that the id starts by 1 in the DB
 	for id, record := range records {
-		types.DBPrecautionaryStatements = append(types.DBPrecautionaryStatements,
+		globals.DBPrecautionaryStatements = append(globals.DBPrecautionaryStatements,
 			types.PrecautionaryStatement{
 				PrecautionaryStatementID:        id + 1,
 				PrecautionaryStatementLabel:     record[0],
@@ -100,7 +104,7 @@ func init() {
 	}
 	// FIXME: we assume here that the id starts by 1 in the DB
 	for id, record := range records {
-		types.DBHazardStatements = append(types.DBHazardStatements,
+		globals.DBHazardStatements = append(globals.DBHazardStatements,
 			types.HazardStatement{
 				HazardStatementID:        id + 1,
 				HazardStatementLabel:     record[0],
@@ -119,11 +123,11 @@ func Test(this js.Value, args []js.Value) interface{} {
 func main() {
 
 	// Common actions for all logged pages.
-	types.Jq("#table").On("load-success.bs.table",
+	jquery.Jq("#table").On("load-success.bs.table",
 		js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			search := URLParameters.Get("search")
 			if search != "" {
-				types.Jq("#table").Bootstraptable(nil).ResetSearch(search)
+				bstable.NewBootstraptable(jquery.Jq("#table"), nil).ResetSearch(search)
 			}
 			return nil
 		}))
@@ -132,8 +136,8 @@ func main() {
 	js.Global().Set("Test", js.FuncOf(Test))
 
 	// Global functions.
-	js.Global().Set("Utils_closeEdit", js.FuncOf(utils.CloseEdit))
-	js.Global().Set("Utils_message", js.FuncOf(utils.DisplayMessageWrapper))
+	js.Global().Set("Utils_closeEdit", js.FuncOf(jsutils.CloseEdit))
+	js.Global().Set("Utils_message", js.FuncOf(jsutils.DisplayMessageWrapper))
 	js.Global().Set("Utils_translate", js.FuncOf(locales.TranslateWrapper))
 
 	js.Global().Set("Widgets_permission", js.FuncOf(widgets.PermissionWrapper))
@@ -167,8 +171,8 @@ func main() {
 	js.Global().Set("Product_magic", js.FuncOf(product.Magic))
 	js.Global().Set("Product_howToMagicalSelector", js.FuncOf(product.HowToMagicalSelector))
 
-	js.Global().Set("Common_search", js.FuncOf(search.Search))
-	js.Global().Set("Common_clearSearch", js.FuncOf(search.ClearSearch))
+	js.Global().Set("Common_search", js.FuncOf(jsutils.Search))
+	js.Global().Set("Common_clearSearch", js.FuncOf(jsutils.ClearSearch))
 
 	js.Global().Set("Product_saveProduct", js.FuncOf(product.SaveProduct))
 
@@ -265,31 +269,21 @@ func main() {
 	// Menu
 	js.Global().Set("Menu_loadContent", js.FuncOf(menu.LoadContentWrapper))
 
-	types.Jq("#loading").Empty()
-	types.Jq("div.container").RemoveClass("invisible")
+	jquery.Jq("#loading").Empty()
+	jquery.Jq("div.container").RemoveClass("invisible")
 
 	// Startup messages
-	utils.DisplaySuccessMessage(locales.Translate("wasm_loaded", HTTPHeaderAcceptLanguage))
+	jsutils.DisplaySuccessMessage(locales.Translate("wasm_loaded", HTTPHeaderAcceptLanguage))
 	message := URLParameters.Get("message")
 	if message != "" {
-		utils.DisplaySuccessMessage(message)
+		jsutils.DisplaySuccessMessage(message)
 	}
 
-	// For the login and home pages, calling the callback
-	// function manually.
-	// For the other pages they are called when clicking
-	// on the menu.
-	if ConnectedUserEmail != "" {
-		productCallbackWrapper := func(args ...interface{}) {
-			product.Product_listCallback(js.Null(), nil)
-		}
-		utils.LoadContent("product", fmt.Sprintf("%sv/products", ApplicationProxyPath), productCallbackWrapper)
-	} else {
-		loginCallbackWrapper := func(args ...interface{}) {
-			login.Login_listCallback(js.Null(), nil)
-		}
-		utils.LoadContent("login", fmt.Sprintf("%slogin", ApplicationProxyPath), loginCallbackWrapper)
+	// Load login page.
+	loginCallbackWrapper := func(args ...interface{}) {
+		login.Login_listCallback(js.Null(), nil)
 	}
+	jsutils.LoadContent("div#content", "login", fmt.Sprintf("%slogin", ApplicationProxyPath), loginCallbackWrapper)
 
 	keepAlive()
 

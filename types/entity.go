@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"syscall/js"
+
+	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
 type Entities struct {
@@ -40,7 +42,7 @@ func (e *Entity) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (Entities) FromJsJSONValue(jsvalue js.Value) Select2ResultAble {
+func (Entities) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 
 	var (
 		entities Entities
@@ -56,9 +58,9 @@ func (Entities) FromJsJSONValue(jsvalue js.Value) Select2ResultAble {
 
 }
 
-func (e Entities) GetRows() []Select2ItemAble {
+func (e Entities) GetRows() []select2.Select2ItemAble {
 
-	var select2ItemAble []Select2ItemAble = make([]Select2ItemAble, len(e.Rows))
+	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(e.Rows))
 
 	for i, row := range e.Rows {
 		select2ItemAble[i] = row
@@ -74,7 +76,7 @@ func (e Entities) GetTotal() int {
 
 }
 
-func (e Entity) FromJsJSONValue(jsvalue js.Value) Select2ItemAble {
+func (e Entity) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 
 	var (
 		entity Entity

@@ -5,7 +5,7 @@ import (
 	"syscall/js"
 
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
-	. "github.com/tbellembois/gochimitheque-wasm/types"
+	"github.com/tbellembois/gochimitheque-wasm/jquery"
 )
 
 func ValidatePersonEmailBeforeSend(this js.Value, args []js.Value) interface{} {
@@ -13,7 +13,7 @@ func ValidatePersonEmailBeforeSend(this js.Value, args []js.Value) interface{} {
 	settings := args[1]
 
 	id := "-1"
-	pid := Jq("input#person_id")
+	pid := jquery.Jq("input#person_id")
 
 	if pid.Object.Length() > 0 {
 		id = pid.GetVal().String()

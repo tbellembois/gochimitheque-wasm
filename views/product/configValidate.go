@@ -5,7 +5,8 @@ import (
 	"syscall/js"
 
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
-	. "github.com/tbellembois/gochimitheque-wasm/types"
+	"github.com/tbellembois/gochimitheque-wasm/jquery"
+	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
 func ValidateProductCeNumberBeforeSend(this js.Value, args []js.Value) interface{} {
@@ -13,7 +14,7 @@ func ValidateProductCeNumberBeforeSend(this js.Value, args []js.Value) interface
 	settings := args[1]
 
 	id := "-1"
-	pid := Jq("input#product_id")
+	pid := jquery.Jq("input#product_id")
 
 	if pid.Object.Length() > 0 {
 		id = pid.GetVal().String()
@@ -27,7 +28,7 @@ func ValidateProductCeNumberBeforeSend(this js.Value, args []js.Value) interface
 
 func ValidateProductCeNumberData(this js.Value, args []js.Value) interface{} {
 
-	return Jq("select#cenumber").Select2Data()[0].Text
+	return select2.NewSelect2(jquery.Jq("select#cenumber"), nil).Select2Data()[0].Text
 
 }
 
@@ -36,7 +37,7 @@ func ValidateProductCasNumberBeforeSend(this js.Value, args []js.Value) interfac
 	settings := args[1]
 
 	id := "-1"
-	pid := Jq("input#product_id")
+	pid := jquery.Jq("input#product_id")
 
 	if pid.Object.Length() > 0 {
 		id = pid.GetVal().String()
@@ -53,7 +54,7 @@ func ValidateProductEmpiricalFormulaBeforeSend(this js.Value, args []js.Value) i
 	settings := args[1]
 
 	id := "-1"
-	pid := Jq("input#product_id")
+	pid := jquery.Jq("input#product_id")
 
 	if pid.Object.Length() > 0 {
 		id = pid.GetVal().String()
@@ -67,18 +68,18 @@ func ValidateProductEmpiricalFormulaBeforeSend(this js.Value, args []js.Value) i
 
 func ValidateProductCasNumberData1(this js.Value, args []js.Value) interface{} {
 
-	return Jq("select#casnumber").Select2Data()[0].Text
+	return select2.NewSelect2(jquery.Jq("select#casnumber"), nil).Select2Data()[0].Text
 
 }
 
 func ValidateProductCasNumberData2(this js.Value, args []js.Value) interface{} {
 
-	return Jq("#product_specificity").GetVal().String()
+	return jquery.Jq("#product_specificity").GetVal().String()
 
 }
 
 func ValidateProductEmpiricalFormulaData(this js.Value, args []js.Value) interface{} {
 
-	return Jq("select#empiricalformula").Select2Data()[0].Text
+	return select2.NewSelect2(jquery.Jq("select#empiricalformula"), nil).Select2Data()[0].Text
 
 }

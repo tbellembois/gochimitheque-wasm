@@ -15,7 +15,7 @@ func TranslateWrapper(this js.Value, args []js.Value) interface{} {
 
 }
 
-// Translate translates the s string in the "accept" language
+// Translate translates the s string in the "accept" language.
 func Translate(s string, accept string) string {
 	if s == "" {
 		return ""
@@ -24,12 +24,11 @@ func Translate(s string, accept string) string {
 	ts, _, e := language.ParseAcceptLanguage(accept)
 	if e != nil {
 		fmt.Println(e)
-		// falling back on english if error
 		ts = []language.Tag{language.English}
 	}
 
-	// the t entries are
-	// ordered by the preferred language
+	// The t entries are
+	// ordered by the preferred language.
 	for _, t := range ts {
 
 		newt := strings.Replace(t.String(), "-", "_", -1)
@@ -42,7 +41,6 @@ func Translate(s string, accept string) string {
 
 		} else {
 
-			// falling back on english if error
 			js_locale_varname = fmt.Sprintf("locale_en_EN_%s", s)
 			translated = js.Global().Get(js_locale_varname)
 			if !translated.IsUndefined() {

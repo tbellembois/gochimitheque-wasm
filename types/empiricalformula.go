@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"syscall/js"
+
+	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
 type EmpiricalFormulas struct {
@@ -44,7 +46,7 @@ func (e *EmpiricalFormula) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (EmpiricalFormulas) FromJsJSONValue(jsvalue js.Value) Select2ResultAble {
+func (EmpiricalFormulas) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 
 	var (
 		empiricalFormulas EmpiricalFormulas
@@ -60,7 +62,7 @@ func (EmpiricalFormulas) FromJsJSONValue(jsvalue js.Value) Select2ResultAble {
 
 }
 
-func (e EmpiricalFormula) FromJsJSONValue(jsvalue js.Value) Select2ItemAble {
+func (e EmpiricalFormula) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 
 	var (
 		empiricalFormula EmpiricalFormula
@@ -76,9 +78,9 @@ func (e EmpiricalFormula) FromJsJSONValue(jsvalue js.Value) Select2ItemAble {
 
 }
 
-func (e EmpiricalFormulas) GetRows() []Select2ItemAble {
+func (e EmpiricalFormulas) GetRows() []select2.Select2ItemAble {
 
-	var select2ItemAble []Select2ItemAble = make([]Select2ItemAble, len(e.Rows))
+	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(e.Rows))
 
 	for i, row := range e.Rows {
 		select2ItemAble[i] = row

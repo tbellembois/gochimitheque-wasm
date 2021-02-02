@@ -3,13 +3,13 @@ package about
 import (
 	"syscall/js"
 
-	. "github.com/tbellembois/gochimitheque-wasm/types"
+	"github.com/tbellembois/gochimitheque-wasm/jquery"
 )
 
 func About_listCallback(this js.Value, args []js.Value) interface{} {
 
-	Jq("#search").Hide()
-	Jq("#actions").Hide()
+	jquery.Jq("#search").Hide()
+	jquery.Jq("#actions").Hide()
 
 	return nil
 

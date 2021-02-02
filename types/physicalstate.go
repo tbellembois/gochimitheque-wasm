@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"syscall/js"
+
+	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
 type PhysicalStates struct {
@@ -44,7 +46,7 @@ func (p *PhysicalState) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (PhysicalStates) FromJsJSONValue(jsvalue js.Value) Select2ResultAble {
+func (PhysicalStates) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 
 	var (
 		physicalStates PhysicalStates
@@ -60,7 +62,7 @@ func (PhysicalStates) FromJsJSONValue(jsvalue js.Value) Select2ResultAble {
 
 }
 
-func (p PhysicalState) FromJsJSONValue(jsvalue js.Value) Select2ItemAble {
+func (p PhysicalState) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 
 	var (
 		physicalState PhysicalState
@@ -76,9 +78,9 @@ func (p PhysicalState) FromJsJSONValue(jsvalue js.Value) Select2ItemAble {
 
 }
 
-func (p PhysicalStates) GetRows() []Select2ItemAble {
+func (p PhysicalStates) GetRows() []select2.Select2ItemAble {
 
-	var select2ItemAble []Select2ItemAble = make([]Select2ItemAble, len(p.Rows))
+	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(p.Rows))
 
 	for i, row := range p.Rows {
 		select2ItemAble[i] = row

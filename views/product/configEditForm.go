@@ -8,21 +8,25 @@ import (
 	"strings"
 	"syscall/js"
 
+	"github.com/tbellembois/gochimitheque-wasm/ajax"
+	"github.com/tbellembois/gochimitheque-wasm/globals"
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
-	"github.com/tbellembois/gochimitheque-wasm/types"
+	"github.com/tbellembois/gochimitheque-wasm/jquery"
+	"github.com/tbellembois/gochimitheque-wasm/jsutils"
+	"github.com/tbellembois/gochimitheque-wasm/select2"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
-	"github.com/tbellembois/gochimitheque-wasm/utils"
-	"github.com/tbellembois/gochimitheque-wasm/views/search"
+	"github.com/tbellembois/gochimitheque-wasm/validate"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 )
 
 func FillInProductForm(p Product, id string) {
 
-	Jq(fmt.Sprintf("#%s #product_id", id)).SetVal(p.ProductID)
+	jquery.Jq(fmt.Sprintf("#%s #product_id", id)).SetVal(p.ProductID)
 
-	Jq("select#category").Select2Clear()
+	select2Category := select2.NewSelect2(jquery.Jq("select#category"), nil)
+	select2Category.Select2Clear()
 	if p.CategoryID.Valid {
-		Jq("select#category").Select2AppendOption(
+		select2Category.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            p.Category.CategoryLabel.String,
 				Value:           strconv.Itoa(int(p.Category.CategoryID.Int64)),
@@ -30,9 +34,11 @@ func FillInProductForm(p Product, id string) {
 				Selected:        true,
 			}).HTMLElement.OuterHTML())
 	}
-	Jq("select#tags").Select2Clear()
+
+	select2Tags := select2.NewSelect2(jquery.Jq("select#tags"), nil)
+	select2Tags.Select2Clear()
 	for _, tag := range p.Tags {
-		Jq("select#tags").Select2AppendOption(
+		select2Tags.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            tag.TagLabel,
 				Value:           strconv.Itoa(tag.TagID),
@@ -41,17 +47,20 @@ func FillInProductForm(p Product, id string) {
 			}).HTMLElement.OuterHTML())
 	}
 
-	Jq("select#name").Select2Clear()
-	Jq("select#name").Select2AppendOption(
+	select2Name := select2.NewSelect2(jquery.Jq("select#name"), nil)
+	select2Name.Select2Clear()
+	select2Name.Select2AppendOption(
 		widgets.NewOption(widgets.OptionAttributes{
 			Text:            p.Name.NameLabel,
 			Value:           strconv.Itoa(int(p.Name.NameID)),
 			DefaultSelected: true,
 			Selected:        true,
 		}).HTMLElement.OuterHTML())
-	Jq("select#synonyms").Select2Clear()
+
+	select2Synonyms := select2.NewSelect2(jquery.Jq("select#synonyms"), nil)
+	select2Synonyms.Select2Clear()
 	for _, synonym := range p.Synonyms {
-		Jq("select#synonyms").Select2AppendOption(
+		select2Synonyms.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            synonym.NameLabel,
 				Value:           strconv.Itoa(synonym.NameID),
@@ -60,9 +69,10 @@ func FillInProductForm(p Product, id string) {
 			}).HTMLElement.OuterHTML())
 	}
 
-	Jq("select#producer").Select2Clear()
+	select2Producer := select2.NewSelect2(jquery.Jq("select#producer"), nil)
+	select2Producer.Select2Clear()
 	if p.Producer.ProducerID.Valid {
-		Jq("select#producer").Select2AppendOption(
+		select2Producer.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            p.Producer.ProducerLabel.String,
 				Value:           strconv.Itoa(int(p.Producer.ProducerID.Int64)),
@@ -70,9 +80,11 @@ func FillInProductForm(p Product, id string) {
 				Selected:        true,
 			}).HTMLElement.OuterHTML())
 	}
-	Jq("select#producerref").Select2Clear()
+
+	select2ProducerRef := select2.NewSelect2(jquery.Jq("select#producerref"), nil)
+	select2ProducerRef.Select2Clear()
 	if p.ProducerRef.ProducerRefID.Valid {
-		Jq("select#producerref").Select2AppendOption(
+		select2ProducerRef.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            p.ProducerRef.ProducerRefLabel.String,
 				Value:           strconv.Itoa(int(p.ProducerRef.ProducerRefID.Int64)),
@@ -81,12 +93,13 @@ func FillInProductForm(p Product, id string) {
 			}).HTMLElement.OuterHTML())
 	}
 
-	Jq("select#supplierrefs").Select2Clear()
+	select2SupplierRef := select2.NewSelect2(jquery.Jq("select#supplierrefs"), nil)
+	select2SupplierRef.Select2Clear()
 	for _, supplierref := range p.SupplierRefs {
 
 		supplierrefToSupplier[supplierref.SupplierRefLabel] = supplierref.Supplier.SupplierID.Int64
 
-		Jq("select#supplierrefs").Select2AppendOption(
+		select2SupplierRef.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            fmt.Sprintf("%s@%s", supplierref.SupplierRefLabel, supplierref.Supplier.SupplierLabel.String),
 				Value:           strconv.Itoa(supplierref.SupplierRefID),
@@ -95,13 +108,15 @@ func FillInProductForm(p Product, id string) {
 			}).HTMLElement.OuterHTML())
 	}
 
-	Jq("#product_temperature").SetVal("")
+	jquery.Jq("#product_temperature").SetVal("")
 	if p.ProductTemperature.Valid {
-		Jq("#product_temperature").SetVal(p.ProductTemperature.Int64)
+		jquery.Jq("#product_temperature").SetVal(p.ProductTemperature.Int64)
 	}
-	Jq("select#unit_temperature").Select2Clear()
+
+	select2UnitTemperature := select2.NewSelect2(jquery.Jq("select#unit_temperature"), nil)
+	select2UnitTemperature.Select2Clear()
 	if p.UnitTemperature.UnitID.Valid {
-		Jq("select#unit_temperature").Select2AppendOption(
+		select2UnitTemperature.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            p.UnitTemperature.UnitLabel.String,
 				Value:           strconv.Itoa(int(p.UnitTemperature.UnitID.Int64)),
@@ -110,9 +125,10 @@ func FillInProductForm(p Product, id string) {
 			}).HTMLElement.OuterHTML())
 	}
 
-	Jq("select#empiricalformula").Select2Clear()
+	select2EmpiricalFormula := select2.NewSelect2(jquery.Jq("select#empiricalformula"), nil)
+	select2EmpiricalFormula.Select2Clear()
 	if p.EmpiricalFormula.EmpiricalFormulaID.Valid {
-		Jq("select#empiricalformula").Select2AppendOption(
+		select2EmpiricalFormula.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            p.EmpiricalFormula.EmpiricalFormulaLabel.String,
 				Value:           strconv.Itoa(int(p.EmpiricalFormula.EmpiricalFormulaID.Int64)),
@@ -120,9 +136,11 @@ func FillInProductForm(p Product, id string) {
 				Selected:        true,
 			}).HTMLElement.OuterHTML())
 	}
-	Jq("select#linearformula").Select2Clear()
+
+	select2LinearFormula := select2.NewSelect2(jquery.Jq("select#linearformula"), nil)
+	select2LinearFormula.Select2Clear()
 	if p.LinearFormula.LinearFormulaID.Valid {
-		Jq("select#linearformula").Select2AppendOption(
+		select2LinearFormula.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            p.LinearFormula.LinearFormulaLabel.String,
 				Value:           strconv.Itoa(int(p.LinearFormula.LinearFormulaID.Int64)),
@@ -131,9 +149,10 @@ func FillInProductForm(p Product, id string) {
 			}).HTMLElement.OuterHTML())
 	}
 
-	Jq("select#casnumber").Select2Clear()
+	select2Casnumber := select2.NewSelect2(jquery.Jq("select#casnumber"), nil)
+	select2Casnumber.Select2Clear()
 	if p.CasNumber.CasNumberID.Valid {
-		Jq("select#casnumber").Select2AppendOption(
+		select2Casnumber.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            p.CasNumber.CasNumberLabel.String,
 				Value:           strconv.Itoa(int(p.CasNumber.CasNumberID.Int64)),
@@ -141,9 +160,11 @@ func FillInProductForm(p Product, id string) {
 				Selected:        true,
 			}).HTMLElement.OuterHTML())
 	}
-	Jq("select#cenumber").Select2Clear()
+
+	select2Cenumber := select2.NewSelect2(jquery.Jq("select#cenumber"), nil)
+	select2Cenumber.Select2Clear()
 	if p.CeNumber.CeNumberID.Valid {
-		Jq("select#cenumber").Select2AppendOption(
+		select2Cenumber.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            p.CeNumber.CeNumberLabel.String,
 				Value:           strconv.Itoa(int(p.CeNumber.CeNumberID.Int64)),
@@ -152,27 +173,28 @@ func FillInProductForm(p Product, id string) {
 			}).HTMLElement.OuterHTML())
 	}
 
-	Jq("#product_specificity").SetVal("")
+	jquery.Jq("#product_specificity").SetVal("")
 	if p.ProductSpecificity.Valid {
-		Jq("#product_specificity").SetVal(p.ProductSpecificity.String)
+		jquery.Jq("#product_specificity").SetVal(p.ProductSpecificity.String)
 	}
-	Jq("#product_msds").SetVal("")
+	jquery.Jq("#product_msds").SetVal("")
 	if p.ProductMSDS.Valid {
-		Jq("#product_msds").SetVal(p.ProductMSDS.String)
+		jquery.Jq("#product_msds").SetVal(p.ProductMSDS.String)
 	}
-	Jq("#product_sheet").SetVal("")
+	jquery.Jq("#product_sheet").SetVal("")
 	if p.ProductSheet.Valid {
-		Jq("#product_sheet").SetVal(p.ProductSheet.String)
+		jquery.Jq("#product_sheet").SetVal(p.ProductSheet.String)
 	}
 
-	Jq("#product_threedformula").SetVal("")
+	jquery.Jq("#product_threedformula").SetVal("")
 	if p.ProductThreeDFormula.Valid {
-		Jq("#product_threedformula").SetVal(p.ProductThreeDFormula.String)
+		jquery.Jq("#product_threedformula").SetVal(p.ProductThreeDFormula.String)
 	}
 
-	Jq("select#physicalstate").Select2Clear()
+	select2PhysicalState := select2.NewSelect2(jquery.Jq("select#physicalstate"), nil)
+	select2PhysicalState.Select2Clear()
 	if p.PhysicalState.PhysicalStateID.Valid {
-		Jq("select#physicalstate").Select2AppendOption(
+		select2PhysicalState.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            p.PhysicalState.PhysicalStateLabel.String,
 				Value:           strconv.Itoa(int(p.PhysicalState.PhysicalStateID.Int64)),
@@ -181,9 +203,10 @@ func FillInProductForm(p Product, id string) {
 			}).HTMLElement.OuterHTML())
 	}
 
-	Jq("select#classofcompound").Select2Clear()
+	select2Coc := select2.NewSelect2(jquery.Jq("select#classofcompound"), nil)
+	select2Coc.Select2Clear()
 	for _, coc := range p.ClassOfCompound {
-		Jq("select#classofcompound").Select2AppendOption(
+		select2Coc.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            coc.ClassOfCompoundLabel,
 				Value:           strconv.Itoa(coc.ClassOfCompoundID),
@@ -192,9 +215,10 @@ func FillInProductForm(p Product, id string) {
 			}).HTMLElement.OuterHTML())
 	}
 
-	Jq("select#signalword").Select2Clear()
+	select2SignalWord := select2.NewSelect2(jquery.Jq("select#signalword"), nil)
+	select2SignalWord.Select2Clear()
 	if p.SignalWord.SignalWordID.Valid {
-		Jq("select#signalword").Select2AppendOption(
+		select2SignalWord.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            p.SignalWord.SignalWordLabel.String,
 				Value:           strconv.Itoa(int(p.SignalWord.SignalWordID.Int64)),
@@ -203,9 +227,10 @@ func FillInProductForm(p Product, id string) {
 			}).HTMLElement.OuterHTML())
 	}
 
-	Jq("select#symbols").Select2Clear()
+	select2Symbols := select2.NewSelect2(jquery.Jq("select#symbols"), nil)
+	select2Symbols.Select2Clear()
 	for _, symbol := range p.Symbols {
-		Jq("select#symbols").Select2AppendOption(
+		select2Symbols.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            symbol.SymbolLabel,
 				Value:           strconv.Itoa(symbol.SymbolID),
@@ -213,9 +238,11 @@ func FillInProductForm(p Product, id string) {
 				Selected:        true,
 			}).HTMLElement.OuterHTML())
 	}
-	Jq("select#hazardstatements").Select2Clear()
+
+	select2HS := select2.NewSelect2(jquery.Jq("select#hazardstatements"), nil)
+	select2HS.Select2Clear()
 	for _, hs := range p.HazardStatements {
-		Jq("select#hazardstatements").Select2AppendOption(
+		select2HS.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            hs.HazardStatementLabel,
 				Value:           strconv.Itoa(hs.HazardStatementID),
@@ -223,9 +250,11 @@ func FillInProductForm(p Product, id string) {
 				Selected:        true,
 			}).HTMLElement.OuterHTML())
 	}
-	Jq("select#precautionarystatements").Select2Clear()
+
+	select2PS := select2.NewSelect2(jquery.Jq("select#precautionarystatements"), nil)
+	select2PS.Select2Clear()
 	for _, ps := range p.PrecautionaryStatements {
-		Jq("select#precautionarystatements").Select2AppendOption(
+		select2PS.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            ps.PrecautionaryStatementLabel,
 				Value:           strconv.Itoa(ps.PrecautionaryStatementID),
@@ -234,26 +263,26 @@ func FillInProductForm(p Product, id string) {
 			}).HTMLElement.OuterHTML())
 	}
 
-	Jq("#product_restricted").SetProp("checked", false)
+	jquery.Jq("#product_restricted").SetProp("checked", false)
 	if p.ProductRestricted.Valid && p.ProductRestricted.Bool {
-		Jq("#product_restricted").SetProp("checked", "checked")
+		jquery.Jq("#product_restricted").SetProp("checked", "checked")
 	}
-	Jq("#product_radioactive").SetProp("checked", false)
+	jquery.Jq("#product_radioactive").SetProp("checked", false)
 	if p.ProductRadioactive.Valid && p.ProductRadioactive.Bool {
-		Jq("#product_radioactive").SetProp("checked", "checked")
+		jquery.Jq("#product_radioactive").SetProp("checked", "checked")
 	}
 
-	Jq("#product_disposalcomment").SetVal("")
+	jquery.Jq("#product_disposalcomment").SetVal("")
 	if p.ProductDisposalComment.Valid {
-		Jq("#product_disposalcomment").SetVal(p.ProductDisposalComment.String)
+		jquery.Jq("#product_disposalcomment").SetVal(p.ProductDisposalComment.String)
 	}
-	Jq("#product_remark").SetVal("")
+	jquery.Jq("#product_remark").SetVal("")
 	if p.ProductRemark.Valid {
-		Jq("#product_remark").SetVal(p.ProductRemark.String)
+		jquery.Jq("#product_remark").SetVal(p.ProductRemark.String)
 	}
 
 	// Chem/Bio detection.
-	if Jq("select#producerref").GetVal().Truthy() {
+	if jquery.Jq("select#producerref").GetVal().Truthy() {
 		Biofy()
 	} else {
 		Chemify()
@@ -269,120 +298,122 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		err                 error
 	)
 
-	if !(Jq("form#product").Valid()) {
+	if !validate.NewValidate(jquery.Jq("#product"), nil).Valid() {
 		return nil
 	}
 
-	types.CurrentProduct = Product{}
-	if Jq("input#product_id").GetVal().Truthy() {
-		if types.CurrentProduct.ProductID, err = strconv.Atoi(Jq("input#product_id").GetVal().String()); err != nil {
+	globals.CurrentProduct = Product{}
+	if jquery.Jq("input#product_id").GetVal().Truthy() {
+		if globals.CurrentProduct.ProductID, err = strconv.Atoi(jquery.Jq("input#product_id").GetVal().String()); err != nil {
 			fmt.Println(err)
 			return nil
 		}
 	}
 
-	if Jq("input#product_temperature").GetVal().Truthy() {
+	if jquery.Jq("input#product_temperature").GetVal().Truthy() {
 		var productTemperature int
-		if productTemperature, err = strconv.Atoi(Jq("input#product_temperature").GetVal().String()); err != nil {
+		if productTemperature, err = strconv.Atoi(jquery.Jq("input#product_temperature").GetVal().String()); err != nil {
 			return nil
 		}
-		types.CurrentProduct.ProductTemperature = sql.NullInt64{
+		globals.CurrentProduct.ProductTemperature = sql.NullInt64{
 			Int64: int64(productTemperature),
 			Valid: true,
 		}
 	}
 
-	if Jq("input#product_specificity").GetVal().Truthy() {
-		types.CurrentProduct.ProductSpecificity = sql.NullString{
-			String: Jq("input#product_specificity").GetVal().String(),
+	if jquery.Jq("input#product_specificity").GetVal().Truthy() {
+		globals.CurrentProduct.ProductSpecificity = sql.NullString{
+			String: jquery.Jq("input#product_specificity").GetVal().String(),
 			Valid:  true,
 		}
 	}
 
-	if Jq("input#hidden_product_twodformula_content").Html() != "" {
-		types.CurrentProduct.ProductTwoDFormula = sql.NullString{
-			String: Jq("input#hidden_product_twodformula_content").Html(),
+	if jquery.Jq("input#hidden_product_twodformula_content").Html() != "" {
+		globals.CurrentProduct.ProductTwoDFormula = sql.NullString{
+			String: jquery.Jq("input#hidden_product_twodformula_content").Html(),
 			Valid:  true,
 		}
 	}
 
-	if Jq("input#product_threedformula").GetVal().Truthy() {
-		types.CurrentProduct.ProductThreeDFormula = sql.NullString{
-			String: Jq("input#product_threedformula").GetVal().String(),
+	if jquery.Jq("input#product_threedformula").GetVal().Truthy() {
+		globals.CurrentProduct.ProductThreeDFormula = sql.NullString{
+			String: jquery.Jq("input#product_threedformula").GetVal().String(),
 			Valid:  true,
 		}
 	}
 
-	if Jq("#hidden_product_molformula_content").GetVal().Truthy() {
-		types.CurrentProduct.ProductMolFormula = sql.NullString{
-			String: Jq("#hidden_product_molformula_content").GetVal().String(),
+	if jquery.Jq("#hidden_product_molformula_content").GetVal().Truthy() {
+		globals.CurrentProduct.ProductMolFormula = sql.NullString{
+			String: jquery.Jq("#hidden_product_molformula_content").GetVal().String(),
 			Valid:  true,
 		}
 	}
 
-	if Jq("input#product_sheet").GetVal().Truthy() {
-		types.CurrentProduct.ProductSheet = sql.NullString{
-			String: Jq("input#product_sheet").GetVal().String(),
+	if jquery.Jq("input#product_sheet").GetVal().Truthy() {
+		globals.CurrentProduct.ProductSheet = sql.NullString{
+			String: jquery.Jq("input#product_sheet").GetVal().String(),
 			Valid:  true,
 		}
 	}
 
-	if Jq("input#product_msds").GetVal().Truthy() {
-		types.CurrentProduct.ProductMSDS = sql.NullString{
-			String: Jq("input#product_msds").GetVal().String(),
+	if jquery.Jq("input#product_msds").GetVal().Truthy() {
+		globals.CurrentProduct.ProductMSDS = sql.NullString{
+			String: jquery.Jq("input#product_msds").GetVal().String(),
 			Valid:  true,
 		}
 	}
 
-	if Jq("textarea#product_disposalcomment").GetVal().Truthy() {
-		types.CurrentProduct.ProductDisposalComment = sql.NullString{
-			String: Jq("textarea#product_disposalcomment").GetVal().String(),
+	if jquery.Jq("textarea#product_disposalcomment").GetVal().Truthy() {
+		globals.CurrentProduct.ProductDisposalComment = sql.NullString{
+			String: jquery.Jq("textarea#product_disposalcomment").GetVal().String(),
 			Valid:  true,
 		}
 	}
 
-	if Jq("textarea#product_remark").GetVal().Truthy() {
-		types.CurrentProduct.ProductRemark = sql.NullString{
-			String: Jq("textarea#product_remark").GetVal().String(),
+	if jquery.Jq("textarea#product_remark").GetVal().Truthy() {
+		globals.CurrentProduct.ProductRemark = sql.NullString{
+			String: jquery.Jq("textarea#product_remark").GetVal().String(),
 			Valid:  true,
 		}
 	}
 
-	if Jq("input#product_restricted:checked").Object.Length() > 0 {
-		types.CurrentProduct.ProductRestricted = sql.NullBool{
+	if jquery.Jq("input#product_restricted:checked").Object.Length() > 0 {
+		globals.CurrentProduct.ProductRestricted = sql.NullBool{
 			Bool:  true,
 			Valid: true,
 		}
 	}
 
-	if Jq("input#product_radioactive:checked").Object.Length() > 0 {
-		types.CurrentProduct.ProductRadioactive = sql.NullBool{
+	if jquery.Jq("input#product_radioactive:checked").Object.Length() > 0 {
+		globals.CurrentProduct.ProductRadioactive = sql.NullBool{
 			Bool:  true,
 			Valid: true,
 		}
 	}
 
-	if len(Jq("select#unit_temperature").Select2Data()) > 0 {
-		select2ItemUnitTemperature := Jq("select#unit_temperature").Select2Data()[0]
-		types.CurrentProduct.UnitTemperature = Unit{}
+	select2UnitTemperature := select2.NewSelect2(jquery.Jq("select#unit_temperature"), nil)
+	if len(select2UnitTemperature.Select2Data()) > 0 {
+		select2ItemUnitTemperature := select2UnitTemperature.Select2Data()[0]
+		globals.CurrentProduct.UnitTemperature = Unit{}
 		var unitTemperatureId int
 		if unitTemperatureId, err = strconv.Atoi(select2ItemUnitTemperature.Id); err != nil {
 			fmt.Println(err)
 			return nil
 		}
-		types.CurrentProduct.UnitTemperature.UnitID = sql.NullInt64{
+		globals.CurrentProduct.UnitTemperature.UnitID = sql.NullInt64{
 			Int64: int64(unitTemperatureId),
 			Valid: true,
 		}
-		types.CurrentProduct.UnitTemperature.UnitLabel = sql.NullString{
+		globals.CurrentProduct.UnitTemperature.UnitLabel = sql.NullString{
 			String: select2ItemUnitTemperature.Text,
 			Valid:  true,
 		}
 	}
 
-	if len(Jq("select#casnumber").Select2Data()) > 0 {
-		select2ItemCasNumber := Jq("select#casnumber").Select2Data()[0]
-		types.CurrentProduct.CasNumber = CasNumber{}
+	select2CasNumber := select2.NewSelect2(jquery.Jq("select#casnumber"), nil)
+	if len(select2CasNumber.Select2Data()) > 0 {
+		select2ItemCasNumber := select2CasNumber.Select2Data()[0]
+		globals.CurrentProduct.CasNumber = CasNumber{}
 		var casNumberId = -1
 
 		if select2ItemCasNumber.IDIsDigit() {
@@ -392,19 +423,20 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			}
 		}
 
-		types.CurrentProduct.CasNumber.CasNumberID = sql.NullInt64{
+		globals.CurrentProduct.CasNumber.CasNumberID = sql.NullInt64{
 			Int64: int64(casNumberId),
 			Valid: true,
 		}
-		types.CurrentProduct.CasNumber.CasNumberLabel = sql.NullString{
+		globals.CurrentProduct.CasNumber.CasNumberLabel = sql.NullString{
 			String: select2ItemCasNumber.Text,
 			Valid:  true,
 		}
 	}
 
-	if len(Jq("select#cenumber").Select2Data()) > 0 {
-		select2ItemCeNumber := Jq("select#cenumber").Select2Data()[0]
-		types.CurrentProduct.CeNumber = CeNumber{}
+	select2CeNumber := select2.NewSelect2(jquery.Jq("select#cenumber"), nil)
+	if len(select2CeNumber.Select2Data()) > 0 {
+		select2ItemCeNumber := select2CeNumber.Select2Data()[0]
+		globals.CurrentProduct.CeNumber = CeNumber{}
 		var ceNumberId = -1
 
 		if select2ItemCeNumber.IDIsDigit() {
@@ -414,19 +446,20 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			}
 		}
 
-		types.CurrentProduct.CeNumber.CeNumberID = sql.NullInt64{
+		globals.CurrentProduct.CeNumber.CeNumberID = sql.NullInt64{
 			Int64: int64(ceNumberId),
 			Valid: true,
 		}
-		types.CurrentProduct.CeNumber.CeNumberLabel = sql.NullString{
+		globals.CurrentProduct.CeNumber.CeNumberLabel = sql.NullString{
 			String: select2ItemCeNumber.Text,
 			Valid:  true,
 		}
 	}
 
-	if len(Jq("select#empiricalformula").Select2Data()) > 0 {
-		select2ItemEmpiricalFormula := Jq("select#empiricalformula").Select2Data()[0]
-		types.CurrentProduct.EmpiricalFormula = EmpiricalFormula{}
+	select2EmpiricalFormula := select2.NewSelect2(jquery.Jq("select#empiricalformula"), nil)
+	if len(select2EmpiricalFormula.Select2Data()) > 0 {
+		select2ItemEmpiricalFormula := select2EmpiricalFormula.Select2Data()[0]
+		globals.CurrentProduct.EmpiricalFormula = EmpiricalFormula{}
 		var empiricalFormulaId = -1
 
 		if select2ItemEmpiricalFormula.IDIsDigit() {
@@ -436,19 +469,20 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			}
 		}
 
-		types.CurrentProduct.EmpiricalFormula.EmpiricalFormulaID = sql.NullInt64{
+		globals.CurrentProduct.EmpiricalFormula.EmpiricalFormulaID = sql.NullInt64{
 			Int64: int64(empiricalFormulaId),
 			Valid: true,
 		}
-		types.CurrentProduct.EmpiricalFormula.EmpiricalFormulaLabel = sql.NullString{
+		globals.CurrentProduct.EmpiricalFormula.EmpiricalFormulaLabel = sql.NullString{
 			String: select2ItemEmpiricalFormula.Text,
 			Valid:  true,
 		}
 	}
 
-	if len(Jq("select#linearformula").Select2Data()) > 0 {
-		select2ItemLinearFormula := Jq("select#linearformula").Select2Data()[0]
-		types.CurrentProduct.LinearFormula = LinearFormula{}
+	select2LinearFormula := select2.NewSelect2(jquery.Jq("select#linearformula"), nil)
+	if len(select2LinearFormula.Select2Data()) > 0 {
+		select2ItemLinearFormula := select2LinearFormula.Select2Data()[0]
+		globals.CurrentProduct.LinearFormula = LinearFormula{}
 		var linearFormulaId = -1
 
 		if select2ItemLinearFormula.IDIsDigit() {
@@ -458,19 +492,20 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			}
 		}
 
-		types.CurrentProduct.LinearFormula.LinearFormulaID = sql.NullInt64{
+		globals.CurrentProduct.LinearFormula.LinearFormulaID = sql.NullInt64{
 			Int64: int64(linearFormulaId),
 			Valid: true,
 		}
-		types.CurrentProduct.LinearFormula.LinearFormulaLabel = sql.NullString{
+		globals.CurrentProduct.LinearFormula.LinearFormulaLabel = sql.NullString{
 			String: select2ItemLinearFormula.Text,
 			Valid:  true,
 		}
 	}
 
-	if len(Jq("select#name").Select2Data()) > 0 {
-		select2ItemName := Jq("select#name").Select2Data()[0]
-		types.CurrentProduct.Name = Name{}
+	select2Name := select2.NewSelect2(jquery.Jq("select#name"), nil)
+	if len(select2Name.Select2Data()) > 0 {
+		select2ItemName := select2Name.Select2Data()[0]
+		globals.CurrentProduct.Name = Name{}
 		var nameId = -1
 
 		if select2ItemName.IDIsDigit() {
@@ -480,13 +515,14 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			}
 		}
 
-		types.CurrentProduct.Name.NameID = nameId
-		types.CurrentProduct.Name.NameLabel = select2ItemName.Text
+		globals.CurrentProduct.Name.NameID = nameId
+		globals.CurrentProduct.Name.NameLabel = select2ItemName.Text
 	}
 
-	if len(Jq("select#physicalstate").Select2Data()) > 0 {
-		select2ItemPhysicalState := Jq("select#physicalstate").Select2Data()[0]
-		types.CurrentProduct.PhysicalState = PhysicalState{}
+	select2PhysicalState := select2.NewSelect2(jquery.Jq("select#physicalstate"), nil)
+	if len(select2PhysicalState.Select2Data()) > 0 {
+		select2ItemPhysicalState := select2PhysicalState.Select2Data()[0]
+		globals.CurrentProduct.PhysicalState = PhysicalState{}
 		var physicalStateId = -1
 
 		if select2ItemPhysicalState.IDIsDigit() {
@@ -496,37 +532,39 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			}
 		}
 
-		types.CurrentProduct.PhysicalState.PhysicalStateID = sql.NullInt64{
+		globals.CurrentProduct.PhysicalState.PhysicalStateID = sql.NullInt64{
 			Int64: int64(physicalStateId),
 			Valid: true,
 		}
-		types.CurrentProduct.PhysicalState.PhysicalStateLabel = sql.NullString{
+		globals.CurrentProduct.PhysicalState.PhysicalStateLabel = sql.NullString{
 			String: select2ItemPhysicalState.Text,
 			Valid:  true,
 		}
 	}
 
-	if len(Jq("select#signalword").Select2Data()) > 0 {
-		select2ItemSignalWord := Jq("select#signalword").Select2Data()[0]
-		types.CurrentProduct.SignalWord = SignalWord{}
+	select2SignalWord := select2.NewSelect2(jquery.Jq("select#signalword"), nil)
+	if len(select2SignalWord.Select2Data()) > 0 {
+		select2ItemSignalWord := select2SignalWord.Select2Data()[0]
+		globals.CurrentProduct.SignalWord = SignalWord{}
 		var signalWordId int
 		if signalWordId, err = strconv.Atoi(select2ItemSignalWord.Id); err != nil {
 			fmt.Println(err)
 			return nil
 		}
-		types.CurrentProduct.SignalWord.SignalWordID = sql.NullInt64{
+		globals.CurrentProduct.SignalWord.SignalWordID = sql.NullInt64{
 			Int64: int64(signalWordId),
 			Valid: true,
 		}
-		types.CurrentProduct.SignalWord.SignalWordLabel = sql.NullString{
+		globals.CurrentProduct.SignalWord.SignalWordLabel = sql.NullString{
 			String: select2ItemSignalWord.Text,
 			Valid:  true,
 		}
 	}
 
-	if len(Jq("select#category").Select2Data()) > 0 {
-		select2ItemCategory := Jq("select#category").Select2Data()[0]
-		types.CurrentProduct.Category = Category{}
+	select2Category := select2.NewSelect2(jquery.Jq("select#category"), nil)
+	if len(select2Category.Select2Data()) > 0 {
+		select2ItemCategory := select2Category.Select2Data()[0]
+		globals.CurrentProduct.Category = Category{}
 		var categoryId = -1
 
 		if select2ItemCategory.IDIsDigit() {
@@ -536,19 +574,20 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			}
 		}
 
-		types.CurrentProduct.Category.CategoryID = sql.NullInt64{
+		globals.CurrentProduct.Category.CategoryID = sql.NullInt64{
 			Int64: int64(categoryId),
 			Valid: true,
 		}
-		types.CurrentProduct.Category.CategoryLabel = sql.NullString{
+		globals.CurrentProduct.Category.CategoryLabel = sql.NullString{
 			String: select2ItemCategory.Text,
 			Valid:  true,
 		}
 	}
 
-	if len(Jq("select#producerref").Select2Data()) > 0 {
-		select2ItemProducerRef := Jq("select#producerref").Select2Data()[0]
-		types.CurrentProduct.ProducerRef = ProducerRef{}
+	select2ProducerRef := select2.NewSelect2(jquery.Jq("select#producerref"), nil)
+	if len(select2ProducerRef.Select2Data()) > 0 {
+		select2ItemProducerRef := select2ProducerRef.Select2Data()[0]
+		globals.CurrentProduct.ProducerRef = ProducerRef{}
 		var producerrefId = -1
 
 		if select2ItemProducerRef.IDIsDigit() && !(select2ItemProducerRef.Id == select2ItemProducerRef.Text) {
@@ -558,22 +597,22 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			}
 		}
 
-		types.CurrentProduct.ProducerRef.ProducerRefID = sql.NullInt64{
+		globals.CurrentProduct.ProducerRef.ProducerRefID = sql.NullInt64{
 			Int64: int64(producerrefId),
 			Valid: true,
 		}
-		types.CurrentProduct.ProducerRef.ProducerRefLabel = sql.NullString{
+		globals.CurrentProduct.ProducerRef.ProducerRefLabel = sql.NullString{
 			String: select2ItemProducerRef.Text,
 			Valid:  true,
 		}
 
 		var producerId int
-		select2ItemProducer := Jq("select#producer").Select2Data()[0]
+		select2ItemProducer := select2.NewSelect2(jquery.Jq("select#producer"), nil).Select2Data()[0]
 		if producerId, err = strconv.Atoi(select2ItemProducer.Id); err != nil {
 			fmt.Println(err)
 			return nil
 		}
-		types.CurrentProduct.ProducerRef.Producer = &Producer{
+		globals.CurrentProduct.ProducerRef.Producer = &Producer{
 			ProducerID: sql.NullInt64{
 				Int64: int64(producerId),
 				Valid: true,
@@ -581,7 +620,8 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		}
 	}
 
-	for _, select2Item := range Jq("select#classofcompound").Select2Data() {
+	select2Coc := select2.NewSelect2(jquery.Jq("select#classofcompound"), nil)
+	for _, select2Item := range select2Coc.Select2Data() {
 		classofcompound := ClassOfCompound{}
 		var classofcompoundID = -1
 
@@ -594,10 +634,11 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		classofcompound.ClassOfCompoundID = classofcompoundID
 		classofcompound.ClassOfCompoundLabel = select2Item.Text
 
-		types.CurrentProduct.ClassOfCompound = append(types.CurrentProduct.ClassOfCompound, classofcompound)
+		globals.CurrentProduct.ClassOfCompound = append(globals.CurrentProduct.ClassOfCompound, classofcompound)
 	}
 
-	for _, select2Item := range Jq("select#synonyms").Select2Data() {
+	select2Synonyms := select2.NewSelect2(jquery.Jq("select#synonyms"), nil)
+	for _, select2Item := range select2Synonyms.Select2Data() {
 		synonym := Name{}
 		var nameID = -1
 
@@ -610,10 +651,11 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		synonym.NameID = nameID
 		synonym.NameLabel = select2Item.Text
 
-		types.CurrentProduct.Synonyms = append(types.CurrentProduct.Synonyms, synonym)
+		globals.CurrentProduct.Synonyms = append(globals.CurrentProduct.Synonyms, synonym)
 	}
 
-	for _, select2Item := range Jq("select#symbols").Select2Data() {
+	select2Symbols := select2.NewSelect2(jquery.Jq("select#symbols"), nil)
+	for _, select2Item := range select2Symbols.Select2Data() {
 		symbol := Symbol{}
 		if symbol.SymbolID, err = strconv.Atoi(select2Item.Id); err != nil {
 			fmt.Println(err)
@@ -621,10 +663,11 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		}
 		symbol.SymbolLabel = select2Item.Text
 
-		types.CurrentProduct.Symbols = append(types.CurrentProduct.Symbols, symbol)
+		globals.CurrentProduct.Symbols = append(globals.CurrentProduct.Symbols, symbol)
 	}
 
-	for _, select2Item := range Jq("select#hazardstatements").Select2Data() {
+	select2HS := select2.NewSelect2(jquery.Jq("select#hazardstatements"), nil)
+	for _, select2Item := range select2HS.Select2Data() {
 		hazardstatement := HazardStatement{}
 		if hazardstatement.HazardStatementID, err = strconv.Atoi(select2Item.Id); err != nil {
 			fmt.Println(err)
@@ -632,10 +675,11 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		}
 		hazardstatement.HazardStatementLabel = select2Item.Text
 
-		types.CurrentProduct.HazardStatements = append(types.CurrentProduct.HazardStatements, hazardstatement)
+		globals.CurrentProduct.HazardStatements = append(globals.CurrentProduct.HazardStatements, hazardstatement)
 	}
 
-	for _, select2Item := range Jq("select#precautionarystatements").Select2Data() {
+	select2PS := select2.NewSelect2(jquery.Jq("select#precautionarystatements"), nil)
+	for _, select2Item := range select2PS.Select2Data() {
 		precautionarystatement := PrecautionaryStatement{}
 		if precautionarystatement.PrecautionaryStatementID, err = strconv.Atoi(select2Item.Id); err != nil {
 			fmt.Println(err)
@@ -643,10 +687,11 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		}
 		precautionarystatement.PrecautionaryStatementLabel = select2Item.Text
 
-		types.CurrentProduct.PrecautionaryStatements = append(types.CurrentProduct.PrecautionaryStatements, precautionarystatement)
+		globals.CurrentProduct.PrecautionaryStatements = append(globals.CurrentProduct.PrecautionaryStatements, precautionarystatement)
 	}
 
-	for _, select2Item := range Jq("select#tags").Select2Data() {
+	select2Tags := select2.NewSelect2(jquery.Jq("select#tags"), nil)
+	for _, select2Item := range select2Tags.Select2Data() {
 		tag := Tag{}
 		var tagId = -1
 
@@ -659,10 +704,11 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		tag.TagID = tagId
 		tag.TagLabel = select2Item.Text
 
-		types.CurrentProduct.Tags = append(types.CurrentProduct.Tags, tag)
+		globals.CurrentProduct.Tags = append(globals.CurrentProduct.Tags, tag)
 	}
 
-	for _, select2Item := range Jq("select#supplierrefs").Select2Data() {
+	select2SupplierRefs := select2.NewSelect2(jquery.Jq("select#supplierrefs"), nil)
+	for _, select2Item := range select2SupplierRefs.Select2Data() {
 		supplierref := SupplierRef{}
 		var supplierrefId = -1
 
@@ -685,23 +731,23 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			},
 		}
 
-		types.CurrentProduct.SupplierRefs = append(types.CurrentProduct.SupplierRefs, supplierref)
+		globals.CurrentProduct.SupplierRefs = append(globals.CurrentProduct.SupplierRefs, supplierref)
 	}
 
-	if (!Jq("form#product input#product_id").GetVal().IsUndefined()) && Jq("form#product input#product_id").GetVal().String() != "" {
-		ajaxURL = fmt.Sprintf("%sproducts/%d", ApplicationProxyPath, types.CurrentProduct.ProductID)
+	if (!jquery.Jq("form#product input#product_id").GetVal().IsUndefined()) && jquery.Jq("form#product input#product_id").GetVal().String() != "" {
+		ajaxURL = fmt.Sprintf("%sproducts/%d", ApplicationProxyPath, globals.CurrentProduct.ProductID)
 		ajaxMethod = "put"
 	} else {
 		ajaxURL = fmt.Sprintf("%sproducts", ApplicationProxyPath)
 		ajaxMethod = "post"
 	}
 
-	if dataBytes, err = json.Marshal(types.CurrentProduct); err != nil {
+	if dataBytes, err = json.Marshal(globals.CurrentProduct); err != nil {
 		fmt.Println(err)
 		return nil
 	}
 
-	Ajax{
+	ajax.Ajax{
 		URL:    ajaxURL,
 		Method: ajaxMethod,
 		Data:   dataBytes,
@@ -712,18 +758,18 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			)
 
 			if err = json.Unmarshal([]byte(data.String()), &CurrentProduct); err != nil {
-				utils.DisplayGenericErrorMessage()
+				jsutils.DisplayGenericErrorMessage()
 				fmt.Println(err)
 			} else {
 				href := fmt.Sprintf("%sv/products", ApplicationProxyPath)
-				search.ClearSearch(js.Null(), nil)
-				utils.LoadContent("product", href, Product_SaveCallback, types.CurrentProduct.ProductID)
+				jsutils.ClearSearch(js.Null(), nil)
+				jsutils.LoadContent("div#content", "product", href, Product_SaveCallback, globals.CurrentProduct.ProductID)
 			}
 
 		},
 		Fail: func(jqXHR js.Value) {
 
-			utils.DisplayGenericErrorMessage()
+			jsutils.DisplayGenericErrorMessage()
 
 		},
 	}.Send()

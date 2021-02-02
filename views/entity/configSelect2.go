@@ -3,7 +3,7 @@ package entity
 import (
 	"syscall/js"
 
-	. "github.com/tbellembois/gochimitheque-wasm/types"
+	"github.com/tbellembois/gochimitheque-wasm/ajax"
 )
 
 func Select2ManagerAjaxData(this js.Value, args []js.Value) interface{} {
@@ -25,7 +25,7 @@ func Select2ManagerAjaxData(this js.Value, args []js.Value) interface{} {
 		offset = 0
 	}
 
-	return QueryFilter{
+	return ajax.QueryFilter{
 		Search: search,
 		Offset: offset,
 		Page:   page,

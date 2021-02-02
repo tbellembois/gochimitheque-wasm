@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"syscall/js"
+
+	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
 type Categories struct {
@@ -45,7 +47,7 @@ func (c *Category) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (Categories) FromJsJSONValue(jsvalue js.Value) Select2ResultAble {
+func (Categories) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 
 	var (
 		categories Categories
@@ -61,7 +63,7 @@ func (Categories) FromJsJSONValue(jsvalue js.Value) Select2ResultAble {
 
 }
 
-func (c Category) FromJsJSONValue(jsvalue js.Value) Select2ItemAble {
+func (c Category) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 
 	var (
 		category Category
@@ -77,9 +79,9 @@ func (c Category) FromJsJSONValue(jsvalue js.Value) Select2ItemAble {
 
 }
 
-func (c Categories) GetRows() []Select2ItemAble {
+func (c Categories) GetRows() []select2.Select2ItemAble {
 
-	var select2ItemAble []Select2ItemAble = make([]Select2ItemAble, len(c.Rows))
+	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(c.Rows))
 
 	for i, row := range c.Rows {
 		select2ItemAble[i] = row

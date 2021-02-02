@@ -1,4 +1,4 @@
-package types
+package jquery
 
 import (
 	"syscall/js"
@@ -10,6 +10,12 @@ var (
 
 type Jquery struct {
 	Object js.Value
+}
+
+func init() {
+
+	Jq = NewJquery
+
 }
 
 func NewJquery(args ...interface{}) Jquery {

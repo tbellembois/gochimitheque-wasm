@@ -5,21 +5,24 @@ import (
 	"fmt"
 	"syscall/js"
 
+	"github.com/tbellembois/gochimitheque-wasm/ajax"
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
+	"github.com/tbellembois/gochimitheque-wasm/jquery"
+	"github.com/tbellembois/gochimitheque-wasm/jsutils"
 	"github.com/tbellembois/gochimitheque-wasm/locales"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
-	"github.com/tbellembois/gochimitheque-wasm/utils"
+	"github.com/tbellembois/gochimitheque-wasm/validate"
 )
 
 func PersonPass_listCallback(this js.Value, args []js.Value) interface{} {
 
-	Jq("#personp").Validate(ValidateConfig{
+	validate.NewValidate(jquery.Jq("#personp"), &validate.ValidateConfig{
 		ErrorClass: "alert alert-danger",
-		Rules: map[string]ValidateRule{
+		Rules: map[string]validate.ValidateRule{
 			"person_password": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
 				EqualTo:  "#person_passwordagain",
-				Remote: ValidateRemote{
+				Remote: validate.ValidateRemote{
 					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
 				},
 			},
@@ -27,7 +30,7 @@ func PersonPass_listCallback(this js.Value, args []js.Value) interface{} {
 				EqualTo: "#person_password",
 			},
 		},
-		Messages: map[string]ValidateMessage{
+		Messages: map[string]validate.ValidateMessage{
 			"person_password": {
 				Required: locales.Translate("required_input", HTTPHeaderAcceptLanguage),
 				EqualTo:  locales.Translate("not_same_password", HTTPHeaderAcceptLanguage),
@@ -38,8 +41,8 @@ func PersonPass_listCallback(this js.Value, args []js.Value) interface{} {
 		},
 	})
 
-	Jq("#search").Hide()
-	Jq("#actions").Hide()
+	jquery.Jq("#search").Hide()
+	jquery.Jq("#actions").Hide()
 
 	return nil
 
@@ -53,28 +56,28 @@ func SavePersonPassword(this js.Value, args []js.Value) interface{} {
 		err       error
 	)
 
-	if !Jq("#personp").Valid() {
+	if !validate.NewValidate(jquery.Jq("#personp"), nil).Valid() {
 		return nil
 	}
 
-	person.PersonPassword = Jq("input#person_password").GetVal().String()
+	person.PersonPassword = jquery.Jq("input#person_password").GetVal().String()
 	if dataBytes, err = json.Marshal(person); err != nil {
 		fmt.Println(err)
 		return nil
 	}
 
-	Ajax{
+	ajax.Ajax{
 		URL:    fmt.Sprintf("%speoplep", ApplicationProxyPath),
 		Method: "post",
 		Data:   dataBytes,
 		Done: func(data js.Value) {
 
-			utils.DisplaySuccessMessage(locales.Translate("person_password_updated_message", HTTPHeaderAcceptLanguage))
+			jsutils.DisplaySuccessMessage(locales.Translate("person_password_updated_message", HTTPHeaderAcceptLanguage))
 
 		},
 		Fail: func(jqXHR js.Value) {
 
-			utils.DisplayGenericErrorMessage()
+			jsutils.DisplayGenericErrorMessage()
 
 		},
 	}.Send()
