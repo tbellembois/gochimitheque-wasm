@@ -694,7 +694,7 @@ func Product_listBookmarkCallback(this js.Value, args []js.Value) interface{} {
 
 func Product_listCallback(this js.Value, args []js.Value) interface{} {
 
-	product_common()
+	//product_common()
 
 	bstable.NewBootstraptable(jquery.Jq("#Product_table"), &bstable.BootstraptableParams{Ajax: "Product_getTableData"})
 	jquery.Jq("#Product_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
@@ -769,7 +769,7 @@ func Product_SaveCallback(args ...interface{}) {
 	// })
 	jquery.Jq("#Product_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
 
-	product_common()
+	//product_common()
 
 	jquery.Jq("#search").Show()
 	jquery.Jq("#actions").Show()

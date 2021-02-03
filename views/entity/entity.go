@@ -61,7 +61,7 @@ func Entity_createCallBack(this js.Value, args []js.Value) interface{} {
 
 func Entity_listCallback(this js.Value, args []js.Value) interface{} {
 
-	entity_common()
+	//entity_common()
 
 	bstable.NewBootstraptable(jquery.Jq("#Entity_table"), &bstable.BootstraptableParams{Ajax: "Entity_getTableData"})
 	jquery.Jq("#Entity_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
@@ -77,6 +77,6 @@ func Entity_SaveCallback(args ...interface{}) {
 	bstable.NewBootstraptable(jquery.Jq("#Entity_table"), nil).ResetSearch(search)
 	jquery.Jq("#Entity_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
 
-	entity_common()
+	//entity_common()
 
 }

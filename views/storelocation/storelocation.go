@@ -87,7 +87,7 @@ func StoreLocation_createCallBack(this js.Value, args []js.Value) interface{} {
 
 func StoreLocation_listCallback(this js.Value, args []js.Value) interface{} {
 
-	storelocation_common()
+	//storelocation_common()
 
 	bstable.NewBootstraptable(jquery.Jq("#StoreLocation_table"), &bstable.BootstraptableParams{Ajax: "StoreLocation_getTableData"})
 	jquery.Jq("#StoreLocation_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
@@ -103,6 +103,6 @@ func StoreLocation_SaveCallback(args ...interface{}) {
 	bstable.NewBootstraptable(jquery.Jq("#StoreLocation_table"), nil).ResetSearch(search)
 	jquery.Jq("#StoreLocation_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
 
-	storelocation_common()
+	//storelocation_common()
 
 }

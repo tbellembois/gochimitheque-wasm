@@ -11,6 +11,7 @@ import (
 
 type Bootstraptable struct {
 	jquery.Jquery
+	params *BootstraptableParams
 }
 
 type BootstraptableParams struct {
@@ -84,7 +85,10 @@ func NewBootstraptable(jq jquery.Jquery, params *BootstraptableParams) Bootstrap
 		jq.Object = jq.Object.Call("bootstrapTable")
 	}
 
-	return Bootstraptable{Jquery: jq}
+	return Bootstraptable{
+		Jquery: jq,
+		params: params,
+	}
 
 }
 
@@ -98,14 +102,51 @@ func (bt Bootstraptable) Refresh(params *BootstraptableRefreshQuery) {
 
 }
 
+func (bt Bootstraptable) TotalRows() int {
+
+	return bt.Jquery.Object.Call("bootstrapTable", "getOptions").Get("totalRows").Int()
+
+}
+
+type nullData []interface{}
+
+func (n nullData) ToJsValue() js.Value {
+
+	var (
+		marshalJson []byte
+		err         error
+	)
+
+	if marshalJson, err = json.Marshal(n); err != nil {
+		fmt.Println(err)
+		return js.Null()
+	}
+
+	return js.Global().Get("JSON").Call("parse", string(marshalJson))
+
+}
+
 func (bt Bootstraptable) RemoveAll() {
 
-	bt.Jquery.Object.Call("bootstrapTable", "removeAll")
+	//bt.Jquery.Object.Call("bootstrapTable", "removeAll")
+
+	jqSave := bt.Jquery
+	var nullData nullData
+	nullData = make([]interface{}, 1)
+
+	jqSave.Object.Call("bootstrapTable", "destroy")
+	jqSave.Object.Call("bootstrapTable", nullData.ToJsValue())
 
 }
 
 func (bt Bootstraptable) ResetSearch(search string) {
 
 	bt.Jquery.Object.Call("bootstrapTable", "resetSearch", search)
+
+}
+
+func (bt Bootstraptable) HideLoading() {
+
+	bt.Jquery.Object.Call("bootstrapTable", "hideLoading")
 
 }

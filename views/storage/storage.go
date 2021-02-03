@@ -202,7 +202,7 @@ func changeSwitchButtonToProduct() {
 
 func Storage_listCallback(this js.Value, args []js.Value) interface{} {
 
-	storage_common()
+	//storage_common()
 
 	bstable.NewBootstraptable(jquery.Jq("#Storage_table"), &bstable.BootstraptableParams{Ajax: "Storage_getTableData"})
 	jquery.Jq("#Storage_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
@@ -236,7 +236,7 @@ func Storage_SaveCallback(args ...interface{}) {
 	// })
 	jquery.Jq("#Storage_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
 
-	storage_common()
+	//storage_common()
 
 	jquery.Jq("#search").Show()
 	jquery.Jq("#actions").Show()

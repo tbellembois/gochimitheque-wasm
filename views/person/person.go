@@ -108,7 +108,7 @@ func Person_createCallBack(this js.Value, args []js.Value) interface{} {
 
 func Person_listCallback(this js.Value, args []js.Value) interface{} {
 
-	person_common()
+	//person_common()
 
 	bstable.NewBootstraptable(jquery.Jq("#Person_table"), &bstable.BootstraptableParams{Ajax: "Person_getTableData"})
 	jquery.Jq("#Person_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
@@ -124,6 +124,6 @@ func Person_SaveCallback(args ...interface{}) {
 	bstable.NewBootstraptable(jquery.Jq("#Person_table"), nil).ResetSearch(search)
 	jquery.Jq("#Person_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
 
-	person_common()
+	//person_common()
 
 }
