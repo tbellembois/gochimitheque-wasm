@@ -19,6 +19,12 @@ type Tag struct {
 	TagLabel string `json:"tag_label"`
 }
 
+func (elems Tags) GetRowConcreteTypeName() string {
+
+	return "Tag"
+
+}
+
 func (elems Tags) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {

@@ -19,6 +19,12 @@ type Name struct {
 	NameLabel string `json:"name_label"`
 }
 
+func (elems Names) GetRowConcreteTypeName() string {
+
+	return "Name"
+
+}
+
 func (elems Names) IsExactMatch() bool {
 
 	return false

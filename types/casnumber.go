@@ -21,6 +21,12 @@ type CasNumber struct {
 	CasNumberCMR   sql.NullString `json:"casnumber_cmr"`
 }
 
+func (elems CasNumbers) GetRowConcreteTypeName() string {
+
+	return "CasNumber"
+
+}
+
 func (elems CasNumbers) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {

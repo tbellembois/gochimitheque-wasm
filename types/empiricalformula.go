@@ -20,6 +20,12 @@ type EmpiricalFormula struct {
 	EmpiricalFormulaLabel sql.NullString `json:"empiricalformula_label"`
 }
 
+func (elems EmpiricalFormulas) GetRowConcreteTypeName() string {
+
+	return "EmpiricalFormula"
+
+}
+
 func (elems EmpiricalFormulas) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {

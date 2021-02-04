@@ -20,6 +20,12 @@ type Producer struct {
 	ProducerLabel sql.NullString `json:"producer_label"`
 }
 
+func (elems Producers) GetRowConcreteTypeName() string {
+
+	return "Producer"
+
+}
+
 func (elems Producers) IsExactMatch() bool {
 
 	return false

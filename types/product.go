@@ -21,6 +21,12 @@ func (elems Products) IsExactMatch() bool {
 
 }
 
+func (elems Products) GetRowConcreteTypeName() string {
+
+	return "Product"
+
+}
+
 type Bookmark struct {
 	BookmarkID sql.NullInt64 `json:"bookmark_id"`
 	Person     `json:"person"`

@@ -20,6 +20,12 @@ type CeNumber struct {
 	CeNumberLabel sql.NullString `json:"cenumber_label"`
 }
 
+func (elems CeNumbers) GetRowConcreteTypeName() string {
+
+	return "CeNumber"
+
+}
+
 func (elems CeNumbers) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {

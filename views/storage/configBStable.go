@@ -425,15 +425,16 @@ func Storage_barecodeFormatter(this js.Value, args []js.Value) interface{} {
 func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 
 	var (
-		buttonClone    string
-		buttonRestore  string
-		buttonDelete   string
-		buttonArchive  string
-		buttonBorrow   string
-		buttonEdit     string
-		buttonHistory  string
-		iconBorrowing  themes.IconFace
-		borrowingTitle string
+		buttonClone        string
+		buttonRestore      string
+		buttonDelete       string
+		buttonArchive      string
+		buttonBorrow       string
+		buttonEdit         string
+		buttonHistory      string
+		iconBorrowing      themes.IconFace
+		iconBorrowingTitle string
+		commentBorrowing   string
 	)
 
 	row := args[1]
@@ -441,10 +442,10 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 
 	if CurrentStorage.Borrowing == nil || !CurrentStorage.Borrowing.BorrowingID.Valid {
 		iconBorrowing = themes.MDI_BORROW
-		borrowingTitle = locales.Translate("storage_borrow", HTTPHeaderAcceptLanguage)
+		iconBorrowingTitle = locales.Translate("storage_borrow", HTTPHeaderAcceptLanguage)
 	} else {
 		iconBorrowing = themes.MDI_UNBORROW
-		borrowingTitle = locales.Translate("storage_unborrow", HTTPHeaderAcceptLanguage)
+		iconBorrowingTitle = locales.Translate("storage_unborrow", HTTPHeaderAcceptLanguage)
 	}
 
 	if CurrentStorage.StorageArchive.Valid && CurrentStorage.StorageArchive.Bool {
@@ -601,7 +602,7 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 					Visible:    false,
 					Attributes: map[string]string{"sid": strconv.Itoa(int(CurrentStorage.StorageID.Int64))},
 				},
-				Title: borrowingTitle,
+				Title: iconBorrowingTitle,
 			},
 			widgets.IconAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -611,7 +612,7 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 					},
 					Classes: []string{"iconlabel"},
 				},
-				Text: borrowingTitle,
+				Text: iconBorrowingTitle,
 				Icon: themes.NewMdiIcon(iconBorrowing, ""),
 			},
 			[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
@@ -651,7 +652,27 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 		Text: fmt.Sprintf("#%d", CurrentStorage.StorageID.Int64),
 	}).OuterHTML()
 
-	return buttonClone + buttonRestore + buttonDelete + buttonArchive + buttonBorrow + buttonEdit + buttonHistory + spanId
+	if CurrentStorage.Borrowing != nil && CurrentStorage.Borrowing.Borrower != nil && CurrentStorage.Borrowing.Borrower.PersonEmail != "" {
+
+		divBorrowing := widgets.NewDiv(widgets.DivAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+				Classes: []string{"row"},
+			},
+		})
+		borrowing := widgets.NewSpan(widgets.SpanAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+				Classes: []string{"iconlabel"},
+			},
+			Text: fmt.Sprintf("%s: %s %s", locales.Translate("storage_borrower_title", HTTPHeaderAcceptLanguage), CurrentStorage.Borrowing.Borrower.PersonEmail, CurrentStorage.Borrowing.BorrowingComment.String),
+		})
+		divBorrowing.AppendChild(borrowing)
+		commentBorrowing = divBorrowing.OuterHTML()
+
+	}
+
+	return buttonClone + buttonRestore + buttonDelete + buttonArchive + buttonBorrow + buttonEdit + buttonHistory + spanId + commentBorrowing
 
 }
 

@@ -22,6 +22,12 @@ type Person struct {
 	CaptchaUID     string        `json:"captcha_uid"`
 }
 
+func (elems People) GetRowConcreteTypeName() string {
+
+	return "Person"
+
+}
+
 func (elems People) IsExactMatch() bool {
 
 	return false

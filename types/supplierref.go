@@ -20,6 +20,12 @@ type SupplierRef struct {
 	Supplier         *Supplier `json:"supplier"`
 }
 
+func (elems SupplierRefs) GetRowConcreteTypeName() string {
+
+	return "SupplierRef"
+
+}
+
 func (s SupplierRef) ToJsValue() js.Value {
 
 	var (

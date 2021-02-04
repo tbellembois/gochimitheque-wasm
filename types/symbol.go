@@ -19,6 +19,12 @@ type Symbol struct {
 	SymbolImage string `json:"symbol_image"`
 }
 
+func (elems Symbols) GetRowConcreteTypeName() string {
+
+	return "Symbol"
+
+}
+
 func (elems Symbols) IsExactMatch() bool {
 
 	return false

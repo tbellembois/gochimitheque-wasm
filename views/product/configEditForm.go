@@ -185,7 +185,6 @@ func FillInProductForm(p Product, id string) {
 	if p.ProductSheet.Valid {
 		jquery.Jq("#product_sheet").SetVal(p.ProductSheet.String)
 	}
-
 	jquery.Jq("#product_threedformula").SetVal("")
 	if p.ProductThreeDFormula.Valid {
 		jquery.Jq("#product_threedformula").SetVal(p.ProductThreeDFormula.String)

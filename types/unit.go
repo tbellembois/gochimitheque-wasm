@@ -22,6 +22,12 @@ type Unit struct {
 	UnitMultiplier int            `json:"-"`
 }
 
+func (elems Units) GetRowConcreteTypeName() string {
+
+	return "Unit"
+
+}
+
 func (elems Units) IsExactMatch() bool {
 
 	return false

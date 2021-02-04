@@ -21,6 +21,12 @@ type PrecautionaryStatement struct {
 	PrecautionaryStatementCMR       sql.NullString `json:"PrecautionaryStatement_cmr"`
 }
 
+func (elems PrecautionaryStatements) GetRowConcreteTypeName() string {
+
+	return "PrecautionaryStatement"
+
+}
+
 func (elems PrecautionaryStatements) IsExactMatch() bool {
 
 	return false

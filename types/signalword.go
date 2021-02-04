@@ -20,6 +20,12 @@ type SignalWord struct {
 	SignalWordLabel sql.NullString `json:"signalword_label"`
 }
 
+func (elems SignalWords) GetRowConcreteTypeName() string {
+
+	return "SignalWord"
+
+}
+
 func (elems SignalWords) IsExactMatch() bool {
 
 	return false

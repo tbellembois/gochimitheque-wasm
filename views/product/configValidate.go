@@ -16,7 +16,7 @@ func ValidateProductCeNumberBeforeSend(this js.Value, args []js.Value) interface
 	id := "-1"
 	pid := jquery.Jq("input#product_id")
 
-	if pid.Object.Length() > 0 {
+	if pid.GetVal().String() != "" {
 		id = pid.GetVal().String()
 	}
 
@@ -39,7 +39,7 @@ func ValidateProductCasNumberBeforeSend(this js.Value, args []js.Value) interfac
 	id := "-1"
 	pid := jquery.Jq("input#product_id")
 
-	if pid.Object.Length() > 0 {
+	if pid.GetVal().String() != "" {
 		id = pid.GetVal().String()
 	}
 
@@ -56,7 +56,7 @@ func ValidateProductEmpiricalFormulaBeforeSend(this js.Value, args []js.Value) i
 	id := "-1"
 	pid := jquery.Jq("input#product_id")
 
-	if pid.Object.Length() > 0 {
+	if pid.GetVal().String() != "" {
 		id = pid.GetVal().String()
 	}
 

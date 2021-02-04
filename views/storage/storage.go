@@ -48,22 +48,6 @@ func storage_common() {
 			},
 		},
 	}).Validate()
-	validate.NewValidate(jquery.Jq("#borrowing"), &validate.ValidateConfig{
-		ErrorClass: "alert alert-danger",
-		Rules: map[string]validate.ValidateRule{
-			"borrower": {
-				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
-				Remote: validate.ValidateRemote{
-					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
-				},
-			},
-		},
-		Messages: map[string]validate.ValidateMessage{
-			"borrower": {
-				Required: locales.Translate("required_input", HTTPHeaderAcceptLanguage),
-			},
-		},
-	}).Validate()
 
 	// select2
 	select2.NewSelect2(jquery.Jq("select#unit_concentration"), &select2.Select2Config{
@@ -115,6 +99,29 @@ func storage_common() {
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Suppliers{})),
 		},
 	}).Select2ify()
+
+	storage_borrower()
+
+}
+
+func storage_borrower() {
+
+	validate.NewValidate(jquery.Jq("#borrowing"), &validate.ValidateConfig{
+		ErrorClass: "alert alert-danger",
+		Rules: map[string]validate.ValidateRule{
+			"borrower": {
+				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
+				Remote: validate.ValidateRemote{
+					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
+				},
+			},
+		},
+		Messages: map[string]validate.ValidateMessage{
+			"borrower": {
+				Required: locales.Translate("required_input", HTTPHeaderAcceptLanguage),
+			},
+		},
+	}).Validate()
 
 	select2.NewSelect2(jquery.Jq("select#borrower"), &select2.Select2Config{
 		Placeholder:    locales.Translate("storage_borrower_placeholder", HTTPHeaderAcceptLanguage),
@@ -203,6 +210,7 @@ func changeSwitchButtonToProduct() {
 func Storage_listCallback(this js.Value, args []js.Value) interface{} {
 
 	//storage_common()
+	storage_borrower()
 
 	bstable.NewBootstraptable(jquery.Jq("#Storage_table"), &bstable.BootstraptableParams{Ajax: "Storage_getTableData"})
 	jquery.Jq("#Storage_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))

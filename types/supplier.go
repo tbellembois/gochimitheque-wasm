@@ -20,6 +20,12 @@ type Supplier struct {
 	SupplierLabel sql.NullString `json:"supplier_label"`
 }
 
+func (elems Suppliers) GetRowConcreteTypeName() string {
+
+	return "Supplier"
+
+}
+
 func (elems Suppliers) IsExactMatch() bool {
 
 	return false

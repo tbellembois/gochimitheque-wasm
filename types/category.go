@@ -20,6 +20,12 @@ type Category struct {
 	CategoryLabel sql.NullString `json:"category_label"`
 }
 
+func (elems Categories) GetRowConcreteTypeName() string {
+
+	return "Category"
+
+}
+
 func (elems Categories) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {

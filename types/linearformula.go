@@ -20,6 +20,12 @@ type LinearFormula struct {
 	LinearFormulaLabel sql.NullString `json:"linearformula_label"`
 }
 
+func (elems LinearFormulas) GetRowConcreteTypeName() string {
+
+	return "LinearFormula"
+
+}
+
 func (elems LinearFormulas) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {

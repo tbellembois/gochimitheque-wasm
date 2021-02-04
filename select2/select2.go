@@ -84,6 +84,7 @@ type Select2 struct {
 type Select2ResultAble interface {
 	FromJsJSONValue(js.Value) Select2ResultAble
 	GetRows() []Select2ItemAble
+	GetRowConcreteTypeName() string
 	GetTotal() int
 	IsExactMatch() bool
 }
@@ -314,18 +315,25 @@ func Select2GenericAjaxProcessResults(select2ResultAble Select2ResultAble) func(
 		}
 
 		objects := select2ResultAble.FromJsJSONValue(data)
+		rowTypeName := objects.GetRowConcreteTypeName()
 
 		rows := objects.GetRows()
 		if len(rows) > 0 {
-			row := rows[0]
-			rowType := reflect.TypeOf(row).Elem()
-			rowTypeName := rowType.Name()
+
+			// row := rows[0]
+			// rowType := reflect.TypeOf(row).Elem()
+			// rowTypeName := rowType.Name()
 
 			if objects.IsExactMatch() {
 				jquery.Jq(fmt.Sprintf("input#exactMatch%s", rowTypeName)).SetVal(true)
 			} else {
 				jquery.Jq(fmt.Sprintf("input#exactMatch%s", rowTypeName)).SetVal(false)
 			}
+
+		} else {
+
+			jquery.Jq(fmt.Sprintf("input#exactMatch%s", rowTypeName)).SetVal(false)
+
 		}
 
 		var select2ItemAbles []Select2ItemAble
@@ -371,7 +379,7 @@ func Select2GenericCreateTag(select2ItemAble Select2ItemAble) func(this js.Value
 		objectName := reflect.TypeOf(select2ItemAble).Name()
 
 		if jquery.Jq(fmt.Sprintf("input#exactMatch%s", objectName)).GetVal().String() == "true" {
-			return nil
+			return js.Null()
 		}
 
 		return Select2Item{

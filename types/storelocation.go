@@ -27,6 +27,12 @@ type StoreLocation struct {
 	Stocks   []Stock          `json:"stock"`
 }
 
+func (elems StoreLocations) GetRowConcreteTypeName() string {
+
+	return "StoreLocation"
+
+}
+
 type Stock struct {
 	Total   float64 `json:"total"`
 	Current float64 `json:"current"`

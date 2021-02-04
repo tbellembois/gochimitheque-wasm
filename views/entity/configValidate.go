@@ -15,7 +15,7 @@ func ValidateEntityNameBeforeSend(this js.Value, args []js.Value) interface{} {
 	id := "-1"
 	eid := jquery.Jq("input#entity_id")
 
-	if eid.Object.Length() > 0 {
+	if eid.GetVal().String() != "" {
 		id = eid.GetVal().String()
 	}
 

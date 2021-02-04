@@ -22,6 +22,12 @@ type Entity struct {
 	EntityPC          int       `json:"entity_pc"`
 }
 
+func (elems Entities) GetRowConcreteTypeName() string {
+
+	return "Entity"
+
+}
+
 func (elems Entities) IsExactMatch() bool {
 
 	return false

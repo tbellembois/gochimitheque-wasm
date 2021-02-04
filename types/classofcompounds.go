@@ -19,6 +19,12 @@ type ClassOfCompound struct {
 	ClassOfCompoundLabel string `json:"classofcompound_label"`
 }
 
+func (elems ClassesOfCompound) GetRowConcreteTypeName() string {
+
+	return "ClassOfCompound"
+
+}
+
 func (elems ClassesOfCompound) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {

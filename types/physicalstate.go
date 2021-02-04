@@ -20,6 +20,12 @@ type PhysicalState struct {
 	PhysicalStateLabel sql.NullString `json:"physicalstate_label"`
 }
 
+func (elems PhysicalStates) GetRowConcreteTypeName() string {
+
+	return "PhysicalState"
+
+}
+
 func (elems PhysicalStates) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {

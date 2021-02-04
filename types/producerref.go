@@ -21,6 +21,12 @@ type ProducerRef struct {
 	Producer         *Producer      `json:"producer"`
 }
 
+func (elems ProducerRefs) GetRowConcreteTypeName() string {
+
+	return "ProducerRef"
+
+}
+
 func (p ProducerRef) ToJsValue() js.Value {
 
 	var (

@@ -21,6 +21,12 @@ type HazardStatement struct {
 	HazardStatementCMR       sql.NullString `json:"hazardstatement_cmr"`
 }
 
+func (elems HazardStatements) GetRowConcreteTypeName() string {
+
+	return "HazardStatement"
+
+}
+
 func (elems HazardStatements) IsExactMatch() bool {
 
 	return false
