@@ -16,7 +16,7 @@ func ValidateProductCeNumberBeforeSend(this js.Value, args []js.Value) interface
 	id := "-1"
 	pid := jquery.Jq("input#product_id")
 
-	if pid.GetVal().String() != "" {
+	if pid.Object.Length() > 0 {
 		id = pid.GetVal().String()
 	}
 
