@@ -701,8 +701,8 @@ func Product_listCallback(this js.Value, args []js.Value) interface{} {
 
 	jquery.Jq("#search").Show()
 	jquery.Jq("#actions").Show()
-	jquery.Jq("#s_storage_archive_button").Hide()
-	jquery.Jq("#s_storage_stock_button").Hide()
+	jquery.Jq("#s_storage_archive_button").SetInvisible()
+	jquery.Jq("#s_storage_stock_button").SetInvisible()
 
 	btnLabel := locales.Translate("switchstorageview_text", HTTPHeaderAcceptLanguage)
 	buttonTitle := widgets.NewIcon(widgets.IconAttributes{

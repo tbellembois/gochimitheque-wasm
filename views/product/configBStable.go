@@ -1649,7 +1649,7 @@ func ShowIfAuthorizedActionButtons(this js.Value, args []js.Value) interface{} {
 		jquery.Jq(".storages").FadeIn()
 		jquery.Jq(".ostorages").FadeIn()
 
-		jquery.Jq("#switchview").RemoveClass("invisible")
+		jquery.Jq("#switchview").SetVisible()
 	}, func() {
 	})
 	jsutils.HasPermission("products", "-2", "put", func() {

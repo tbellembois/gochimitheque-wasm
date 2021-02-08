@@ -158,3 +158,19 @@ func (jq Jquery) HasClass(class string) bool {
 	return jq.Object.Call("hasClass", class).Bool()
 
 }
+
+func (jq Jquery) SetVisible() Jquery {
+
+	jq = jq.RemoveClass("invisible")
+	jq = jq.AddClass("visible")
+	return jq
+
+}
+
+func (jq Jquery) SetInvisible() Jquery {
+
+	jq = jq.RemoveClass("visible")
+	jq = jq.AddClass("invisible")
+	return jq
+
+}

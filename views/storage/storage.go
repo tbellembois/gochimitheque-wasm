@@ -217,10 +217,10 @@ func Storage_listCallback(this js.Value, args []js.Value) interface{} {
 
 	jquery.Jq("#search").Show()
 	jquery.Jq("#actions").Show()
-	jquery.Jq("#s_storage_archive_button").Show()
+	jquery.Jq("#s_storage_archive_button").SetVisible()
 
 	if BSTableQueryFilter.QueryFilter.Product != "" {
-		jquery.Jq("#s_storage_stock_button").Show()
+		jquery.Jq("#s_storage_stock_button").SetVisible()
 	}
 
 	changeSwitchButtonToProduct()
