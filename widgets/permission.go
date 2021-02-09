@@ -5,6 +5,7 @@ import (
 	"syscall/js"
 
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
+	"github.com/tbellembois/gochimitheque-wasm/locales"
 	"honnef.co/go/js/dom/v2"
 )
 
@@ -62,7 +63,7 @@ func Permission(entityID int, entityName string, ismanager bool) *dom.HTMLDivEle
 				"name":      fmt.Sprintf("perm%s%d", i, entityID),
 				"value":     "none",
 				"checked":   "checked",
-				"label":     fmt.Sprintf("<label class=\"form-check-label ml-sm-1 pr-sm-1 pl-sm-1 text-secondary border border-secondary rounded\" for=\"permn%s%d\"><span class=\"mdi mdi-close\"></span></label>", i, entityID),
+				"label":     fmt.Sprintf("<label class=\"form-check-label ml-sm-1 pr-sm-1 pl-sm-1 text-secondary border border-secondary rounded\" for=\"permn%s%d\" title=\"%s\"><span class=\"mdi mdi-close\"></span></label>", i, entityID, locales.Translate("permission_none", HTTPHeaderAcceptLanguage)),
 				"perm_name": "n",
 				"item_name": i,
 				"entity_id": fmt.Sprintf("%d", entityID),
@@ -71,7 +72,7 @@ func Permission(entityID int, entityName string, ismanager bool) *dom.HTMLDivEle
 				"id":        fmt.Sprintf("permr%s%d", i, entityID),
 				"name":      fmt.Sprintf("perm%s%d", i, entityID),
 				"value":     "r",
-				"label":     fmt.Sprintf("<label class=\"form-check-label ml-sm-1 pr-sm-1 pl-sm-1 text-secondary border border-secondary rounded\" for=\"permn%s%d\"><span class=\"mdi mdi-eye\"></span></label>", i, entityID),
+				"label":     fmt.Sprintf("<label class=\"form-check-label ml-sm-1 pr-sm-1 pl-sm-1 text-secondary border border-secondary rounded\" for=\"permn%s%d\" title=\"%s\"><span class=\"mdi mdi-eye\"></span></label>", i, entityID, locales.Translate("permission_read", HTTPHeaderAcceptLanguage)),
 				"perm_name": "r",
 				"item_name": i,
 				"entity_id": fmt.Sprintf("%d", entityID),
@@ -80,7 +81,7 @@ func Permission(entityID int, entityName string, ismanager bool) *dom.HTMLDivEle
 				"id":        fmt.Sprintf("permw%s%d", i, entityID),
 				"name":      fmt.Sprintf("perm%s%d", i, entityID),
 				"value":     "w",
-				"label":     fmt.Sprintf("<label class=\"form-check-label ml-sm-1 pr-sm-1 pl-sm-1 text-secondary border border-secondary rounded\" for=\"permn%s%d\"><span class=\"mdi mdi-eye\"></span><span class=\"mdi mdi-creation\"></span><span class=\"mdi mdi-border-color\"></span><span class=\"mdi mdi-delete\"></span></label>", i, entityID),
+				"label":     fmt.Sprintf("<label class=\"form-check-label ml-sm-1 pr-sm-1 pl-sm-1 text-secondary border border-secondary rounded\" for=\"permn%s%d\" title=\"%s\"><span class=\"mdi mdi-eye\"></span><span class=\"mdi mdi-creation\"></span><span class=\"mdi mdi-border-color\"></span><span class=\"mdi mdi-delete\"></span></label>", i, entityID, locales.Translate("permission_crud", HTTPHeaderAcceptLanguage)),
 				"perm_name": "w",
 				"item_name": i,
 				"entity_id": fmt.Sprintf("%d", entityID),

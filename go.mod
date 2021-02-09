@@ -1,6 +1,6 @@
 module github.com/tbellembois/gochimitheque-wasm
 
-go 1.15
+go 1.16
 
 replace (
 	github.com/tbellembois/gochimitheque v2.0.6+incompatible => /home/thbellem/workspace/workspace_go/src/github.com/tbellembois/gochimitheque
