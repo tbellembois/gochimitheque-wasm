@@ -177,7 +177,7 @@ func ResetPassword(this js.Value, args []js.Value) interface{} {
 
 func Login_listCallback(this js.Value, args []js.Value) interface{} {
 
-	validate.NewValidate(jquery.Jq("#authForm"), &validate.ValidateConfig{
+	validate.NewValidate(jquery.Jq("#authform"), &validate.ValidateConfig{
 		ErrorClass: "alert alert-danger",
 		Rules: map[string]validate.ValidateRule{
 			"person_email": {
