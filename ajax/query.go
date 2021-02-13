@@ -27,6 +27,8 @@ type QueryFilter struct {
 	ProductBookmark             bool   `json:"bookmark,omitempty"`
 	Storage                     string `json:"storage,omitempty"`
 	StorageFilterLabel          string
+	Storages                    []int `json:"ids,omitempty"`
+	StoragesFilterLabel         string
 	UnitType                    string `json:"unit_type,omitempty"`
 	Supplier                    string `json:"supplier,omitempty"`
 	Producer                    string `json:"producer,omitempty"`
@@ -120,6 +122,11 @@ func (q QueryFilter) ToRawQuery() string {
 	}
 	if q.Storage != "" {
 		values.Set("storage", q.Storage)
+	}
+	if len(q.Storages) > 0 {
+		for _, storage := range q.Storages {
+			values.Add("ids", strconv.Itoa(storage))
+		}
 	}
 	if q.Supplier != "" {
 		values.Set("supplier", q.Supplier)

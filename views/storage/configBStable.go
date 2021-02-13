@@ -108,7 +108,7 @@ func Storage_operateEventsClone(this js.Value, args []js.Value) interface{} {
 	}
 
 	href := fmt.Sprintf("%svc/storages", ApplicationProxyPath)
-	jsutils.LoadContent("div#content", "storage", href, Storage_createCallback, CurrentStorage)
+	jsutils.LoadContent("div#content", "storage", href, Storage_createCallback, CurrentStorage, "clone")
 
 	return nil
 
@@ -1325,7 +1325,8 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 
 	queryFilter := ajax.QueryFilterFromJsJSONValue(params)
 
-	// Storage_SaveCallback storage id.
+	queryFilter.Storages = BSTableQueryFilter.Storages
+	queryFilter.StoragesFilterLabel = BSTableQueryFilter.StoragesFilterLabel
 	queryFilter.Product = BSTableQueryFilter.Product
 	queryFilter.ProductFilterLabel = BSTableQueryFilter.ProductFilterLabel
 	queryFilter.Storage = BSTableQueryFilter.Storage

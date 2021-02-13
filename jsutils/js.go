@@ -293,6 +293,10 @@ func DisplayFilter(q ajax.QueryFilter) {
 		isFilter = true
 		jquery.Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("storage", globals.HTTPHeaderAcceptLanguage), q.StorageFilterLabel))
 	}
+	if len(q.Storages) > 0 {
+		isFilter = true
+		jquery.Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("storages", globals.HTTPHeaderAcceptLanguage), q.StoragesFilterLabel))
+	}
 
 	if q.CustomNamePartOf != "" {
 		isFilter = true

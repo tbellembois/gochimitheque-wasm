@@ -21,7 +21,9 @@ var (
 	// the listed storages.
 	CurrentProduct types.Product
 	// CurrentStorage is the current viewed or edited storage.
-	CurrentStorage            types.Storage
+	CurrentStorage types.Storage
+	// CurrentStorages are the newly created storages.
+	CurrentStorages           []types.Storage
 	DBPrecautionaryStatements []types.PrecautionaryStatement // for magic selector
 	DBHazardStatements        []types.HazardStatement        // for magic selector
 

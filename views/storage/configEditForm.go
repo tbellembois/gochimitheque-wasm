@@ -395,13 +395,13 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 				err error
 			)
 
-			if err = json.Unmarshal([]byte(data.String()), &CurrentStorage); err != nil {
+			if err = json.Unmarshal([]byte(data.String()), &CurrentStorages); err != nil {
 				jsutils.DisplayGenericErrorMessage()
 				fmt.Println(err)
 			} else {
 				href := fmt.Sprintf("%sv/storages", ApplicationProxyPath)
 				jsutils.ClearSearchExceptProduct(js.Null(), nil)
-				jsutils.LoadContent("div#content", "storage", href, Storage_SaveCallback, int(globals.CurrentStorage.StorageID.Int64))
+				jsutils.LoadContent("div#content", "storage", href, Storage_SaveCallback)
 			}
 
 		},

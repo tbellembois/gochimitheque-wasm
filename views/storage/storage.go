@@ -3,7 +3,6 @@ package storage
 import (
 	"fmt"
 	"reflect"
-	"strconv"
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/bstable"
@@ -161,8 +160,10 @@ func Storage_createCallback(args ...interface{}) {
 
 		FillInStorageForm(storage, "storage")
 
-		jquery.Jq("input#storage_nbitem").SetProp("disabled", "disabled")
-		jquery.Jq("input#storage_identicalbarecode").SetProp("disabled", "disabled")
+		if !(len(args) > 1 && args[1] == "clone") {
+			jquery.Jq("input#storage_nbitem").SetProp("disabled", "disabled")
+			jquery.Jq("input#storage_identicalbarecode").SetProp("disabled", "disabled")
+		}
 
 	}
 
@@ -231,9 +232,18 @@ func Storage_listCallback(this js.Value, args []js.Value) interface{} {
 
 func Storage_SaveCallback(args ...interface{}) {
 
+	var (
+		currentStorageIds []int
+		filterLabel       string
+	)
+	for _, storage := range CurrentStorages {
+		currentStorageIds = append(currentStorageIds, int(storage.StorageID.Int64))
+		filterLabel += fmt.Sprintf("#%d ", storage.StorageID.Int64)
+	}
+
 	BSTableQueryFilter.Lock()
-	BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(args[0].(int))
-	BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d", CurrentStorage.StorageID.Int64)
+	BSTableQueryFilter.QueryFilter.Storages = currentStorageIds
+	BSTableQueryFilter.QueryFilter.StoragesFilterLabel = filterLabel
 	BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", globals.CurrentProduct.Name.NameLabel, globals.CurrentProduct.ProductSpecificity.String)
 	bstable.NewBootstraptable(jquery.Jq("#Storage_table"), nil).Refresh(nil)
 
