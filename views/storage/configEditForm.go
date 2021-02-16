@@ -371,11 +371,9 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 	}
 
 	if (!jquery.Jq("form#storage input#storage_id").GetVal().IsUndefined()) && jquery.Jq("form#storage input#storage_id").GetVal().String() != "" {
-		fmt.Println("update")
 		ajaxURL = fmt.Sprintf("%sstorages/%d", ApplicationProxyPath, globals.CurrentStorage.StorageID.Int64)
 		ajaxMethod = "put"
 	} else {
-		fmt.Println("create")
 		ajaxURL = fmt.Sprintf("%sstorages", ApplicationProxyPath)
 		ajaxMethod = "post"
 	}
@@ -418,7 +416,9 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 
 func FillInStorageForm(s Storage, id string) {
 
-	jquery.Jq(fmt.Sprintf("#%s #storage_id", id)).SetVal(s.StorageID.Int64)
+	if s.StorageID.Valid {
+		jquery.Jq(fmt.Sprintf("#%s #storage_id", id)).SetVal(s.StorageID.Int64)
+	}
 
 	select2StoreLocation := select2.NewSelect2(jquery.Jq("select#storelocation"), nil)
 	select2StoreLocation.Select2Clear()
