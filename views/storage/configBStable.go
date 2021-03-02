@@ -1468,15 +1468,15 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 							Visible: true,
 							Classes: []string{"iconlabel"},
 						},
-						Onclick: "$('#export').hide()",
+						Onclick: "$('#export').collapse('hide')",
 						Title:   locales.Translate("download_export", HTTPHeaderAcceptLanguage),
 						Href:    fmt.Sprintf("%sdownload/%s", ApplicationProxyPath, storages.GetExportFn()),
 						Label:   icon,
 					})
 
-					jquery.Jq("#export-body").SetHtml("")
-					jquery.Jq("#export-body").Append(downloadLink.OuterHTML())
+					jquery.Jq("#export-body").SetHtml(downloadLink.OuterHTML())
 					jquery.Jq("#export").Show()
+					jquery.Jq("button#export").SetProp("disabled", false)
 
 				} else if storages.GetTotal() != 0 {
 					row.Call("success", js.ValueOf(js.Global().Get("JSON").Call("parse", data)))

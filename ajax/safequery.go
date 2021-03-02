@@ -23,7 +23,9 @@ func (s *SafeQueryFilter) Unlock() {
 }
 
 func (s *SafeQueryFilter) Clean() {
+	s.Lock()
 	s.QueryFilter = QueryFilter{}
+	s.Unlock()
 }
 
 func (s *SafeQueryFilter) CleanExceptProduct() {

@@ -227,7 +227,7 @@ func Search_listCallback(args ...interface{}) {
 		jquery.Jq("#stock").Append(widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
-				Classes: []string{"mdi", "mdi-loading", "mdi-spin"},
+				Classes: []string{"mdi", "mdi-loading", "mdi-spin", "mdi-36px"},
 			},
 		}).OuterHTML())
 
