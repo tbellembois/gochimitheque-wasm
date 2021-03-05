@@ -158,6 +158,18 @@ func Search_listCallback(args ...interface{}) {
 		},
 	}).Select2ify()
 
+	select2.NewSelect2(jquery.Jq("select#s_producerref"), &select2.Select2Config{
+		Placeholder:    locales.Translate("s_producerref", HTTPHeaderAcceptLanguage),
+		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(ProducerRef{})),
+		AllowClear:     true,
+		Ajax: select2.Select2Ajax{
+			URL:            ApplicationProxyPath + "products/producerrefs/",
+			DataType:       "json",
+			Data:           js.FuncOf(select2.Select2GenericAjaxData),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(ProducerRefs{})),
+		},
+	}).Select2ify()
+
 	select2.NewSelect2(jquery.Jq("select#s_signalword"), &select2.Select2Config{
 		Placeholder:    locales.Translate("s_signalword", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(SignalWord{})),

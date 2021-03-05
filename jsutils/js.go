@@ -314,6 +314,10 @@ func DisplayFilter(q ajax.QueryFilter) {
 		isFilter = true
 		jquery.Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_storage_barecode", globals.HTTPHeaderAcceptLanguage), q.StorageBarecode))
 	}
+	if q.StorageBatchNumber != "" {
+		isFilter = true
+		jquery.Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_storage_batchnumber", globals.HTTPHeaderAcceptLanguage), q.StorageBatchNumberFilterLabel))
+	}
 	if q.StoreLocation != "" {
 		isFilter = true
 		jquery.Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_storelocation", globals.HTTPHeaderAcceptLanguage), q.StoreLocationFilterLabel))
@@ -321,6 +325,10 @@ func DisplayFilter(q ajax.QueryFilter) {
 	if q.Name != "" {
 		isFilter = true
 		jquery.Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_name", globals.HTTPHeaderAcceptLanguage), q.NameFilterLabel))
+	}
+	if q.ProducerRef != "" {
+		isFilter = true
+		jquery.Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_producerref", globals.HTTPHeaderAcceptLanguage), q.ProducerRefFilterLabel))
 	}
 
 	if q.ProductBookmark {

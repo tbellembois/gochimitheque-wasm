@@ -1337,6 +1337,15 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 	BSTableQueryFilter.Export = false
 	BSTableQueryFilter.Unlock()
 
+	select2SProducerRef := select2.NewSelect2(jquery.Jq("select#s_producerref"), nil)
+	if select2SProducerRef.Select2IsInitialized() {
+		i := select2SProducerRef.Select2Data()
+		if len(i) > 0 {
+			queryFilter.ProducerRef = i[0].Id
+			queryFilter.ProducerRefFilterLabel = i[0].Text
+		}
+	}
+
 	select2SStoreLocation := select2.NewSelect2(jquery.Jq("select#s_storelocation"), nil)
 	if select2SStoreLocation.Select2IsInitialized() {
 		i := select2SStoreLocation.Select2Data()
@@ -1404,6 +1413,10 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 		}
 	}
 
+	if jquery.Jq("#s_storage_batchnumber").GetVal().Truthy() {
+		queryFilter.StorageBatchNumber = jquery.Jq("#s_storage_batchnumber").GetVal().String()
+		queryFilter.StorageBatchNumberFilterLabel = jquery.Jq("#s_storage_batchnumber").GetVal().String()
+	}
 	if jquery.Jq("#s_storage_barecode").GetVal().Truthy() {
 		queryFilter.StorageBarecode = jquery.Jq("#s_storage_barecode").GetVal().String()
 	}
