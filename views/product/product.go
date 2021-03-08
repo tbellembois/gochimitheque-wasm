@@ -588,7 +588,7 @@ func ShowIfAuthorizedMenuItems(args ...interface{}) {
 
 }
 
-func showStockRecursive(storelocation *StoreLocation, depth int) {
+func showStockRecursive(storelocation *StoreLocation, depth int, jqSelector string) {
 
 	// Checking if there is a stock or not for the store location.
 	hasStock := false
@@ -604,7 +604,7 @@ func showStockRecursive(storelocation *StoreLocation, depth int) {
 		// Depth.
 		depthSep := ""
 		for i := 0; i <= depth; i++ {
-			depthSep += "<span class='mdi mdi-microsoft'></span>"
+			depthSep += "<span class='mdi mdi-square-outline'></span>"
 		}
 
 		rowStorelocation := widgets.NewDiv(widgets.DivAttributes{
@@ -616,53 +616,51 @@ func showStockRecursive(storelocation *StoreLocation, depth int) {
 		rowStorelocation.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
-				Classes: []string{"col", "iconlabel"},
+				Classes: []string{"iconlabel"},
 			},
 			Text: fmt.Sprintf("%s %s", depthSep, storelocation.StoreLocationName.String),
 		}))
 
-		jquery.Jq("#stock").Append(rowStorelocation.OuterHTML())
-
 		for _, stock := range storelocation.Stocks {
-
-			rowStocks := widgets.NewDiv(widgets.DivAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-					Classes: []string{"row", "iconlabel"},
-				},
-			})
 
 			if !(stock.Total == 0 && stock.Current == 0) {
 
-				rowStock := widgets.NewDiv(widgets.DivAttributes{
+				rowStorelocation.AppendChild(widgets.NewIcon(widgets.IconAttributes{
 					BaseAttributes: widgets.BaseAttributes{
 						Visible: true,
-						Classes: []string{"col-sm-12", "iconlabel"},
+						Classes: []string{"ml-sm-2"},
 					},
-				})
-
-				rowStock.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
-					BaseAttributes: widgets.BaseAttributes{
-						Visible: true,
-						Classes: []string{"iconlabel"},
-					},
-					Text: fmt.Sprintf("%s %s: %f %s %s: %f %s",
-						depthSep,
-						locales.Translate("stock_storelocation_title", HTTPHeaderAcceptLanguage),
-						stock.Current,
-						stock.Unit.UnitLabel.String,
-						locales.Translate("stock_storelocation_sub_title", HTTPHeaderAcceptLanguage),
-						stock.Total,
-						stock.Unit.UnitLabel.String),
+					Icon:  themes.NewMdiIcon(themes.MDI_STORELOCATION, ""),
+					Title: locales.Translate("stock_storelocation_title", HTTPHeaderAcceptLanguage),
 				}))
-
-				rowStocks.AppendChild(rowStock)
-
-				jquery.Jq("#stock").Append(rowStocks.OuterHTML())
+				rowStorelocation.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+						Classes: []string{""},
+					},
+					Text: fmt.Sprintf("%g %s", stock.Current, stock.Unit.UnitLabel.String),
+				}))
+				rowStorelocation.AppendChild(widgets.NewIcon(widgets.IconAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+						Classes: []string{"ml-sm-2"},
+					},
+					Icon:  themes.NewMdiIcon(themes.MDI_SUBSTORELOCATION, ""),
+					Title: locales.Translate("stock_storelocation_sub_title", HTTPHeaderAcceptLanguage),
+				}))
+				rowStorelocation.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+						Classes: []string{""},
+					},
+					Text: fmt.Sprintf("%g %s", stock.Total, stock.Unit.UnitLabel.String),
+				}))
 
 			}
 
 		}
+
+		jquery.Jq(jqSelector).Append(rowStorelocation.OuterHTML())
 
 	}
 
@@ -670,7 +668,7 @@ func showStockRecursive(storelocation *StoreLocation, depth int) {
 		depth++
 		for _, child := range storelocation.Children {
 
-			showStockRecursive(child, depth)
+			showStockRecursive(child, depth, jqSelector)
 
 		}
 	}

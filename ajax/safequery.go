@@ -33,7 +33,9 @@ func (s *SafeQueryFilter) CleanExceptProduct() {
 	backupProduct := s.QueryFilter.Product
 	backupProductFilterLabel := s.QueryFilter.ProductFilterLabel
 	s.Clean()
+	s.Lock()
 	s.QueryFilter.Product = backupProduct
 	s.QueryFilter.ProductFilterLabel = backupProductFilterLabel
+	s.Unlock()
 
 }

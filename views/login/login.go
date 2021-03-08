@@ -196,6 +196,20 @@ func Login_listCallback(this js.Value, args []js.Value) interface{} {
 		},
 	}).Validate()
 
+	jquery.Jq("#authform input").On("keyup", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+
+		event := args[0]
+		if event.Get("which").Int() == 13 {
+
+			event.Call("preventDefault")
+			GetToken(js.Null(), nil)
+
+		}
+
+		return nil
+
+	}))
+
 	return nil
 
 }

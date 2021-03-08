@@ -187,6 +187,87 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 
 }
 
+func OperateEventsTotalStock(this js.Value, args []js.Value) interface{} {
+
+	row := args[2]
+	product := Product{}.ProductFromJsJSONValue(row)
+
+	jquery.Jq(fmt.Sprintf("#totalstock-collapse-%d", product.ProductID)).Append(widgets.NewSpan(widgets.SpanAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"mdi", "mdi-loading", "mdi-spin", "mdi-36px"},
+		},
+	}).OuterHTML())
+
+	jquery.Jq(fmt.Sprintf("#totalstock-collapse-%d", product.ProductID)).Show()
+
+	url := fmt.Sprintf("%sentities/stocks/%d", ApplicationProxyPath, product.ProductID)
+	method := "get"
+
+	done := func(data js.Value) {
+
+		var (
+			storelocations []StoreLocation
+			err            error
+		)
+
+		if err = json.Unmarshal([]byte(data.String()), &storelocations); err != nil {
+			fmt.Println(err)
+		}
+
+		jquery.Jq(fmt.Sprintf("#totalstock-collapse-%d", product.ProductID)).SetHtml("")
+
+		// rowButtonClose := widgets.NewDiv(widgets.DivAttributes{
+		// 	BaseAttributes: widgets.BaseAttributes{
+		// 		Visible: true,
+		// 		Classes: []string{"row"},
+		// 	},
+		// })
+		// buttonClose := widgets.NewBSButtonWithIcon(
+		// 	widgets.ButtonAttributes{
+		// 		BaseAttributes: widgets.BaseAttributes{
+		// 			Visible: true,
+		// 			Attributes: map[string]string{
+		// 				"onclick": fmt.Sprintf("$('#totalstock-collapse-%d').html('')", product.ProductID),
+		// 			},
+		// 		},
+		// 		Title: locales.Translate("close", HTTPHeaderAcceptLanguage),
+		// 	},
+		// 	widgets.IconAttributes{
+		// 		BaseAttributes: widgets.BaseAttributes{
+		// 			Visible: true,
+		// 			Classes: []string{"iconlabel"},
+		// 		},
+		// 		Text: locales.Translate("close", HTTPHeaderAcceptLanguage),
+		// 		Icon: themes.NewMdiIcon(themes.MDI_CLOSE, ""),
+		// 	},
+		// 	[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
+		// )
+		// rowButtonClose.AppendChild(buttonClose)
+
+		// jquery.Jq(fmt.Sprintf("#totalstock-collapse-%d", product.ProductID)).Append(rowButtonClose.OuterHTML())
+
+		for _, storelocation := range storelocations {
+			showStockRecursive(&storelocation, 0, fmt.Sprintf("#totalstock-collapse-%d", product.ProductID))
+		}
+
+	}
+	fail := func(data js.Value) {
+
+		jsutils.DisplayGenericErrorMessage()
+
+	}
+
+	ajax.Ajax{
+		Method: method,
+		URL:    url,
+		Done:   done,
+		Fail:   fail,
+	}.Send()
+
+	return nil
+}
+
 func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
@@ -378,6 +459,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 		i := select2SSignalWord.Select2Data()
 		if len(i) > 0 {
 			queryFilter.SignalWord = i[0].Id
+			queryFilter.SignalWordFilterLabel = i[0].Text
 		}
 	}
 
@@ -387,6 +469,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 		if len(i) > 0 {
 			for _, hs := range i {
 				queryFilter.HazardStatements = append(queryFilter.HazardStatements, hs.Id)
+				queryFilter.HazardStatementsFilterLabel += fmt.Sprintf(" %s", hs.Text)
 			}
 		}
 	}
@@ -397,6 +480,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 		if len(i) > 0 {
 			for _, ps := range i {
 				queryFilter.PrecautionaryStatements = append(queryFilter.PrecautionaryStatements, ps.Id)
+				queryFilter.PrecautionaryStatementsFilterLabel += fmt.Sprintf(" %s", ps.Text)
 			}
 		}
 	}
@@ -407,6 +491,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 		if len(i) > 0 {
 			for _, s := range i {
 				queryFilter.Symbols = append(queryFilter.Symbols, s.Id)
+				queryFilter.SignalWordFilterLabel += fmt.Sprintf(" %s", s.Text)
 			}
 		}
 	}
@@ -417,18 +502,23 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 	}
 	if jquery.Jq("#s_storage_barecode").GetVal().Truthy() {
 		queryFilter.StorageBarecode = jquery.Jq("#s_storage_barecode").GetVal().String()
+		queryFilter.StorageBarecodeFilterLabel = jquery.Jq("#s_storage_barecode").GetVal().String()
 	}
 	if jquery.Jq("#s_custom_name_part_of").GetVal().Truthy() {
 		queryFilter.CustomNamePartOf = jquery.Jq("#s_custom_name_part_of").GetVal().String()
+		queryFilter.CustomNamePartOfFilterLabel = jquery.Jq("#s_custom_name_part_of").GetVal().String()
 	}
 	if jquery.Jq("#s_casnumber_cmr:checked").Object.Length() > 0 {
 		queryFilter.CasNumberCMR = true
+		queryFilter.CasNumberCMRFilterLabel = locales.Translate("s_casnumber_cmr", globals.HTTPHeaderAcceptLanguage)
 	}
 	if jquery.Jq("#s_borrowing:checked").Object.Length() > 0 {
 		queryFilter.Borrowing = true
+		queryFilter.BorrowingFilterLabel = locales.Translate("s_borrowing", globals.HTTPHeaderAcceptLanguage)
 	}
 	if jquery.Jq("#s_storage_to_destroy:checked").Object.Length() > 0 {
 		queryFilter.StorageToDestroy = true
+		queryFilter.StorageToDestroyFilterLabel = locales.Translate("s_storage_to_destroy", globals.HTTPHeaderAcceptLanguage)
 	}
 
 	jsutils.DisplayFilter(queryFilter)
@@ -1493,11 +1583,40 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 		[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
 	).OuterHTML()
 
+	buttonTotalStock := widgets.NewBSButtonWithIcon(
+		widgets.ButtonAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Id:         "totalstock" + strconv.Itoa(globals.CurrentProduct.ProductID),
+				Classes:    []string{"totalstock"},
+				Visible:    false,
+				Attributes: map[string]string{"pid": strconv.Itoa(globals.CurrentProduct.ProductID)},
+			},
+			Title: locales.Translate("totalstock_text", HTTPHeaderAcceptLanguage),
+		},
+		widgets.IconAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+				Classes: []string{"iconlabel"},
+			},
+			Text: locales.Translate("totalstock_text", HTTPHeaderAcceptLanguage),
+			Icon: themes.NewMdiIcon(themes.MDI_TOTALSTOCK, ""),
+		},
+		[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
+	).OuterHTML()
+
 	ostoragesDiv := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
 			Id:      "ostorages-collapse-" + strconv.Itoa(globals.CurrentProduct.ProductID),
 			Classes: []string{"collapse"},
+		},
+	}).OuterHTML()
+
+	totalstockDiv := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Id:      "totalstock-collapse-" + strconv.Itoa(globals.CurrentProduct.ProductID),
+			Classes: []string{"collapse", "p-sm-3", "float-right"},
 		},
 	}).OuterHTML()
 
@@ -1511,7 +1630,7 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 		}).OuterHTML()
 	}
 
-	return buttonStorages + buttonOStorages + buttonStore + buttonEdit + buttonDelete + buttonBookmark + ostoragesDiv + iconRestricted + spanCasCMR + spanHSCMR + imgSGH02
+	return buttonStorages + buttonOStorages + buttonStore + buttonEdit + buttonDelete + buttonBookmark + buttonTotalStock + ostoragesDiv + totalstockDiv + iconRestricted + spanCasCMR + spanHSCMR + imgSGH02
 
 }
 
@@ -1661,6 +1780,7 @@ func ShowIfAuthorizedActionButtons(this js.Value, args []js.Value) interface{} {
 	jsutils.HasPermission("storages", "-2", "get", func() {
 		jquery.Jq(".storages").FadeIn()
 		jquery.Jq(".ostorages").FadeIn()
+		jquery.Jq(".totalstock").FadeIn()
 
 		jquery.Jq("#switchview").SetVisible()
 	}, func() {

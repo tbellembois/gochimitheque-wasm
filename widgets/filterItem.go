@@ -1,9 +1,16 @@
 package widgets
 
+import (
+	"fmt"
+
+	"github.com/tbellembois/gochimitheque-wasm/globals"
+	"github.com/tbellembois/gochimitheque-wasm/locales"
+	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
+)
+
 func FilterItem(title, value string) string {
 
 	var (
-		colTitle *div
 		colValue *div
 	)
 
@@ -14,43 +21,65 @@ func FilterItem(title, value string) string {
 		},
 	})
 
-	colTitle = NewDiv(DivAttributes{
+	colRemoveFilter := NewDiv(DivAttributes{
 		BaseAttributes: BaseAttributes{
 			Visible: true,
-			Classes: []string{"col", "iconlabel"},
+			Classes: []string{"col-sm-auto"},
 		},
 	})
-	colTitle.AppendChild(NewSpan(SpanAttributes{
+	colRemoveFilter.AppendChild(NewBSButtonWithIcon(
+		ButtonAttributes{
+			BaseAttributes: BaseAttributes{
+				Visible: true,
+				Id:      fmt.Sprintf("removefilter%s", title),
+				Classes: []string{"btn-sm", "btn", "btn-outline-primary"},
+			},
+			Title: locales.Translate("remove_filter", globals.HTTPHeaderAcceptLanguage),
+		},
+		IconAttributes{
+			BaseAttributes: BaseAttributes{
+				Visible: true,
+			},
+			Icon:  themes.NewMdiIcon(themes.MDI_REMOVEFILTER, themes.MDI_16PX),
+			Title: locales.Translate("remove_filter", globals.HTTPHeaderAcceptLanguage),
+		},
+		[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
+	))
+
+	colRemoveFilter.AppendChild(NewSpan(SpanAttributes{
 		BaseAttributes: BaseAttributes{
 			Visible: true,
-			Classes: []string{"text-end"},
+			Classes: []string{"iconlabel", "text-primary"},
 		},
-		Text: title,
+		Text: locales.Translate(title, globals.HTTPHeaderAcceptLanguage),
 	}))
 
-	var classes []string
-	if title == "" {
-		classes = []string{"col-sm-10", "badge", "badge-dark", "mt-sm-2"}
-	} else {
-		classes = []string{"col"}
-	}
 	colValue = NewDiv(DivAttributes{
 		BaseAttributes: BaseAttributes{
 			Visible: true,
-			Classes: classes,
+			Classes: []string{"col-sm-auto"},
 		},
 	})
-	colValue.AppendChild(NewSpan(SpanAttributes{
-		BaseAttributes: BaseAttributes{
-			Visible: true,
-			Classes: []string{"text-start"},
-		},
-		Text: value,
-	}))
-
-	if title != "" {
-		row.AppendChild(colTitle)
+	switch title {
+	case "s_casnumber_cmr", "s_borrowing", "s_storage_to_destroy":
+		colValue.AppendChild(NewIcon(IconAttributes{
+			BaseAttributes: BaseAttributes{
+				Visible: true,
+				Classes: []string{"iconlabel"},
+			},
+			Icon: themes.NewMdiIcon(themes.MDI_OK, ""),
+		}))
+	default:
+		colValue.AppendChild(NewSpan(SpanAttributes{
+			BaseAttributes: BaseAttributes{
+				Visible: true,
+				Classes: []string{"text-start"},
+			},
+			Text: value,
+		}))
 	}
+
+	row.AppendChild(colRemoveFilter)
 	row.AppendChild(colValue)
 
 	return row.OuterHTML()

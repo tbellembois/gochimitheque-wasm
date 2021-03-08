@@ -22,42 +22,51 @@ type QueryParams struct {
 // results ("/entities", "/people"...).
 // It is especially used by select2 and bootstraptable.
 type QueryFilter struct {
-	Product                       string `json:"product,omitempty"`
-	ProductFilterLabel            string
-	ProductBookmark               bool   `json:"bookmark,omitempty"`
-	ProducerRef                   string `json:"producerref,omitempty"`
-	ProducerRefFilterLabel        string
-	Storage                       string `json:"storage,omitempty"`
-	StorageFilterLabel            string
-	Storages                      []int `json:"ids,omitempty"`
-	StoragesFilterLabel           string
-	UnitType                      string `json:"unit_type,omitempty"`
-	Supplier                      string `json:"supplier,omitempty"`
-	Producer                      string `json:"producer,omitempty"`
-	StoreLocation                 string `json:"storelocation,omitempty"`
-	StoreLocationCanStore         bool   `json:"storelocation_canstore,omitempty"`
-	StoreLocationFilterLabel      string
-	Entity                        string `json:"entity,omitempty"`
-	Name                          string `json:"name,omitempty"`
-	NameFilterLabel               string
-	CasNumber                     string `json:"casnumber,omitempty"`
-	CasNumberFilterLabel          string
-	EmpiricalFormula              string `json:"empiricalformula,omitempty"`
-	EmpiricalFormulaFilterLabel   string
-	SignalWord                    string   `json:"signalword,omitempty"`
-	HazardStatements              []string `json:"hazardstatements,omitempty"`
-	PrecautionaryStatements       []string `json:"precautionarystatements,omitempty"`
-	Symbols                       []string `json:"symbols,omitempty"`
-	StorageBarecode               string   `json:"storage_barecode,omitempty"`
-	CustomNamePartOf              string   `json:"custom_name_part_of,omitempty"`
-	CasNumberCMR                  bool     `json:"casnumber_cmr,omitempty"`
-	Borrowing                     bool     `json:"borrowing,omitempty"`
-	StorageToDestroy              bool     `json:"storage_to_destroy,omitempty"`
-	StorageArchive                bool     `json:"storage_archive,omitempty"`
-	StorageHistory                bool     `json:"storage_history,omitempty"`
-	StorageBatchNumber            string   `json:"storage_batchnumber,omitempty"`
-	StorageBatchNumberFilterLabel string
-	Export                        bool `json:"export,omitempty"`
+	Product                            string `json:"product,omitempty"`
+	ProductFilterLabel                 string
+	ProductBookmark                    bool   `json:"bookmark,omitempty"`
+	ProducerRef                        string `json:"producerref,omitempty"`
+	ProducerRefFilterLabel             string
+	Storage                            string `json:"storage,omitempty"`
+	StorageFilterLabel                 string
+	Storages                           []int `json:"ids,omitempty"`
+	StoragesFilterLabel                string
+	UnitType                           string `json:"unit_type,omitempty"`
+	Supplier                           string `json:"supplier,omitempty"`
+	Producer                           string `json:"producer,omitempty"`
+	StoreLocation                      string `json:"storelocation,omitempty"`
+	StoreLocationCanStore              bool   `json:"storelocation_canstore,omitempty"`
+	StoreLocationFilterLabel           string
+	Entity                             string `json:"entity,omitempty"`
+	Name                               string `json:"name,omitempty"`
+	NameFilterLabel                    string
+	CasNumber                          string `json:"casnumber,omitempty"`
+	CasNumberFilterLabel               string
+	EmpiricalFormula                   string `json:"empiricalformula,omitempty"`
+	EmpiricalFormulaFilterLabel        string
+	SignalWord                         string `json:"signalword,omitempty"`
+	SignalWordFilterLabel              string
+	HazardStatements                   []string `json:"hazardstatements,omitempty"`
+	HazardStatementsFilterLabel        string
+	PrecautionaryStatements            []string `json:"precautionarystatements,omitempty"`
+	PrecautionaryStatementsFilterLabel string
+	Symbols                            []string `json:"symbols,omitempty"`
+	SymbolsFilterLabel                 string
+	StorageBarecode                    string `json:"storage_barecode,omitempty"`
+	StorageBarecodeFilterLabel         string
+	CustomNamePartOf                   string `json:"custom_name_part_of,omitempty"`
+	CustomNamePartOfFilterLabel        string
+	CasNumberCMR                       bool `json:"casnumber_cmr,omitempty"`
+	CasNumberCMRFilterLabel            string
+	Borrowing                          bool `json:"borrowing,omitempty"`
+	BorrowingFilterLabel               string
+	StorageToDestroy                   bool `json:"storage_to_destroy,omitempty"`
+	StorageToDestroyFilterLabel        string
+	StorageArchive                     bool   `json:"storage_archive,omitempty"`
+	StorageHistory                     bool   `json:"storage_history,omitempty"`
+	StorageBatchNumber                 string `json:"storage_batchnumber,omitempty"`
+	StorageBatchNumberFilterLabel      string
+	Export                             bool `json:"export,omitempty"`
 
 	Search string `json:"search,omitempty"`
 	Page   int    `json:"page,omitempty"`

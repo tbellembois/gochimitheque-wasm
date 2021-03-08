@@ -78,6 +78,9 @@ func clearSearchForm() {
 	if select2.NewSelect2(jquery.Jq("select#s_empiricalformula"), nil).Select2IsInitialized() {
 		select2.NewSelect2(jquery.Jq("select#s_empiricalformula"), nil).Select2Clear()
 	}
+	if select2.NewSelect2(jquery.Jq("select#s_producerref"), nil).Select2IsInitialized() {
+		select2.NewSelect2(jquery.Jq("select#s_producerref"), nil).Select2Clear()
+	}
 	if select2.NewSelect2(jquery.Jq("select#s_casnumber"), nil).Select2IsInitialized() {
 		select2.NewSelect2(jquery.Jq("select#s_casnumber"), nil).Select2Clear()
 	}
@@ -104,6 +107,7 @@ func clearSearchForm() {
 		jquery.Jq("#s_storage_to_destroy:checked").SetProp("checked", false)
 	}
 
+	jquery.Jq("#s_storage_batchnumber").SetVal("")
 	jquery.Jq("#s_storage_barecode").SetVal("")
 	jquery.Jq("#s_custom_name_part_of").SetVal("")
 
@@ -287,48 +291,143 @@ func DisplayFilter(q ajax.QueryFilter) {
 
 	if q.Product != "" {
 		isFilter = true
-		jquery.Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("storage_product_table_header", globals.HTTPHeaderAcceptLanguage), q.ProductFilterLabel))
+		jquery.Jq("#filter-item").Append(widgets.FilterItem("storage_product_table_header", q.ProductFilterLabel))
+		jquery.Jq("#removefilterstorage_product_table_header").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			globals.BSTableQueryFilter.Lock()
+			globals.BSTableQueryFilter.Product = ""
+			globals.BSTableQueryFilter.Unlock()
+			Search(js.Null(), nil)
+			return nil
+		}))
 	}
 	if q.Storage != "" {
 		isFilter = true
-		jquery.Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("storage", globals.HTTPHeaderAcceptLanguage), q.StorageFilterLabel))
+		jquery.Jq("#filter-item").Append(widgets.FilterItem("storage", q.StorageFilterLabel))
+		jquery.Jq("#removefilterstorage").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			globals.BSTableQueryFilter.Lock()
+			globals.BSTableQueryFilter.Storage = ""
+			globals.BSTableQueryFilter.Unlock()
+			Search(js.Null(), nil)
+			return nil
+		}))
 	}
 	if len(q.Storages) > 0 {
 		isFilter = true
-		jquery.Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("storages", globals.HTTPHeaderAcceptLanguage), q.StoragesFilterLabel))
+		jquery.Jq("#filter-item").Append(widgets.FilterItem("storages", q.StoragesFilterLabel))
+		jquery.Jq("#removefilterstorages").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			globals.BSTableQueryFilter.Lock()
+			globals.BSTableQueryFilter.Storages = nil
+			globals.BSTableQueryFilter.Unlock()
+			Search(js.Null(), nil)
+			return nil
+		}))
 	}
 
 	if q.CustomNamePartOf != "" {
 		isFilter = true
-		jquery.Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_custom_name_part_of", globals.HTTPHeaderAcceptLanguage), q.CustomNamePartOf))
+		jquery.Jq("#filter-item").Append(widgets.FilterItem("s_custom_name_part_of", q.CustomNamePartOf))
+		jquery.Jq("#removefilters_custom_name_part_of").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			globals.BSTableQueryFilter.Lock()
+			globals.BSTableQueryFilter.CustomNamePartOf = ""
+			globals.BSTableQueryFilter.Unlock()
+			jquery.Jq("#s_custom_name_part_of").SetVal("")
+			Search(js.Null(), nil)
+			return nil
+		}))
 	}
 	if q.CasNumber != "" {
 		isFilter = true
-		jquery.Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_casnumber", globals.HTTPHeaderAcceptLanguage), q.CasNumberFilterLabel))
+		jquery.Jq("#filter-item").Append(widgets.FilterItem("s_casnumber", q.CasNumberFilterLabel))
+		jquery.Jq("#removefilters_casnumber").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			globals.BSTableQueryFilter.Lock()
+			globals.BSTableQueryFilter.CasNumber = ""
+			globals.BSTableQueryFilter.Unlock()
+			if select2.NewSelect2(jquery.Jq("select#s_casnumber"), nil).Select2IsInitialized() {
+				select2.NewSelect2(jquery.Jq("select#s_casnumber"), nil).Select2Clear()
+			}
+			Search(js.Null(), nil)
+			return nil
+		}))
 	}
 	if q.EmpiricalFormula != "" {
 		isFilter = true
-		jquery.Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_empiricalformula", globals.HTTPHeaderAcceptLanguage), q.EmpiricalFormulaFilterLabel))
+		jquery.Jq("#filter-item").Append(widgets.FilterItem("s_empiricalformula", q.EmpiricalFormulaFilterLabel))
+		jquery.Jq("#removefilters_empiricalformula").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			globals.BSTableQueryFilter.Lock()
+			globals.BSTableQueryFilter.EmpiricalFormula = ""
+			globals.BSTableQueryFilter.Unlock()
+			if select2.NewSelect2(jquery.Jq("select#s_empiricalformula"), nil).Select2IsInitialized() {
+				select2.NewSelect2(jquery.Jq("select#s_empiricalformula"), nil).Select2Clear()
+			}
+			Search(js.Null(), nil)
+			return nil
+		}))
 	}
 	if q.StorageBarecode != "" {
 		isFilter = true
-		jquery.Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_storage_barecode", globals.HTTPHeaderAcceptLanguage), q.StorageBarecode))
+		jquery.Jq("#filter-item").Append(widgets.FilterItem("s_storage_barecode", q.StorageBarecode))
+		jquery.Jq("#removefilters_storage_barecode").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			globals.BSTableQueryFilter.Lock()
+			globals.BSTableQueryFilter.StorageBarecode = ""
+			globals.BSTableQueryFilter.Unlock()
+			jquery.Jq("#s_storage_barecode").SetVal("")
+			Search(js.Null(), nil)
+			return nil
+		}))
 	}
 	if q.StorageBatchNumber != "" {
 		isFilter = true
-		jquery.Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_storage_batchnumber", globals.HTTPHeaderAcceptLanguage), q.StorageBatchNumberFilterLabel))
+		jquery.Jq("#filter-item").Append(widgets.FilterItem("storage_batchnumber_title", q.StorageBatchNumberFilterLabel))
+		jquery.Jq("#removefilterstorage_batchnumber_title").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			globals.BSTableQueryFilter.Lock()
+			globals.BSTableQueryFilter.StorageBatchNumber = ""
+			globals.BSTableQueryFilter.Unlock()
+			jquery.Jq("#s_storage_batchnumber").SetVal("")
+			Search(js.Null(), nil)
+			return nil
+		}))
 	}
 	if q.StoreLocation != "" {
 		isFilter = true
-		jquery.Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_storelocation", globals.HTTPHeaderAcceptLanguage), q.StoreLocationFilterLabel))
+		jquery.Jq("#filter-item").Append(widgets.FilterItem("s_storelocation", q.StoreLocationFilterLabel))
+		jquery.Jq("#removefilters_storelocation").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			globals.BSTableQueryFilter.Lock()
+			globals.BSTableQueryFilter.StoreLocation = ""
+			globals.BSTableQueryFilter.Unlock()
+			if select2.NewSelect2(jquery.Jq("select#s_storelocation"), nil).Select2IsInitialized() {
+				select2.NewSelect2(jquery.Jq("select#s_storelocation"), nil).Select2Clear()
+			}
+			Search(js.Null(), nil)
+			return nil
+		}))
 	}
 	if q.Name != "" {
 		isFilter = true
-		jquery.Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_name", globals.HTTPHeaderAcceptLanguage), q.NameFilterLabel))
+		jquery.Jq("#filter-item").Append(widgets.FilterItem("s_name", q.NameFilterLabel))
+		jquery.Jq("#removefilters_name").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			globals.BSTableQueryFilter.Lock()
+			globals.BSTableQueryFilter.Name = ""
+			globals.BSTableQueryFilter.Unlock()
+			if select2.NewSelect2(jquery.Jq("select#s_name"), nil).Select2IsInitialized() {
+				select2.NewSelect2(jquery.Jq("select#s_name"), nil).Select2Clear()
+			}
+			Search(js.Null(), nil)
+			return nil
+		}))
 	}
 	if q.ProducerRef != "" {
 		isFilter = true
-		jquery.Jq("#filter-item").Append(widgets.FilterItem(locales.Translate("s_producerref", globals.HTTPHeaderAcceptLanguage), q.ProducerRefFilterLabel))
+		jquery.Jq("#filter-item").Append(widgets.FilterItem("s_producerref", q.ProducerRefFilterLabel))
+		jquery.Jq("#removefilters_producerref").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			globals.BSTableQueryFilter.Lock()
+			globals.BSTableQueryFilter.ProducerRef = ""
+			globals.BSTableQueryFilter.Unlock()
+			if select2.NewSelect2(jquery.Jq("select#s_producerref"), nil).Select2IsInitialized() {
+				select2.NewSelect2(jquery.Jq("select#s_producerref"), nil).Select2Clear()
+			}
+			Search(js.Null(), nil)
+			return nil
+		}))
 	}
 
 	if q.ProductBookmark {
@@ -344,8 +443,51 @@ func DisplayFilter(q ajax.QueryFilter) {
 		jquery.Jq("#filter-item").Append(widgets.FilterItem("", locales.Translate("storage_history", globals.HTTPHeaderAcceptLanguage)))
 	}
 
+	if q.CasNumberCMR {
+		isFilter = true
+		jquery.Jq("#filter-item").Append(widgets.FilterItem("s_casnumber_cmr", q.CasNumberCMRFilterLabel))
+		jquery.Jq("#removefilters_casnumber_cmr").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			globals.BSTableQueryFilter.Lock()
+			globals.BSTableQueryFilter.CasNumberCMR = false
+			globals.BSTableQueryFilter.Unlock()
+			jquery.Jq("#s_casnumber_cmr").SetProp("checked", false)
+			Search(js.Null(), nil)
+			return nil
+		}))
+	}
+	if q.Borrowing {
+		isFilter = true
+		jquery.Jq("#filter-item").Append(widgets.FilterItem("s_borrowing", q.BorrowingFilterLabel))
+		jquery.Jq("#removefilters_borrowing").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			globals.BSTableQueryFilter.Lock()
+			globals.BSTableQueryFilter.Borrowing = false
+			globals.BSTableQueryFilter.Unlock()
+			jquery.Jq("#s_borrowing").SetProp("checked", false)
+			Search(js.Null(), nil)
+			return nil
+		}))
+	}
+	if q.StorageToDestroy {
+		isFilter = true
+		jquery.Jq("#filter-item").Append(widgets.FilterItem("s_storage_to_destroy", q.StorageToDestroyFilterLabel))
+		jquery.Jq("#removefilters_storage_to_destroy").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			globals.BSTableQueryFilter.Lock()
+			globals.BSTableQueryFilter.StorageToDestroy = false
+			globals.BSTableQueryFilter.Unlock()
+			jquery.Jq("#s_storage_to_destroy").SetProp("checked", false)
+			Search(js.Null(), nil)
+			return nil
+		}))
+	}
+
 	if !isFilter {
-		jquery.Jq("#filter-item").Append(widgets.FilterItem("", locales.Translate("no_filter", globals.HTTPHeaderAcceptLanguage)))
+		jquery.Jq("#filter-item").Append(widgets.NewSpan(widgets.SpanAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+				Classes: []string{"iconlabel"},
+			},
+			Text: locales.Translate("no_filter", globals.HTTPHeaderAcceptLanguage),
+		}).OuterHTML())
 	}
 
 }

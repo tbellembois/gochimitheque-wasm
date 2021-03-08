@@ -154,6 +154,7 @@ func main() {
 	js.Global().Set("Product_operateEventsOStorages", js.FuncOf(product.OperateEventsOStorages))
 	js.Global().Set("Product_operateEventsEdit", js.FuncOf(product.OperateEventsEdit))
 	js.Global().Set("Product_operateEventsDelete", js.FuncOf(product.OperateEventsDelete))
+	js.Global().Set("Product_operateEventsTotalStock", js.FuncOf(product.OperateEventsTotalStock))
 	js.Global().Set("Product_getTableData", js.FuncOf(product.GetTableData))
 	js.Global().Set("Product_dataQueryParams", js.FuncOf(product.DataQueryParams))
 	js.Global().Set("Product_detailFormatter", js.FuncOf(product.DetailFormatter))

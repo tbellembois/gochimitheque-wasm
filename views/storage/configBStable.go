@@ -12,6 +12,7 @@ import (
 
 	"github.com/tbellembois/gochimitheque-wasm/ajax"
 	"github.com/tbellembois/gochimitheque-wasm/bstable"
+	"github.com/tbellembois/gochimitheque-wasm/globals"
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
 	"github.com/tbellembois/gochimitheque-wasm/jquery"
 	"github.com/tbellembois/gochimitheque-wasm/jsutils"
@@ -1383,6 +1384,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 		i := select2SSignalWord.Select2Data()
 		if len(i) > 0 {
 			queryFilter.SignalWord = i[0].Id
+			queryFilter.SignalWordFilterLabel = i[0].Text
 		}
 	}
 	select2SHS := select2.NewSelect2(jquery.Jq("select#s_hazardstatements"), nil)
@@ -1391,6 +1393,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 		if len(i) > 0 {
 			for _, hs := range i {
 				queryFilter.HazardStatements = append(queryFilter.HazardStatements, hs.Id)
+				queryFilter.HazardStatementsFilterLabel += fmt.Sprintf(" %s", hs.Text)
 			}
 		}
 	}
@@ -1400,6 +1403,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 		if len(i) > 0 {
 			for _, ps := range i {
 				queryFilter.PrecautionaryStatements = append(queryFilter.PrecautionaryStatements, ps.Id)
+				queryFilter.PrecautionaryStatementsFilterLabel += fmt.Sprintf(" %s", ps.Text)
 			}
 		}
 	}
@@ -1409,6 +1413,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 		if len(i) > 0 {
 			for _, s := range i {
 				queryFilter.Symbols = append(queryFilter.Symbols, s.Id)
+				queryFilter.SignalWordFilterLabel += fmt.Sprintf(" %s", s.Text)
 			}
 		}
 	}
@@ -1419,18 +1424,23 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 	}
 	if jquery.Jq("#s_storage_barecode").GetVal().Truthy() {
 		queryFilter.StorageBarecode = jquery.Jq("#s_storage_barecode").GetVal().String()
+		queryFilter.StorageBarecodeFilterLabel = jquery.Jq("#s_storage_barecode").GetVal().String()
 	}
 	if jquery.Jq("#s_custom_name_part_of").GetVal().Truthy() {
 		queryFilter.CustomNamePartOf = jquery.Jq("#s_custom_name_part_of").GetVal().String()
+		queryFilter.CustomNamePartOfFilterLabel = jquery.Jq("#s_custom_name_part_of").GetVal().String()
 	}
 	if jquery.Jq("#s_casnumber_cmr:checked").Object.Length() > 0 {
 		queryFilter.CasNumberCMR = true
+		queryFilter.CasNumberCMRFilterLabel = locales.Translate("s_casnumber_cmr", globals.HTTPHeaderAcceptLanguage)
 	}
 	if jquery.Jq("#s_borrowing:checked").Object.Length() > 0 {
 		queryFilter.Borrowing = true
+		queryFilter.BorrowingFilterLabel = locales.Translate("s_borrowing", globals.HTTPHeaderAcceptLanguage)
 	}
 	if jquery.Jq("#s_storage_to_destroy:checked").Object.Length() > 0 {
 		queryFilter.StorageToDestroy = true
+		queryFilter.StorageToDestroyFilterLabel = locales.Translate("s_storage_to_destroy", globals.HTTPHeaderAcceptLanguage)
 	}
 
 	jsutils.DisplayFilter(queryFilter)
