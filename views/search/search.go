@@ -109,6 +109,18 @@ func showStockRecursive(storelocation *StoreLocation, depth int, jqSelector stri
 
 func Search_listCallback(args ...interface{}) {
 
+	select2.NewSelect2(jquery.Jq("select#s_entity"), &select2.Select2Config{
+		Placeholder:    locales.Translate("s_entity", HTTPHeaderAcceptLanguage),
+		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Entity{})),
+		AllowClear:     true,
+		Ajax: select2.Select2Ajax{
+			URL:            ApplicationProxyPath + "entities",
+			DataType:       "json",
+			Data:           js.FuncOf(select2.Select2GenericAjaxData),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Entities{})),
+		},
+	}).Select2ify()
+
 	select2.NewSelect2(jquery.Jq("select#s_storelocation"), &select2.Select2Config{
 		Placeholder:    locales.Translate("s_storelocation", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(Select2StoreLocationTemplateResults),
@@ -116,7 +128,7 @@ func Search_listCallback(args ...interface{}) {
 		Ajax: select2.Select2Ajax{
 			URL:            ApplicationProxyPath + "storelocations",
 			DataType:       "json",
-			Data:           js.FuncOf(select2.Select2GenericAjaxData),
+			Data:           js.FuncOf(Select2StoreLocationAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(StoreLocations{})),
 		},
 	}).Select2ify()
