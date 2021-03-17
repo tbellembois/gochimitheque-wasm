@@ -9,8 +9,8 @@ import (
 
 func Home_listCallback(this js.Value, args []js.Value) interface{} {
 
-	email := js.Global().Call("readCookie", "email").String()
-	jquery.Jq("#logged").SetHtml(email)
+	// email := js.Global().Call("readCookie", "email").String()
+	// jquery.Jq("#logged").SetHtml(email)
 
 	jsutils.HasPermission("products", "-2", "get", func() {
 		jquery.Jq("#menu_scan_qrcode").FadeIn()

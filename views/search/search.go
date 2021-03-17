@@ -233,7 +233,7 @@ func Search_listCallback(args ...interface{}) {
 	jquery.Jq("#search input").On("keyup", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
 		event := args[0]
-		if event.Get("which").Int() == 13 {
+		if !event.Get("which").IsUndefined() && event.Get("which").Int() == 13 {
 
 			event.Call("preventDefault")
 			jsutils.Search(js.Null(), nil)

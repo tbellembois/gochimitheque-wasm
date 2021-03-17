@@ -199,7 +199,7 @@ func Login_listCallback(this js.Value, args []js.Value) interface{} {
 	jquery.Jq("#authform input").On("keyup", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
 		event := args[0]
-		if event.Get("which").Int() == 13 {
+		if !event.Get("which").IsUndefined() && event.Get("which").Int() == 13 {
 
 			event.Call("preventDefault")
 			GetToken(js.Null(), nil)
@@ -227,23 +227,20 @@ func AfterLogin_listCallback(this js.Value, args []js.Value) interface{} {
 	// Can not read Email and ID from container as those values
 	// are not set before login.
 	cookie := js.Global().Get("document").Get("cookie").String()
-	regex := regexp.MustCompile(`(?P<token>token=\S*)\s{0,1}(?P<email>email=\S*)\s{0,1}(?P<id>id=\S*)\s{0,1}`)
-	match := regex.FindStringSubmatch(cookie)
 
-	if len(match) > 0 {
+	regexEmail := regexp.MustCompile(`email=(\S+)`)
+	matchEmail := regexEmail.FindStringSubmatch(cookie)[1]
 
-		result := make(map[string]string)
-		for i, name := range regex.SubexpNames() {
-			if i != 0 && name != "" {
-				result[name] = match[i]
-			}
-		}
-		ConnectedUserEmail = strings.TrimRight(result["email"], ";")[6:]
-		var err error
-		if ConnectedUserID, err = strconv.Atoi(strings.TrimRight(result["id"], ";")[3:]); err != nil {
-			panic(err)
-		}
+	regexId := regexp.MustCompile(`id=(\S+)`)
+	matchId := regexId.FindStringSubmatch(cookie)[1]
 
+	matchEmail = strings.TrimRight(matchEmail, ";")
+	matchId = strings.TrimRight(matchId, ";")
+
+	ConnectedUserEmail = matchEmail
+	var err error
+	if ConnectedUserID, err = strconv.Atoi(matchId); err != nil {
+		panic(err)
 	}
 
 	jquery.Jq("#logged").SetHtml(ConnectedUserEmail)
