@@ -68,6 +68,9 @@ func person_common() {
 		}
 
 		jquery.Jq(fmt.Sprintf("#perm%s", entitySelected.Id)).Remove()
+		if jquery.Jq(".permnstorages").Object.Length() == 0 {
+			jquery.Jq("#selectAllPermissions").Hide()
+		}
 
 		return nil
 
@@ -88,6 +91,7 @@ func person_common() {
 		}
 
 		jquery.Jq("#permissions").Append(widgets.Permission(entitySelectedId, entitySelected.Text, false))
+		jquery.Jq("#selectAllPermissions").Show()
 
 		return nil
 

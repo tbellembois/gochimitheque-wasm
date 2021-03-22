@@ -157,6 +157,64 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 
 }
 
+func SelectAllEntity(this js.Value, args []js.Value) interface{} {
+
+	url := fmt.Sprintf("%sentities", ApplicationProxyPath)
+	method := "get"
+
+	done := func(data js.Value) {
+
+		var (
+			entities Entities
+			err      error
+		)
+
+		if err = json.Unmarshal([]byte(data.String()), &entities); err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		jquery.Jq("#permissions").SetHtml("")
+
+		select2Entities := select2.NewSelect2(jquery.Jq("select#entities"), nil)
+		select2Entities.Select2Clear()
+		for _, entity := range entities.Rows {
+
+			select2Entities.Select2AppendOption(
+				widgets.NewOption(widgets.OptionAttributes{
+					Text:            entity.EntityName,
+					Value:           strconv.Itoa(entity.EntityID),
+					DefaultSelected: true,
+					Selected:        true,
+				}).HTMLElement.OuterHTML())
+
+			jquery.Jq("#permissions").Append(widgets.Permission(entity.EntityID, entity.EntityName, false))
+
+		}
+
+		jquery.Jq("button#selectAllEntity").SetProp("disabled", false)
+		jquery.Jq("#selectAllPermissions").Show()
+
+	}
+	fail := func(data js.Value) {
+
+		jsutils.DisplayGenericErrorMessage()
+
+	}
+
+	jquery.Jq("button#selectAllEntity").SetProp("disabled", true)
+
+	ajax.Ajax{
+		Method: method,
+		URL:    url,
+		Done:   done,
+		Fail:   fail,
+	}.Send()
+
+	return nil
+
+}
+
 func FillInPersonForm(p Person, id string) {
 
 	type Permissions []Permission
