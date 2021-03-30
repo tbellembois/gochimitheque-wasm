@@ -174,3 +174,16 @@ func (jq Jquery) SetInvisible() Jquery {
 	return jq
 
 }
+
+func (jq Jquery) Not(i ...interface{}) Jquery {
+
+	jq.Object = jq.Object.Call("not", i...)
+	return jq
+
+}
+
+func (jq Jquery) Is(i ...interface{}) bool {
+
+	return jq.Object.Call("is", i...).Bool()
+
+}

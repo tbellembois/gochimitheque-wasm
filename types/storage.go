@@ -33,6 +33,9 @@ type Storage struct {
 	StorageToDestroy         sql.NullBool    `json:"storage_todestroy"`
 	StorageArchive           sql.NullBool    `json:"storage_archive"`
 	StorageConcentration     sql.NullInt64   `json:"storage_concentration"`
+	StorageNumberOfUnit      sql.NullInt64   `json:"storage_number_of_unit"`
+	StorageNumberOfBag       sql.NullInt64   `json:"storage_number_of_bag"`
+	StorageNumberOfCarton    sql.NullInt64   `json:"storage_number_of_carton"`
 	Person                   `json:"person"`
 	Product                  `json:"product"`
 	StoreLocation            `json:"storelocation"`

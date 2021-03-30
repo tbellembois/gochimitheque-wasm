@@ -19,6 +19,7 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/locales"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
+	"github.com/tbellembois/gochimitheque-wasm/validate"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
 	"honnef.co/go/js/dom/v2"
@@ -44,6 +45,63 @@ func chunks(s string, chunkSize int) []string {
 		chunks = append(chunks, string(chunk[:len]))
 	}
 	return chunks
+}
+
+func Consufy() {
+
+	jquery.Jq(".bio").Not(".consu").Hide()
+	jquery.Jq(".chem").Not(".consu").Hide()
+	jquery.Jq(".consu").Show()
+
+	validate.NewValidate(jquery.Jq("input#storage_number_of_unit"), nil).ValidateAdd(validate.ValidateRule{
+		Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			return jquery.Jq("#storage_number_of_bag").GetVal().String() == "" && jquery.Jq("#storage_number_of_carton").GetVal().String() == ""
+		}),
+	})
+	validate.NewValidate(jquery.Jq("input#storage_number_of_bag"), nil).ValidateAdd(validate.ValidateRule{
+		Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			return jquery.Jq("#storage_number_of_unit").GetVal().String() == "" && jquery.Jq("#storage_number_of_carton").GetVal().String() == ""
+		}),
+	})
+	validate.NewValidate(jquery.Jq("input#storage_number_of_carton"), nil).ValidateAdd(validate.ValidateRule{
+		Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			return jquery.Jq("#storage_number_of_bag").GetVal().String() == "" && jquery.Jq("#storage_number_of_unit").GetVal().String() == ""
+		}),
+	})
+	validate.NewValidate(jquery.Jq("input#storage_batchnumber"), nil).ValidateAddRequired()
+
+	jquery.Jq("span#storage_batchnumber.badge").Show()
+
+}
+
+func Chemify() {
+
+	jquery.Jq(".bio").Not(".chem").Hide()
+	jquery.Jq(".consu").Not(".chem").Hide()
+	jquery.Jq(".chem").Show()
+
+	validate.NewValidate(jquery.Jq("input#storage_number_of_unit"), nil).ValidateRemoveRequired()
+	validate.NewValidate(jquery.Jq("input#storage_number_of_bag"), nil).ValidateRemoveRequired()
+	validate.NewValidate(jquery.Jq("input#storage_number_of_carton"), nil).ValidateRemoveRequired()
+	validate.NewValidate(jquery.Jq("input#storage_batchnumber"), nil).ValidateRemoveRequired()
+
+	jquery.Jq("span#storage_batchnumber.badge").Hide()
+
+}
+
+func Biofy() {
+
+	jquery.Jq(".consu").Not(".bio").Hide()
+	jquery.Jq(".chem").Not(".bio").Hide()
+	jquery.Jq(".bio").Show()
+
+	validate.NewValidate(jquery.Jq("input#storage_number_of_unit"), nil).ValidateRemoveRequired()
+	validate.NewValidate(jquery.Jq("input#storage_number_of_bag"), nil).ValidateRemoveRequired()
+	validate.NewValidate(jquery.Jq("input#storage_number_of_carton"), nil).ValidateRemoveRequired()
+	validate.NewValidate(jquery.Jq("input#storage_batchnumber"), nil).ValidateAddRequired()
+
+	jquery.Jq("span#storage_batchnumber.badge").Show()
+
 }
 
 func Storage_operateEventsRestore(this js.Value, args []js.Value) interface{} {
@@ -924,6 +982,89 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	rowProductAndStorelocation.AppendChild(colStorelocation)
 
 	//
+	// Number of bag, carton, unit.
+	//
+	rowNumberOfCartonBagUnit := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"row", "mt-sm-3"},
+		},
+	})
+	// Cartons.
+	colNumberOfCarton := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"col-sm-4"},
+		},
+	})
+	if CurrentStorage.StorageNumberOfCarton.Int64 != 0 {
+		colNumberOfCarton.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+				Classes: []string{"iconlabel", "mr-sm-2"},
+			},
+			Text: locales.Translate("storage_number_of_carton", HTTPHeaderAcceptLanguage),
+		}))
+		colNumberOfCarton.AppendChild(
+			widgets.NewSpan(widgets.SpanAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+				},
+				Text: fmt.Sprintf("%d", CurrentStorage.StorageNumberOfCarton.Int64),
+			}))
+	}
+	// Bags.
+	colNumberOfBag := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"col-sm-4"},
+		},
+	})
+	if CurrentStorage.StorageNumberOfBag.Int64 != 0 {
+		colNumberOfBag.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+				Classes: []string{"iconlabel", "mr-sm-2"},
+			},
+			Text: locales.Translate("storage_number_of_bag", HTTPHeaderAcceptLanguage),
+		}))
+		colNumberOfBag.AppendChild(
+			widgets.NewSpan(widgets.SpanAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+				},
+				Text: fmt.Sprintf("%d", CurrentStorage.StorageNumberOfBag.Int64),
+			}))
+	}
+	// Units.
+	colNumberOfUnit := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"col-sm-4"},
+		},
+	})
+	if CurrentStorage.StorageNumberOfUnit.Int64 != 0 {
+		colNumberOfUnit.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+				Classes: []string{"iconlabel", "mr-sm-2"},
+			},
+			Text: locales.Translate("storage_number_of_unit", HTTPHeaderAcceptLanguage),
+		}))
+		colNumberOfUnit.AppendChild(
+			widgets.NewSpan(widgets.SpanAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+				},
+				Text: fmt.Sprintf("%d", CurrentStorage.StorageNumberOfUnit.Int64),
+			}))
+	}
+
+	rowNumberOfCartonBagUnit.AppendChild(colNumberOfCarton)
+	rowNumberOfCartonBagUnit.AppendChild(colNumberOfBag)
+	rowNumberOfCartonBagUnit.AppendChild(colNumberOfUnit)
+
+	//
 	// Quantity and barecode.
 	//
 	rowQuantityandBarecode := widgets.NewDiv(widgets.DivAttributes{
@@ -939,20 +1080,22 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-6"},
 		},
 	})
-	colQuantity.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"iconlabel", "mr-sm-2"},
-		},
-		Text: locales.Translate("storage_quantity_title", HTTPHeaderAcceptLanguage),
-	}))
-	colQuantity.AppendChild(
-		widgets.NewSpan(widgets.SpanAttributes{
+	if CurrentStorage.StorageQuantity.Float64 != 0 {
+		colQuantity.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
+				Classes: []string{"iconlabel", "mr-sm-2"},
 			},
-			Text: fmt.Sprintf("%v %s", CurrentStorage.StorageQuantity.Float64, CurrentStorage.UnitQuantity.UnitLabel.String),
+			Text: locales.Translate("storage_quantity_title", HTTPHeaderAcceptLanguage),
 		}))
+		colQuantity.AppendChild(
+			widgets.NewSpan(widgets.SpanAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+				},
+				Text: fmt.Sprintf("%v %s", CurrentStorage.StorageQuantity.Float64, CurrentStorage.UnitQuantity.UnitLabel.String),
+			}))
+	}
 	// Barecode.
 	colBarecode := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
@@ -1311,6 +1454,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	return rowQrcodeAndID.OuterHTML() +
 		rowPrintQrcode.OuterHTML() +
 		rowProductAndStorelocation.OuterHTML() +
+		rowNumberOfCartonBagUnit.OuterHTML() +
 		rowQuantityandBarecode.OuterHTML() +
 		rowConcentrationAndBatchnumber.OuterHTML() +
 		rowSupplierAndReference.OuterHTML() +
@@ -1441,6 +1585,22 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 	if jquery.Jq("#s_storage_to_destroy:checked").Object.Length() > 0 {
 		queryFilter.StorageToDestroy = true
 		queryFilter.StorageToDestroyFilterLabel = locales.Translate("s_storage_to_destroy", globals.HTTPHeaderAcceptLanguage)
+	}
+
+	if jquery.Jq("input#searchshowbio:checked").Object.Length() > 0 {
+		queryFilter.ShowBio = true
+	} else {
+		queryFilter.ShowBio = false
+	}
+	if jquery.Jq("input#searchshowchem:checked").Object.Length() > 0 {
+		queryFilter.ShowChem = true
+	} else {
+		queryFilter.ShowChem = false
+	}
+	if jquery.Jq("input#searchshowconsu:checked").Object.Length() > 0 {
+		queryFilter.ShowConsu = true
+	} else {
+		queryFilter.ShowConsu = false
 	}
 
 	jsutils.DisplayFilter(queryFilter)

@@ -127,6 +127,12 @@ func NewValidate(jq jquery.Jquery, config *ValidateConfig) Validate {
 	return Validate{Jquery: jq, config: config}
 }
 
+func (v Validate) ValidateAdd(rule ValidateRule) {
+
+	v.Jquery.Object.Call("rules", "add", structToMap(rule))
+
+}
+
 func (v Validate) ValidateAddRequired() {
 
 	v.Jquery.Object.Call("rules", "add", "required")

@@ -270,33 +270,33 @@ func Search_listCallback(args ...interface{}) {
 
 			jquery.Jq("#stock").SetHtml("")
 
-			rowButtonClose := widgets.NewDiv(widgets.DivAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-					Classes: []string{"row"},
-				},
-			})
-			buttonClose := widgets.NewBSButtonWithIcon(
-				widgets.ButtonAttributes{
-					BaseAttributes: widgets.BaseAttributes{
-						Visible: true,
-						Attributes: map[string]string{
-							"onclick": "$('#stock').html('')",
-						},
-					},
-					Title: locales.Translate("close", HTTPHeaderAcceptLanguage),
-				},
-				widgets.IconAttributes{
-					BaseAttributes: widgets.BaseAttributes{
-						Visible: true,
-						Classes: []string{"iconlabel"},
-					},
-					Text: locales.Translate("close", HTTPHeaderAcceptLanguage),
-					Icon: themes.NewMdiIcon(themes.MDI_CLOSE, ""),
-				},
-				[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
-			)
-			rowButtonClose.AppendChild(buttonClose)
+			// rowButtonClose := widgets.NewDiv(widgets.DivAttributes{
+			// 	BaseAttributes: widgets.BaseAttributes{
+			// 		Visible: true,
+			// 		Classes: []string{"row"},
+			// 	},
+			// })
+			// buttonClose := widgets.NewBSButtonWithIcon(
+			// 	widgets.ButtonAttributes{
+			// 		BaseAttributes: widgets.BaseAttributes{
+			// 			Visible: true,
+			// 			Attributes: map[string]string{
+			// 				"onclick": "$('#stock').html('')",
+			// 			},
+			// 		},
+			// 		Title: locales.Translate("close", HTTPHeaderAcceptLanguage),
+			// 	},
+			// 	widgets.IconAttributes{
+			// 		BaseAttributes: widgets.BaseAttributes{
+			// 			Visible: true,
+			// 			Classes: []string{"iconlabel"},
+			// 		},
+			// 		Text: locales.Translate("close", HTTPHeaderAcceptLanguage),
+			// 		Icon: themes.NewMdiIcon(themes.MDI_CLOSE, ""),
+			// 	},
+			// 	[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
+			// )
+			// rowButtonClose.AppendChild(buttonClose)
 
 			// rowProduct := widgets.NewDiv(widgets.DivAttributes{
 			// 	BaseAttributes: widgets.BaseAttributes{
@@ -312,7 +312,7 @@ func Search_listCallback(args ...interface{}) {
 			// 	Text: CurrentProduct.Name.NameLabel,
 			// }))
 
-			jquery.Jq("#stock").Append(rowButtonClose.OuterHTML())
+			//jquery.Jq("#stock").Append(rowButtonClose.OuterHTML())
 			// jquery.Jq("#stock").Append(rowProduct.OuterHTML())
 
 			for _, storelocation := range storelocations {

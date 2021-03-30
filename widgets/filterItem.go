@@ -27,6 +27,7 @@ func FilterItem(title, value string) string {
 			Classes: []string{"col-sm-auto"},
 		},
 	})
+
 	colRemoveFilter.AppendChild(NewBSButtonWithIcon(
 		ButtonAttributes{
 			BaseAttributes: BaseAttributes{

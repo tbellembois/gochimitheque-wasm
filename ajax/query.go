@@ -22,6 +22,9 @@ type QueryParams struct {
 // results ("/entities", "/people"...).
 // It is especially used by select2 and bootstraptable.
 type QueryFilter struct {
+	ShowBio                            bool   `json:"showbio,omitempty"`
+	ShowChem                           bool   `json:"showchem,omitempty"`
+	ShowConsu                          bool   `json:"showconsu,omitempty"`
 	Product                            string `json:"product,omitempty"`
 	ProductFilterLabel                 string
 	ProductBookmark                    bool   `json:"bookmark,omitempty"`
@@ -216,6 +219,16 @@ func (q QueryFilter) ToRawQuery() string {
 	}
 	if q.Export {
 		values.Set("export", strconv.FormatBool(true))
+	}
+
+	if q.ShowBio {
+		values.Set("showbio", strconv.FormatBool(true))
+	}
+	if q.ShowChem {
+		values.Set("showchem", strconv.FormatBool(true))
+	}
+	if q.ShowConsu {
+		values.Set("showconsu", strconv.FormatBool(true))
 	}
 
 	return values.Encode()

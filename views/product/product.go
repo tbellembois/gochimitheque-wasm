@@ -151,6 +151,8 @@ func product_common() {
 			Chemify()
 		case "bio":
 			Biofy()
+		default:
+			Consufy()
 		}
 
 		return nil
@@ -701,6 +703,7 @@ func Product_listCallback(this js.Value, args []js.Value) interface{} {
 	jquery.Jq("#actions").Show()
 	jquery.Jq("#s_storage_archive_button").SetInvisible()
 	jquery.Jq("#s_storage_stock_button").SetInvisible()
+	jquery.Jq("#stock").SetHtml("")
 
 	btnLabel := locales.Translate("switchstorageview_text", HTTPHeaderAcceptLanguage)
 	buttonTitle := widgets.NewIcon(widgets.IconAttributes{

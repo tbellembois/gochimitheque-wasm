@@ -363,6 +363,40 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 		}
 	}
 
+	if jquery.Jq("input#storage_number_of_unit").GetVal().Truthy() {
+		var storageNumberOfUnit int
+		if storageNumberOfUnit, err = strconv.Atoi(jquery.Jq("input#storage_number_of_unit").GetVal().String()); err != nil {
+			fmt.Println(err)
+			return nil
+		}
+		globals.CurrentStorage.StorageNumberOfUnit = sql.NullInt64{
+			Valid: true,
+			Int64: int64(storageNumberOfUnit),
+		}
+	}
+	if jquery.Jq("input#storage_number_of_bag").GetVal().Truthy() {
+		var StorageNumberOfBag int
+		if StorageNumberOfBag, err = strconv.Atoi(jquery.Jq("input#storage_number_of_bag").GetVal().String()); err != nil {
+			fmt.Println(err)
+			return nil
+		}
+		globals.CurrentStorage.StorageNumberOfBag = sql.NullInt64{
+			Valid: true,
+			Int64: int64(StorageNumberOfBag),
+		}
+	}
+	if jquery.Jq("input#storage_number_of_carton").GetVal().Truthy() {
+		var StorageNumberOfCarton int
+		if StorageNumberOfCarton, err = strconv.Atoi(jquery.Jq("input#storage_number_of_carton").GetVal().String()); err != nil {
+			fmt.Println(err)
+			return nil
+		}
+		globals.CurrentStorage.StorageNumberOfCarton = sql.NullInt64{
+			Valid: true,
+			Int64: int64(StorageNumberOfCarton),
+		}
+	}
+
 	if jquery.Jq("input#storage_todestroy:checked").Object.Length() > 0 {
 		globals.CurrentStorage.StorageToDestroy = sql.NullBool{
 			Bool:  true,
@@ -432,9 +466,9 @@ func FillInStorageForm(s Storage, id string) {
 			}).HTMLElement.OuterHTML())
 	}
 
-	jquery.Jq("#storage_quantity").SetVal("")
+	jquery.Jq("input#storage_quantity").SetVal("")
 	if s.StorageQuantity.Valid {
-		jquery.Jq("#storage_quantity").SetVal(s.StorageQuantity.Float64)
+		jquery.Jq("input#storage_quantity").SetVal(s.StorageQuantity.Float64)
 	}
 
 	select2UnitQuantity := select2.NewSelect2(jquery.Jq("select#unit_quantity"), nil)
@@ -449,9 +483,9 @@ func FillInStorageForm(s Storage, id string) {
 			}).HTMLElement.OuterHTML())
 	}
 
-	jquery.Jq("#storage_concentration").SetVal("")
+	jquery.Jq("input#storage_concentration").SetVal("")
 	if s.StorageConcentration.Valid {
-		jquery.Jq("#storage_concentration").SetVal(s.StorageConcentration.Int64)
+		jquery.Jq("input#storage_concentration").SetVal(s.StorageConcentration.Int64)
 	}
 
 	select2UnitConcentration := select2.NewSelect2(jquery.Jq("select#unit_concentration"), nil)
@@ -478,43 +512,56 @@ func FillInStorageForm(s Storage, id string) {
 			}).HTMLElement.OuterHTML())
 	}
 
-	jquery.Jq("#storage_entrydate").SetVal("")
-	if s.StorageEntryDate.Valid {
-		jquery.Jq("#storage_entrydate").SetVal(s.StorageEntryDate.Time.Format("2006-01-02"))
+	jquery.Jq("input#storage_number_of_unit").SetVal("")
+	if s.StorageNumberOfUnit.Valid {
+		jquery.Jq("input#storage_number_of_unit").SetVal(s.StorageNumberOfUnit.Int64)
 	}
-	jquery.Jq("#storage_exitdate").SetVal("")
+	jquery.Jq("input#storage_number_of_bag").SetVal("")
+	if s.StorageNumberOfBag.Valid {
+		jquery.Jq("input#storage_number_of_bag").SetVal(s.StorageNumberOfBag.Int64)
+	}
+	jquery.Jq("input#storage_number_of_carton").SetVal("")
+	if s.StorageNumberOfCarton.Valid {
+		jquery.Jq("input#storage_number_of_carton").SetVal(s.StorageNumberOfCarton.Int64)
+	}
+
+	jquery.Jq("input#storage_entrydate").SetVal("")
+	if s.StorageEntryDate.Valid {
+		jquery.Jq("input#storage_entrydate").SetVal(s.StorageEntryDate.Time.Format("2006-01-02"))
+	}
+	jquery.Jq("input#storage_exitdate").SetVal("")
 	if s.StorageExitDate.Valid {
-		jquery.Jq("#storage_exitdate").SetVal(s.StorageExitDate.Time.Format("2006-01-02"))
+		jquery.Jq("input#storage_exitdate").SetVal(s.StorageExitDate.Time.Format("2006-01-02"))
 	}
 	jquery.Jq("#storage_openingdate").SetVal("")
 	if s.StorageOpeningDate.Valid {
 		jquery.Jq("#storage_openingdate").SetVal(s.StorageOpeningDate.Time.Format("2006-01-02"))
 	}
-	jquery.Jq("#storage_expirationdate").SetVal("")
+	jquery.Jq("input#storage_expirationdate").SetVal("")
 	if s.StorageExpirationDate.Valid {
-		jquery.Jq("#storage_expirationdate").SetVal(s.StorageExpirationDate.Time.Format("2006-01-02"))
+		jquery.Jq("input#storage_expirationdate").SetVal(s.StorageExpirationDate.Time.Format("2006-01-02"))
 	}
 
-	jquery.Jq("#storage_reference").SetVal("")
+	jquery.Jq("input#storage_reference").SetVal("")
 	if s.StorageReference.Valid {
-		jquery.Jq("#storage_reference").SetVal(s.StorageReference.String)
+		jquery.Jq("input#storage_reference").SetVal(s.StorageReference.String)
 	}
-	jquery.Jq("#storage_batchnumber").SetVal("")
+	jquery.Jq("input#storage_batchnumber").SetVal("")
 	if s.StorageBatchNumber.Valid {
-		jquery.Jq("#storage_batchnumber").SetVal(s.StorageBatchNumber.String)
+		jquery.Jq("input#storage_batchnumber").SetVal(s.StorageBatchNumber.String)
 	}
-	jquery.Jq("#storage_barecode").SetVal("")
+	jquery.Jq("input#storage_barecode").SetVal("")
 	if s.StorageBarecode.Valid {
-		jquery.Jq("#storage_barecode").SetVal(s.StorageBarecode.String)
+		jquery.Jq("input#storage_barecode").SetVal(s.StorageBarecode.String)
 	}
-	jquery.Jq("#storage_comment").SetVal("")
+	jquery.Jq("input#storage_comment").SetVal("")
 	if s.StorageComment.Valid {
-		jquery.Jq("#storage_comment").SetVal(s.StorageComment.String)
+		jquery.Jq("input#storage_comment").SetVal(s.StorageComment.String)
 	}
 
-	jquery.Jq("#storage_todestroy").SetProp("chacked", false)
+	jquery.Jq("input#storage_todestroy").SetProp("checked", false)
 	if s.StorageToDestroy.Valid && s.StorageToDestroy.Bool {
-		jquery.Jq("#storage_todestroy").SetProp("checked", "checked")
+		jquery.Jq("input#storage_todestroy").SetProp("checked", "checked")
 	}
 
 }

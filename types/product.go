@@ -46,6 +46,8 @@ type Product struct {
 	ProductRemark          sql.NullString `json:"product_remark"`
 	ProductTemperature     sql.NullInt64  `json:"product_temperature"`
 	ProductSheet           sql.NullString `json:"product_sheet"`
+	ProductNumberPerCarton sql.NullInt64  `json:"product_number_per_carton"`
+	ProductNumberPerBag    sql.NullInt64  `json:"product_number_per_bag"`
 	EmpiricalFormula       `json:"empiricalformula"`
 	LinearFormula          `json:"linearformula"`
 	PhysicalState          `json:"physicalstate"`

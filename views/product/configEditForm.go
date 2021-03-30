@@ -280,8 +280,19 @@ func FillInProductForm(p Product, id string) {
 		jquery.Jq("#product_remark").SetVal(p.ProductRemark.String)
 	}
 
-	// Chem/Bio detection.
-	if jquery.Jq("select#producerref").GetVal().Truthy() {
+	jquery.Jq("#product_number_per_carton").SetVal("")
+	if p.ProductNumberPerCarton.Valid && p.ProductNumberPerCarton.Int64 > 0 {
+		jquery.Jq("#product_number_per_carton").SetVal(p.ProductNumberPerCarton.Int64)
+	}
+	jquery.Jq("#product_number_per_bag").SetVal("")
+	if p.ProductNumberPerBag.Valid {
+		jquery.Jq("#product_number_per_bag").SetVal(p.ProductNumberPerBag.Int64)
+	}
+
+	// Chem/Bio/Consu detection.
+	if p.ProductNumberPerCarton.Valid {
+		Consufy()
+	} else if p.ProducerRef.ProducerRefID.Valid {
 		Biofy()
 	} else {
 		Chemify()
@@ -316,6 +327,33 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		}
 		globals.CurrentProduct.ProductTemperature = sql.NullInt64{
 			Int64: int64(productTemperature),
+			Valid: true,
+		}
+	}
+
+	if jquery.Jq("input#product_number_per_carton").GetVal().Truthy() {
+		var productNumberPerCarton int
+		if productNumberPerCarton, err = strconv.Atoi(jquery.Jq("input#product_number_per_carton").GetVal().String()); err != nil {
+			return nil
+		}
+		globals.CurrentProduct.ProductNumberPerCarton = sql.NullInt64{
+			Int64: int64(productNumberPerCarton),
+			Valid: true,
+		}
+	} else if jquery.Jq("input#showconsu:checked").Object.Length() > 0 {
+		globals.CurrentProduct.ProductNumberPerCarton = sql.NullInt64{
+			Int64: -1,
+			Valid: true,
+		}
+	}
+
+	if jquery.Jq("input#product_number_per_bag").GetVal().Truthy() {
+		var productNumberPerBag int
+		if productNumberPerBag, err = strconv.Atoi(jquery.Jq("input#product_number_per_bag").GetVal().String()); err != nil {
+			return nil
+		}
+		globals.CurrentProduct.ProductNumberPerBag = sql.NullInt64{
+			Int64: int64(productNumberPerBag),
 			Valid: true,
 		}
 	}

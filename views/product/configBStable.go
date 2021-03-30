@@ -521,6 +521,22 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 		queryFilter.StorageToDestroyFilterLabel = locales.Translate("s_storage_to_destroy", globals.HTTPHeaderAcceptLanguage)
 	}
 
+	if jquery.Jq("input#searchshowbio:checked").Object.Length() > 0 {
+		queryFilter.ShowBio = true
+	} else {
+		queryFilter.ShowBio = false
+	}
+	if jquery.Jq("input#searchshowchem:checked").Object.Length() > 0 {
+		queryFilter.ShowChem = true
+	} else {
+		queryFilter.ShowChem = false
+	}
+	if jquery.Jq("input#searchshowconsu:checked").Object.Length() > 0 {
+		queryFilter.ShowConsu = true
+	} else {
+		queryFilter.ShowConsu = false
+	}
+
 	jsutils.DisplayFilter(queryFilter)
 
 	return queryFilter.ToJsValue()
@@ -744,6 +760,65 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 
 	rowSupplierAndProducer.AppendChild(colProducer)
 	rowSupplierAndProducer.AppendChild(colSuppliers)
+
+	//
+	// Number per carton and per bag.
+	//
+	rowNumberPerCartonAndBag := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"row", "mt-sm-3"},
+		},
+	})
+	// Carton.
+	colNumberPerCarton := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"col-sm-6"},
+		},
+	})
+	if globals.CurrentProduct.ProductNumberPerCarton.Valid && globals.CurrentProduct.ProductNumberPerCarton.Int64 > 0 {
+		colNumberPerCarton.AppendChild(
+			widgets.NewSpan(widgets.SpanAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+					Classes: []string{"iconlabel", "mr-sm-2"},
+				},
+				Text: locales.Translate("product_number_per_carton_title", HTTPHeaderAcceptLanguage),
+			}))
+		colNumberPerCarton.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+			},
+			Text: fmt.Sprintf("%d", globals.CurrentProduct.ProductNumberPerCarton.Int64),
+		}))
+	}
+	// Bag.
+	colNumberPerBag := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"col-sm-6"},
+		},
+	})
+	if globals.CurrentProduct.ProductNumberPerBag.Valid {
+		colNumberPerBag.AppendChild(
+			widgets.NewSpan(widgets.SpanAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+					Classes: []string{"iconlabel", "mr-sm-2"},
+				},
+				Text: locales.Translate("product_number_per_bag_title", HTTPHeaderAcceptLanguage),
+			}))
+		colNumberPerBag.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+			},
+			Text: fmt.Sprintf("%d", globals.CurrentProduct.ProductNumberPerBag.Int64),
+		}))
+	}
+
+	rowNumberPerCartonAndBag.AppendChild(colNumberPerCarton)
+	rowNumberPerCartonAndBag.AppendChild(colNumberPerBag)
 
 	//
 	// Producer sheet.
@@ -1336,6 +1411,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		rowCategoryAndTags.OuterHTML() +
 		rowSupplierAndProducer.OuterHTML() +
 		rowProducerSheet.OuterHTML() +
+		rowNumberPerCartonAndBag.OuterHTML() +
 		rowStorageTemperature.OuterHTML() +
 		rowCasCeMsds.OuterHTML() +
 		rowFormulas.OuterHTML() +
@@ -1728,10 +1804,33 @@ func AddSupplier(this js.Value, args []js.Value) interface{} {
 
 }
 
+func Consufy() {
+
+	jquery.Jq(".chem").Not(".consu").Hide()
+	jquery.Jq(".bio").Not(".consu").Hide()
+	jquery.Jq(".consu").Show()
+
+	validate.NewValidate(jquery.Jq("select#producerref"), nil).ValidateAddRequired()
+	validate.NewValidate(jquery.Jq("input#product_batchnumber"), nil).ValidateRemoveRequired()
+
+	jquery.Jq("span#producerref.badge").Show()
+	jquery.Jq("span#product_batchnumber.badge").Hide()
+
+	validate.NewValidate(jquery.Jq("select#empiricalformula"), nil).ValidateRemoveRequired()
+	validate.NewValidate(jquery.Jq("select#casnumber"), nil).ValidateRemoveRequired()
+
+	jquery.Jq("span#empiricalformula.badge").Hide()
+	jquery.Jq("span#casnumber.badge").Hide()
+
+	jquery.Jq("input#showconsu").SetProp("checked", "checked")
+
+}
+
 func Chemify() {
 
+	jquery.Jq(".bio").Not(".chem").Hide()
+	jquery.Jq(".consu").Not(".chem").Hide()
 	jquery.Jq(".chem").Show()
-	jquery.Jq(".bio").Hide()
 
 	validate.NewValidate(jquery.Jq("select#producerref"), nil).ValidateRemoveRequired()
 	validate.NewValidate(jquery.Jq("input#product_batchnumber"), nil).ValidateRemoveRequired()
@@ -1751,8 +1850,9 @@ func Chemify() {
 
 func Biofy() {
 
+	jquery.Jq(".chem").Not(".bio").Hide()
+	jquery.Jq(".consu").Not(".bio").Hide()
 	jquery.Jq(".bio").Show()
-	jquery.Jq(".chem").Hide()
 
 	validate.NewValidate(jquery.Jq("select#producerref"), nil).ValidateAddRequired()
 	validate.NewValidate(jquery.Jq("input#product_batchnumber"), nil).ValidateAddRequired()

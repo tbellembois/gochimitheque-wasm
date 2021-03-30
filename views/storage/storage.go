@@ -26,6 +26,38 @@ func storage_common() {
 	validate.NewValidate(jquery.Jq("#storage"), &validate.ValidateConfig{
 		ErrorClass: "alert alert-danger",
 		Rules: map[string]validate.ValidateRule{
+			// "storage_number_of_unit": {
+			// 	Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			// 		return jquery.Jq("#storage_number_of_bag").GetVal().String() == "" && jquery.Jq("#storage_number_of_carton").GetVal().String() == ""
+			// 	}),
+			// 	Remote: validate.ValidateRemote{
+			// 		BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
+			// 	},
+			// },
+			// "storage_number_of_bag": {
+			// 	Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			// 		return jquery.Jq("#storage_number_of_unit").GetVal().String() == "" && jquery.Jq("#storage_number_of_carton").GetVal().String() == ""
+			// 	}),
+			// 	Remote: validate.ValidateRemote{
+			// 		BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
+			// 	},
+			// },
+			// "storage_number_of_carton": {
+			// 	Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			// 		return jquery.Jq("#storage_number_of_bag").GetVal().String() == "" && jquery.Jq("#storage_number_of_unit").GetVal().String() == ""
+			// 	}),
+			// 	Remote: validate.ValidateRemote{
+			// 		BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
+			// 	},
+			// },
+			"storage_batchnumber": {
+				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+					return true
+				}),
+				Remote: validate.ValidateRemote{
+					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
+				},
+			},
 			"storelocation": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
 				Remote: validate.ValidateRemote{
@@ -43,6 +75,21 @@ func storage_common() {
 		},
 		Messages: map[string]validate.ValidateMessage{
 			"storelocation": {
+				Required: locales.Translate("required_input", HTTPHeaderAcceptLanguage),
+			},
+			"unit_concentration": {
+				Required: locales.Translate("required_input", HTTPHeaderAcceptLanguage),
+			},
+			"storage_number_of_unit": {
+				Required: locales.Translate("storage_one_number_required", HTTPHeaderAcceptLanguage),
+			},
+			"storage_number_of_bag": {
+				Required: locales.Translate("storage_one_number_required", HTTPHeaderAcceptLanguage),
+			},
+			"storage_number_of_carton": {
+				Required: locales.Translate("storage_one_number_required", HTTPHeaderAcceptLanguage),
+			},
+			"storage_batchnumber": {
 				Required: locales.Translate("required_input", HTTPHeaderAcceptLanguage),
 			},
 		},
@@ -152,6 +199,17 @@ func Storage_createCallback(args ...interface{}) {
 		productId = product.ProductID
 		productName = fmt.Sprintf("%s %s", product.Name.NameLabel, product.ProductSpecificity.String)
 
+		// Chem/Bio/Consu detection.
+		if product.ProductNumberPerCarton.Valid {
+			Consufy()
+		} else if product.ProducerRef.ProducerRefID.Valid {
+			Biofy()
+		} else {
+			Chemify()
+		}
+
+		globals.CurrentProduct = product
+
 	case reflect.TypeOf(Storage{}):
 
 		storage := args[0].(Storage)
@@ -160,10 +218,21 @@ func Storage_createCallback(args ...interface{}) {
 
 		FillInStorageForm(storage, "storage")
 
+		// Chem/Bio/Consu detection.
+		if storage.Product.ProductNumberPerCarton.Valid {
+			Consufy()
+		} else if storage.Product.ProducerRef.ProducerRefID.Valid {
+			Biofy()
+		} else {
+			Chemify()
+		}
+
 		if !(len(args) > 1 && args[1] == "clone") {
 			jquery.Jq("input#storage_nbitem").SetProp("disabled", "disabled")
 			jquery.Jq("input#storage_identicalbarecode").SetProp("disabled", "disabled")
 		}
+
+		globals.CurrentProduct = storage.Product
 
 	}
 
@@ -185,6 +254,13 @@ func Storage_createCallback(args ...interface{}) {
 
 	jquery.Jq("input#product_id").SetVal(productId)
 	jquery.Jq("#filter-product").SetHtml(title.OuterHTML())
+
+	if !globals.CurrentProduct.ProductNumberPerBag.Valid || !(globals.CurrentProduct.ProductNumberPerBag.Int64 > 0) {
+		jquery.Jq("input#storage_number_of_bag").SetProp("disabled", true)
+	}
+	if !globals.CurrentProduct.ProductNumberPerCarton.Valid || !(globals.CurrentProduct.ProductNumberPerCarton.Int64 > 0) {
+		jquery.Jq("input#storage_number_of_carton").SetProp("disabled", true)
+	}
 
 	jquery.Jq("#search").Hide()
 	jquery.Jq("#actions").Hide()
