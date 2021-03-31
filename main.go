@@ -159,6 +159,7 @@ func main() {
 	js.Global().Set("Product_dataQueryParams", js.FuncOf(product.DataQueryParams))
 	js.Global().Set("Product_detailFormatter", js.FuncOf(product.DetailFormatter))
 	js.Global().Set("Product_empiricalformulaFormatter", js.FuncOf(product.EmpiricalformulaFormatter))
+	js.Global().Set("Product_nameFormatter", js.FuncOf(product.NameFormatter))
 	js.Global().Set("Product_casnumberFormatter", js.FuncOf(product.CasnumberFormatter))
 	js.Global().Set("Product_productspecificityFormatter", js.FuncOf(product.Product_productSpecificityFormatter))
 	js.Global().Set("Product_productslFormatter", js.FuncOf(product.Product_productSlFormatter))

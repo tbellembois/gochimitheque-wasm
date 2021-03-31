@@ -1422,6 +1422,20 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 
 }
 
+func NameFormatter(this js.Value, args []js.Value) interface{} {
+
+	row := args[1]
+	globals.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
+
+	result := fmt.Sprintf("%s <i>%s</i>", globals.CurrentProduct.Name.NameLabel, globals.CurrentProduct.ProductSpecificity.String)
+	if globals.CurrentProduct.ProductSL.Valid && globals.CurrentProduct.ProductSL.String != "" {
+		result += fmt.Sprintf("<div><span class='text-white badge bg-secondary'>%s</span></div>", globals.CurrentProduct.ProductSL.String)
+	}
+
+	return result
+
+}
+
 func EmpiricalformulaFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
@@ -1477,14 +1491,15 @@ func Product_productSlFormatter(this js.Value, args []js.Value) interface{} {
 func OperateFormatter(this js.Value, args []js.Value) interface{} {
 
 	var (
-		imgSGH02        string
-		spanCasCMR      string
-		spanHSCMR       string
-		iconRestricted  string
-		buttonStorages  string
-		buttonOStorages string
-		iconBookmark    themes.IconFace
-		textBookmark    string
+		imgSGH02         string
+		spanCasCMR       string
+		spanHSCMR        string
+		iconRestricted   string
+		buttonStorages   string
+		buttonOStorages  string
+		buttonTotalStock string
+		iconBookmark     themes.IconFace
+		textBookmark     string
 	)
 
 	row := args[1]
@@ -1659,26 +1674,28 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 		[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
 	).OuterHTML()
 
-	buttonTotalStock := widgets.NewBSButtonWithIcon(
-		widgets.ButtonAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Id:         "totalstock" + strconv.Itoa(globals.CurrentProduct.ProductID),
-				Classes:    []string{"totalstock"},
-				Visible:    false,
-				Attributes: map[string]string{"pid": strconv.Itoa(globals.CurrentProduct.ProductID)},
+	if globals.CurrentProduct.ProductSC != 0 {
+		buttonTotalStock = widgets.NewBSButtonWithIcon(
+			widgets.ButtonAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Id:         "totalstock" + strconv.Itoa(globals.CurrentProduct.ProductID),
+					Classes:    []string{"totalstock"},
+					Visible:    false,
+					Attributes: map[string]string{"pid": strconv.Itoa(globals.CurrentProduct.ProductID)},
+				},
+				Title: locales.Translate("totalstock_text", HTTPHeaderAcceptLanguage),
 			},
-			Title: locales.Translate("totalstock_text", HTTPHeaderAcceptLanguage),
-		},
-		widgets.IconAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Visible: true,
-				Classes: []string{"iconlabel"},
+			widgets.IconAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+					Classes: []string{"iconlabel"},
+				},
+				Text: locales.Translate("totalstock_text", HTTPHeaderAcceptLanguage),
+				Icon: themes.NewMdiIcon(themes.MDI_TOTALSTOCK, ""),
 			},
-			Text: locales.Translate("totalstock_text", HTTPHeaderAcceptLanguage),
-			Icon: themes.NewMdiIcon(themes.MDI_TOTALSTOCK, ""),
-		},
-		[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
-	).OuterHTML()
+			[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
+		).OuterHTML()
+	}
 
 	ostoragesDiv := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
