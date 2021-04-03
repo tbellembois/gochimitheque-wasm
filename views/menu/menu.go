@@ -10,6 +10,7 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/views/person"
 	"github.com/tbellembois/gochimitheque-wasm/views/product"
 	"github.com/tbellembois/gochimitheque-wasm/views/storelocation"
+	"github.com/tbellembois/gochimitheque-wasm/views/welcomeannounce"
 )
 
 // LoadContentWrapper is only called in the menu.jade template
@@ -43,6 +44,9 @@ func LoadContentWrapper(this js.Value, args []js.Value) interface{} {
 	aboutListCallbackWrapper := func(args ...interface{}) {
 		about.About_listCallback(js.Null(), nil)
 	}
+	welcomeannounceListCallbackWrapper := func(args ...interface{}) {
+		welcomeannounce.WelcomeAnnounce_listCallback(js.Null(), nil)
+	}
 
 	var callbackFunc func(args ...interface{})
 
@@ -66,7 +70,7 @@ func LoadContentWrapper(this js.Value, args []js.Value) interface{} {
 	case "PersonPass_list":
 		callbackFunc = aboutListCallbackWrapper
 	case "WelcomeAnnounce_list":
-		callbackFunc = aboutListCallbackWrapper
+		callbackFunc = welcomeannounceListCallbackWrapper
 	case "About_list":
 		callbackFunc = aboutListCallbackWrapper
 	}

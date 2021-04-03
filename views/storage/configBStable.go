@@ -1662,13 +1662,9 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 					jquery.Jq("button#export").SetProp("disabled", false)
 
 				} else if storages.GetTotal() != 0 {
+
 					row.Call("success", js.ValueOf(js.Global().Get("JSON").Call("parse", data)))
-				} else {
-					// Checking the number of row to avoid a recursive loop.
-					if (bstable.NewBootstraptable(jquery.Jq("#Storage_table"), nil).TotalRows()) != 0 {
-						bstable.NewBootstraptable(jquery.Jq("#Storage_table"), nil).RemoveAll()
-						bstable.NewBootstraptable(jquery.Jq("#Storage_table"), nil).HideLoading()
-					}
+
 				}
 
 			},

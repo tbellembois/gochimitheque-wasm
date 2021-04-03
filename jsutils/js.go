@@ -10,6 +10,7 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/bstable"
 	"github.com/tbellembois/gochimitheque-wasm/globals"
 	"github.com/tbellembois/gochimitheque-wasm/jquery"
+	"github.com/tbellembois/gochimitheque-wasm/locales"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
@@ -143,7 +144,7 @@ func DisplayGenericErrorMessage() {
 				"style": "z-index:2",
 			},
 		}})
-	icon := widgets.NewIcon(widgets.IconAttributes{Icon: themes.NewMdiIcon(themes.MDI_TOW_TRUCK, themes.MDI_48PX)})
+	icon := widgets.NewIcon(widgets.IconAttributes{Icon: themes.NewMdiIcon(themes.MDI_BUG, themes.MDI_48PX)})
 	span := widgets.NewSpan(widgets.SpanAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Classes: []string{"pl-sm-2"},
@@ -433,6 +434,10 @@ func DisplayFilter(q ajax.QueryFilter) {
 		}))
 	}
 
+	if q.ProductBookmark {
+		// isFilter = true
+		jquery.Jq("#filter-item").Append(locales.Translate("menu_bookmark", globals.HTTPHeaderAcceptLanguage))
+	}
 	// if q.ProductBookmark {
 	// 	// isFilter = true
 	// 	jquery.Jq("#filter-item").Append(widgets.FilterItem("", locales.Translate("menu_bookmark", globals.HTTPHeaderAcceptLanguage)))

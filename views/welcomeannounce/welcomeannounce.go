@@ -25,7 +25,7 @@ func WelcomeAnnounce_listCallback(this js.Value, args []js.Value) interface{} {
 		if err = json.Unmarshal([]byte(data.String()), &welcomeAnnounce); err != nil {
 			fmt.Println(err)
 		}
-		jquery.Jq("#welcomeannounce_text").SetHtml(welcomeAnnounce.WelcomeAnnounceText)
+		jquery.Jq("#welcomeannounce_text").SetVal(welcomeAnnounce.WelcomeAnnounceText)
 
 	}
 	fail := func(data js.Value) {

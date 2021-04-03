@@ -53,7 +53,7 @@ func Permission(entityID int, entityName string, ismanager bool) *dom.HTMLDivEle
 			// building first col for table name
 			label := Doc.CreateElement("div").(*dom.HTMLDivElement)
 			label.SetClass("iconlabel text-right")
-			label.SetInnerHTML(i)
+			label.SetInnerHTML(locales.Translate(fmt.Sprintf("permission_%s", i), HTTPHeaderAcceptLanguage))
 			firstcoldiv := Doc.CreateElement("div").(*dom.HTMLDivElement)
 			firstcoldiv.SetClass("col-sm-2")
 			firstcoldiv.AppendChild(label)
