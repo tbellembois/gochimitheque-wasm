@@ -441,10 +441,45 @@ func Storage_storelocationFormatter(this js.Value, args []js.Value) interface{} 
 
 func Storage_quantityFormatter(this js.Value, args []js.Value) interface{} {
 
+	var (
+		ret string
+	)
+
 	row := args[1]
 	CurrentStorage = Storage{}.FromJsJSONValue(row)
 
-	return fmt.Sprintf("%v %s", CurrentStorage.StorageQuantity.Float64, CurrentStorage.UnitQuantity.UnitLabel.String)
+	if CurrentStorage.StorageQuantity.Float64 != 0 {
+
+		ret = fmt.Sprintf("%v %s", CurrentStorage.StorageQuantity.Float64, CurrentStorage.UnitQuantity.UnitLabel.String)
+
+	} else {
+
+		var (
+			totalUnits int64
+		)
+
+		if CurrentStorage.Product.ProductNumberPerCarton.Valid &&
+			CurrentStorage.Product.ProductNumberPerCarton.Int64 != 0 &&
+			CurrentStorage.StorageNumberOfCarton.Valid &&
+			CurrentStorage.StorageNumberOfCarton.Int64 != 0 {
+
+			totalUnits = CurrentStorage.Product.ProductNumberPerCarton.Int64 * CurrentStorage.StorageNumberOfCarton.Int64
+
+		}
+		if CurrentStorage.Product.ProductNumberPerBag.Valid &&
+			CurrentStorage.Product.ProductNumberPerBag.Int64 != 0 &&
+			CurrentStorage.StorageNumberOfBag.Valid &&
+			CurrentStorage.StorageNumberOfBag.Int64 != 0 {
+
+			totalUnits = totalUnits + CurrentStorage.Product.ProductNumberPerBag.Int64*CurrentStorage.StorageNumberOfBag.Int64
+
+		}
+
+		ret = fmt.Sprintf("%d", totalUnits)
+
+	}
+
+	return ret
 
 }
 
