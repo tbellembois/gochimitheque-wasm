@@ -55,6 +55,10 @@ type QueryFilter struct {
 	PrecautionaryStatementsFilterLabel string
 	Symbols                            []string `json:"symbols,omitempty"`
 	SymbolsFilterLabel                 string
+	Tags                               []string `json:"tags,omitempty"`
+	TagsFilterLabel                    string
+	Category                           string `json:"category,omitempty"`
+	CategoryFilterLabel                string
 	StorageBarecode                    string `json:"storage_barecode,omitempty"`
 	StorageBarecodeFilterLabel         string
 	CustomNamePartOf                   string `json:"custom_name_part_of,omitempty"`
@@ -171,6 +175,9 @@ func (q QueryFilter) ToRawQuery() string {
 	if q.SignalWord != "" {
 		values.Set("signalword", q.SignalWord)
 	}
+	if q.Category != "" {
+		values.Set("category", q.Category)
+	}
 	if len(q.HazardStatements) > 0 {
 		for _, hs := range q.HazardStatements {
 			values.Set("hazardstatements[]", hs)
@@ -184,6 +191,11 @@ func (q QueryFilter) ToRawQuery() string {
 	if len(q.Symbols) > 0 {
 		for _, s := range q.Symbols {
 			values.Set("symbols[]", s)
+		}
+	}
+	if len(q.Tags) > 0 {
+		for _, tag := range q.Tags {
+			values.Set("tags[]", tag)
 		}
 	}
 

@@ -1558,12 +1558,30 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 			queryFilter.EmpiricalFormulaFilterLabel = i[0].Text
 		}
 	}
+	select2SCategory := select2.NewSelect2(jquery.Jq("select#s_category"), nil)
+	if select2SCategory.Select2IsInitialized() {
+		i := select2SCategory.Select2Data()
+		if len(i) > 0 {
+			queryFilter.Category = i[0].Id
+			queryFilter.CategoryFilterLabel = i[0].Text
+		}
+	}
 	select2SSignalWord := select2.NewSelect2(jquery.Jq("select#s_signalword"), nil)
 	if select2SSignalWord.Select2IsInitialized() {
 		i := select2SSignalWord.Select2Data()
 		if len(i) > 0 {
 			queryFilter.SignalWord = i[0].Id
 			queryFilter.SignalWordFilterLabel = i[0].Text
+		}
+	}
+	select2STags := select2.NewSelect2(jquery.Jq("select#s_tags"), nil)
+	if select2STags.Select2IsInitialized() {
+		i := select2STags.Select2Data()
+		if len(i) > 0 {
+			for _, tag := range i {
+				queryFilter.Tags = append(queryFilter.Tags, tag.Id)
+				queryFilter.TagsFilterLabel += fmt.Sprintf(" %s", tag.Text)
+			}
 		}
 	}
 	select2SHS := select2.NewSelect2(jquery.Jq("select#s_hazardstatements"), nil)

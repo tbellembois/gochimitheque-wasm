@@ -109,6 +109,30 @@ func showStockRecursive(storelocation *StoreLocation, depth int, jqSelector stri
 
 func Search_listCallback(args ...interface{}) {
 
+	select2.NewSelect2(jquery.Jq("select#s_tags"), &select2.Select2Config{
+		Placeholder:    locales.Translate("s_tags", HTTPHeaderAcceptLanguage),
+		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Tag{})),
+		AllowClear:     true,
+		Ajax: select2.Select2Ajax{
+			URL:            ApplicationProxyPath + "products/tags/",
+			DataType:       "json",
+			Data:           js.FuncOf(select2.Select2GenericAjaxData),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Tags{})),
+		},
+	}).Select2ify()
+
+	select2.NewSelect2(jquery.Jq("select#s_category"), &select2.Select2Config{
+		Placeholder:    locales.Translate("s_category", HTTPHeaderAcceptLanguage),
+		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Category{})),
+		AllowClear:     true,
+		Ajax: select2.Select2Ajax{
+			URL:            ApplicationProxyPath + "products/categories/",
+			DataType:       "json",
+			Data:           js.FuncOf(select2.Select2GenericAjaxData),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Categories{})),
+		},
+	}).Select2ify()
+
 	select2.NewSelect2(jquery.Jq("select#s_entity"), &select2.Select2Config{
 		Placeholder:    locales.Translate("s_entity", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Entity{})),

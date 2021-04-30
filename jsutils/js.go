@@ -69,6 +69,12 @@ func Search(this js.Value, args []js.Value) interface{} {
 
 func clearSearchForm() {
 
+	if select2.NewSelect2(jquery.Jq("select#s_tags"), nil).Select2IsInitialized() {
+		select2.NewSelect2(jquery.Jq("select#s_tags"), nil).Select2Clear()
+	}
+	if select2.NewSelect2(jquery.Jq("select#s_category"), nil).Select2IsInitialized() {
+		select2.NewSelect2(jquery.Jq("select#s_category"), nil).Select2Clear()
+	}
 	if select2.NewSelect2(jquery.Jq("select#s_storelocation"), nil).Select2IsInitialized() {
 		select2.NewSelect2(jquery.Jq("select#s_storelocation"), nil).Select2Clear()
 	}
