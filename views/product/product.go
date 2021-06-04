@@ -699,7 +699,7 @@ func Product_listCallback(this js.Value, args []js.Value) interface{} {
 	bstable.NewBootstraptable(jquery.Jq("#Product_table"), &bstable.BootstraptableParams{Ajax: "Product_getTableData"})
 	jquery.Jq("#Product_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
 
-	jquery.Jq("#search").Show()
+	jquery.Jq("#searchbar").Show()
 	jquery.Jq("#actions").Show()
 	jquery.Jq("#s_storage_archive_button").SetInvisible()
 	jquery.Jq("#s_storage_stock_button").SetInvisible()
@@ -738,7 +738,7 @@ func Product_createCallback(args ...interface{}) {
 
 		FillInProductForm(product, "product")
 
-		jquery.Jq("#search").Hide()
+		jquery.Jq("#searchbar").Hide()
 		jquery.Jq("#actions").Hide()
 
 	}
@@ -751,7 +751,7 @@ func Product_createCallback(args ...interface{}) {
 		jquery.Jq("input#showbio").SetProp("disabled", "disabled")
 	}
 
-	jquery.Jq("#search").Hide()
+	jquery.Jq("#searchbar").Hide()
 	jquery.Jq("#actions").Hide()
 
 }
@@ -772,7 +772,7 @@ func Product_SaveCallback(args ...interface{}) {
 
 	//product_common()
 
-	jquery.Jq("#search").Show()
+	jquery.Jq("#searchbar").Show()
 	jquery.Jq("#actions").Show()
 
 }

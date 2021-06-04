@@ -40,8 +40,7 @@ func PersonPass_listCallback(this js.Value, args []js.Value) interface{} {
 			},
 		},
 	})
-
-	jquery.Jq("#search").Hide()
+	jquery.Jq("#searchbar").Hide()
 	jquery.Jq("#actions").Hide()
 
 	return nil

@@ -261,8 +261,7 @@ func Storage_createCallback(args ...interface{}) {
 	if !globals.CurrentProduct.ProductNumberPerCarton.Valid || !(globals.CurrentProduct.ProductNumberPerCarton.Int64 > 0) {
 		jquery.Jq("input#storage_number_of_carton").SetProp("disabled", true)
 	}
-
-	jquery.Jq("#search").Hide()
+	jquery.Jq("#searchbar").Hide()
 	jquery.Jq("#actions").Hide()
 
 }
@@ -292,7 +291,7 @@ func Storage_listCallback(this js.Value, args []js.Value) interface{} {
 	bstable.NewBootstraptable(jquery.Jq("#Storage_table"), &bstable.BootstraptableParams{Ajax: "Storage_getTableData"})
 	jquery.Jq("#Storage_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
 
-	jquery.Jq("#search").Show()
+	jquery.Jq("#searchbar").Show()
 	jquery.Jq("#actions").Show()
 	jquery.Jq("#s_storage_archive_button").SetVisible()
 
@@ -332,7 +331,7 @@ func Storage_SaveCallback(args ...interface{}) {
 
 	//storage_common()
 
-	jquery.Jq("#search").Show()
+	jquery.Jq("#searchbar").Show()
 	jquery.Jq("#actions").Show()
 
 	changeSwitchButtonToProduct()

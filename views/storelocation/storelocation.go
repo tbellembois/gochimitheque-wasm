@@ -72,7 +72,7 @@ func storelocation_common() {
 
 	jquery.Jq("#storelocation_color").Object.Call("colorpicker")
 
-	jquery.Jq("#search").Hide()
+	jquery.Jq("#searchbar").Hide()
 	jquery.Jq("#actions").Hide()
 
 }

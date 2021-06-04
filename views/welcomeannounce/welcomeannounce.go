@@ -41,7 +41,7 @@ func WelcomeAnnounce_listCallback(this js.Value, args []js.Value) interface{} {
 		Fail:   fail,
 	}.Send()
 
-	jquery.Jq("#search").Hide()
+	jquery.Jq("#searchbar").Hide()
 	jquery.Jq("#actions").Hide()
 
 	return nil

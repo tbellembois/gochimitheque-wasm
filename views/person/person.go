@@ -97,7 +97,7 @@ func person_common() {
 
 	}))
 
-	jquery.Jq("#search").Hide()
+	jquery.Jq("#searchbar").Hide()
 	jquery.Jq("#actions").Hide()
 
 }

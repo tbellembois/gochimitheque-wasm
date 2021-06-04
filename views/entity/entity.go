@@ -46,7 +46,7 @@ func entity_common() {
 		},
 	}).Select2ify()
 
-	jquery.Jq("#search").Hide()
+	jquery.Jq("#searchbar").Hide()
 	jquery.Jq("#actions").Hide()
 
 }
