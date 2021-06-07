@@ -372,6 +372,11 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 
 					row.Call("success", js.ValueOf(js.Global().Get("JSON").Call("parse", data)))
 
+				} else {
+
+					// TODO: improve this
+					jquery.Jq("span.loading-wrap").SetHtml(locales.Translate("no_result", globals.HTTPHeaderAcceptLanguage))
+
 				}
 
 			},

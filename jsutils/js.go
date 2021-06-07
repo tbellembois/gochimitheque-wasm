@@ -10,7 +10,6 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/bstable"
 	"github.com/tbellembois/gochimitheque-wasm/globals"
 	"github.com/tbellembois/gochimitheque-wasm/jquery"
-	"github.com/tbellembois/gochimitheque-wasm/locales"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
@@ -442,7 +441,15 @@ func DisplayFilter(q ajax.QueryFilter) {
 
 	if q.ProductBookmark {
 		// isFilter = true
-		jquery.Jq("#filter-item").Append(locales.Translate("menu_bookmark", globals.HTTPHeaderAcceptLanguage))
+		//jquery.Jq("#filter-item").Append(locales.Translate("menu_bookmark", globals.HTTPHeaderAcceptLanguage))
+		jquery.Jq("#filter-item").Append(widgets.FilterItem("menu_bookmark", ""))
+		jquery.Jq("#removefiltermenu_bookmark").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			globals.BSTableQueryFilter.Lock()
+			globals.BSTableQueryFilter.ProductBookmark = false
+			globals.BSTableQueryFilter.Unlock()
+			Search(js.Null(), nil)
+			return nil
+		}))
 	}
 	// if q.ProductBookmark {
 	// 	// isFilter = true

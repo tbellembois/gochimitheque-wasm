@@ -786,9 +786,9 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	}
 
 	//
-	// Qrcode, to destroy and ID.
+	// Qrcode, to destroy.
 	//
-	rowQrcodeAndID := widgets.NewDiv(widgets.DivAttributes{
+	rowQrcodeAndToDestroy := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
 			Classes: []string{"row", "mt-sm-3"},
@@ -800,16 +800,25 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Id:      fmt.Sprintf("qrcode%d", CurrentStorage.StorageID.Int64),
 			Visible: true,
 			Classes: []string{"ml-sm-4"},
+			Attributes: map[string]string{
+				"css": "width: 128px;",
+			},
 		},
 	})
 
 	qrcodeLayoutRow1 := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"iconlabel", "row"},
+			Classes: []string{"iconlabel", "row", "text-center"},
 		},
 	})
 	qrcodeLayoutRow2 := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"iconlabel", "row"},
+		},
+	})
+	qrcodeLayoutRow3 := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
 			Classes: []string{"iconlabel", "row"},
@@ -819,7 +828,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	qrcodeImgCol := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-auto", "p-sm-0"},
+			Classes: []string{"col", "p-sm-0"},
 		},
 	})
 	qrcodeImg := widgets.NewImg(widgets.ImgAttributes{
@@ -836,15 +845,14 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 
 	qrcodeProductNameCol := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
-			Visible:    true,
-			Classes:    []string{"col-sm-auto", "p-sm-0"},
-			Attributes: map[string]string{"style": "height: 8em;"},
+			Visible: true,
+			Classes: []string{"col", "p-sm-0"},
 		},
 	})
 	qrcodeProductNameSpan := widgets.NewSpan(widgets.SpanAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"iconlabel", "verticaltext", "align-bottom"},
+			Classes: []string{"iconlabel"},
 		},
 		Text: fmt.Sprintf("%s %s", CurrentStorage.Product.Name.NameLabel, CurrentStorage.Product.ProductSpecificity.String),
 	})
@@ -854,7 +862,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	qrcodeStoreLocationNameCol := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible:    true,
-			Classes:    []string{"col-sm-12", "p-sm-0"},
+			Classes:    []string{"col", "p-sm-0"},
 			Attributes: map[string]string{"style": "width: 9em;"},
 		},
 	})
@@ -867,17 +875,19 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	})
 	qrcodeStoreLocationNameCol.AppendChild(qrcodeStoreLocationNameSpan)
 
-	qrcodeLayoutRow1.AppendChild(qrcodeImgCol)
 	qrcodeLayoutRow1.AppendChild(qrcodeProductNameCol)
-	qrcodeLayoutRow2.AppendChild(qrcodeStoreLocationNameCol)
+	qrcodeLayoutRow2.AppendChild(qrcodeImgCol)
+	qrcodeLayoutRow3.AppendChild(qrcodeStoreLocationNameCol)
 
 	colQrcode.AppendChild(qrcodeLayoutRow1)
 	colQrcode.AppendChild(qrcodeLayoutRow2)
+	colQrcode.AppendChild(qrcodeLayoutRow3)
+
 	// To destroy.
 	colToDestroy := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-4"},
+			Classes: []string{"col"},
 		},
 	})
 	if CurrentStorage.StorageToDestroy.Valid && CurrentStorage.StorageToDestroy.Bool {
@@ -890,32 +900,9 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				Text: locales.Translate("storage_todestroy_title", HTTPHeaderAcceptLanguage),
 			}))
 	}
-	// ID.
-	colID := widgets.NewDiv(widgets.DivAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"col-sm-4"},
-		},
-	})
-	colID.AppendChild(
-		widgets.NewSpan(widgets.SpanAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Visible: true,
-				Classes: []string{"iconlabel", "mr-sm-2"},
-			},
-			Text: "id",
-		}))
-	colID.AppendChild(
-		widgets.NewSpan(widgets.SpanAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Visible: true,
-			},
-			Text: strconv.Itoa(int(CurrentStorage.StorageID.Int64)),
-		}))
 
-	rowQrcodeAndID.AppendChild(colQrcode)
-	rowQrcodeAndID.AppendChild(colToDestroy)
-	rowQrcodeAndID.AppendChild(colID)
+	rowQrcodeAndToDestroy.AppendChild(colQrcode)
+	rowQrcodeAndToDestroy.AppendChild(colToDestroy)
 
 	//
 	// Print QRCode.
@@ -1479,14 +1466,14 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Visible: true,
 			Classes: []string{"blockquote-footer", "mr-sm-2"},
 		},
-		Text: CurrentStorage.Person.PersonEmail,
+		Text: fmt.Sprintf("%s id: %d", CurrentStorage.Person.PersonEmail, CurrentStorage.StorageID.Int64),
 	}))
 
 	rowCreationDateAndPerson.AppendChild(colCreationDate)
 	rowCreationDateAndPerson.AppendChild(colModificationDate)
 	rowCreationDateAndPerson.AppendChild(colPerson)
 
-	return rowQrcodeAndID.OuterHTML() +
+	return rowQrcodeAndToDestroy.OuterHTML() +
 		rowPrintQrcode.OuterHTML() +
 		rowProductAndStorelocation.OuterHTML() +
 		rowNumberOfCartonBagUnit.OuterHTML() +
@@ -1717,6 +1704,11 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 				} else if storages.GetTotal() != 0 {
 
 					row.Call("success", js.ValueOf(js.Global().Get("JSON").Call("parse", data)))
+
+				} else {
+
+					// TODO: improve this
+					jquery.Jq("span.loading-wrap").SetHtml(locales.Translate("no_result", globals.HTTPHeaderAcceptLanguage))
 
 				}
 

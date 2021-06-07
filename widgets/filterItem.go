@@ -61,24 +61,32 @@ func FilterItem(title, value string) string {
 			Classes: []string{"col-sm-auto"},
 		},
 	})
-	switch title {
-	case "s_casnumber_cmr", "s_borrowing", "s_storage_to_destroy":
-		colValue.AppendChild(NewIcon(IconAttributes{
-			BaseAttributes: BaseAttributes{
-				Visible: true,
-				Classes: []string{"iconlabel"},
-			},
-			Icon: themes.NewMdiIcon(themes.MDI_OK, ""),
-		}))
-	default:
-		colValue.AppendChild(NewSpan(SpanAttributes{
-			BaseAttributes: BaseAttributes{
-				Visible: true,
-				Classes: []string{"text-start"},
-			},
-			Text: value,
-		}))
-	}
+	// switch title {
+	// case "s_casnumber_cmr", "s_borrowing", "s_storage_to_destroy":
+	// 	colValue.AppendChild(NewIcon(IconAttributes{
+	// 		BaseAttributes: BaseAttributes{
+	// 			Visible: true,
+	// 			Classes: []string{"iconlabel"},
+	// 		},
+	// 		Icon: themes.NewMdiIcon(themes.MDI_OK, ""),
+	// 	}))
+	// default:
+	// 	colValue.AppendChild(NewSpan(SpanAttributes{
+	// 		BaseAttributes: BaseAttributes{
+	// 			Visible: true,
+	// 			Classes: []string{"text-start"},
+	// 		},
+	// 		Text: value,
+	// 	}))
+	// }
+
+	colValue.AppendChild(NewSpan(SpanAttributes{
+		BaseAttributes: BaseAttributes{
+			Visible: true,
+			Classes: []string{"text-start"},
+		},
+		Text: value,
+	}))
 
 	row.AppendChild(colRemoveFilter)
 	row.AppendChild(colValue)
