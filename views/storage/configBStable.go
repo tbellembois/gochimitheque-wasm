@@ -463,7 +463,7 @@ func Storage_quantityFormatter(this js.Value, args []js.Value) interface{} {
 			CurrentStorage.StorageNumberOfCarton.Valid &&
 			CurrentStorage.StorageNumberOfCarton.Int64 != 0 {
 
-			totalUnits = CurrentStorage.Product.ProductNumberPerCarton.Int64 * CurrentStorage.StorageNumberOfCarton.Int64
+			totalUnits += CurrentStorage.Product.ProductNumberPerCarton.Int64 * CurrentStorage.StorageNumberOfCarton.Int64
 
 		}
 		if CurrentStorage.Product.ProductNumberPerBag.Valid &&
@@ -471,8 +471,12 @@ func Storage_quantityFormatter(this js.Value, args []js.Value) interface{} {
 			CurrentStorage.StorageNumberOfBag.Valid &&
 			CurrentStorage.StorageNumberOfBag.Int64 != 0 {
 
-			totalUnits = totalUnits + CurrentStorage.Product.ProductNumberPerBag.Int64*CurrentStorage.StorageNumberOfBag.Int64
+			totalUnits += totalUnits + CurrentStorage.Product.ProductNumberPerBag.Int64*CurrentStorage.StorageNumberOfBag.Int64
 
+		}
+		if CurrentStorage.StorageNumberOfUnit.Valid &&
+			CurrentStorage.StorageNumberOfUnit.Int64 != 0 {
+			totalUnits += int64(CurrentStorage.StorageNumberOfUnit.Int64)
 		}
 
 		ret = fmt.Sprintf("%d", totalUnits)
