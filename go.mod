@@ -1,6 +1,6 @@
 module github.com/tbellembois/gochimitheque-wasm
 
-go 1.16
+go 1.17
 
 replace (
 	github.com/tbellembois/gochimitheque v0.0.0 => /home/thbellem/workspace/workspace_go/src/github.com/tbellembois/gochimitheque
@@ -14,4 +14,9 @@ require (
 	github.com/tbellembois/gochimitheque-utils v0.0.0
 	golang.org/x/text v0.3.6
 	honnef.co/go/js/dom/v2 v2.0.0-20200509013220-d4405f7ab4d8
+)
+
+require (
+	github.com/sirupsen/logrus v1.8.1 // indirect
+	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
 )

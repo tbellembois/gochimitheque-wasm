@@ -471,7 +471,7 @@ func Storage_quantityFormatter(this js.Value, args []js.Value) interface{} {
 			CurrentStorage.StorageNumberOfBag.Valid &&
 			CurrentStorage.StorageNumberOfBag.Int64 != 0 {
 
-			totalUnits += totalUnits + CurrentStorage.Product.ProductNumberPerBag.Int64*CurrentStorage.StorageNumberOfBag.Int64
+			totalUnits += CurrentStorage.Product.ProductNumberPerBag.Int64 * CurrentStorage.StorageNumberOfBag.Int64
 
 		}
 		if CurrentStorage.StorageNumberOfUnit.Valid &&
