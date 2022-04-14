@@ -27,7 +27,7 @@ func Permission(entityID int, entityName string, ismanager bool) *dom.HTMLDivEle
 	widgetdiv.SetClass("col-sm-12")
 	title := Doc.CreateElement("div").(*dom.HTMLDivElement)
 	title.SetClass("d-flex")
-	title.SetInnerHTML("<span class='mdi mdi-store mdi-24px'/>" + entityName)
+	title.SetInnerHTML("<span class='mdi mdi-home-group mdi-24px'/>" + entityName)
 
 	widgetdiv.AppendChild(title)
 
@@ -81,7 +81,7 @@ func Permission(entityID int, entityName string, ismanager bool) *dom.HTMLDivEle
 				"id":        fmt.Sprintf("permw%s%d", i, entityID),
 				"name":      fmt.Sprintf("perm%s%d", i, entityID),
 				"value":     "w",
-				"label":     fmt.Sprintf("<label class=\"form-check-label ml-sm-1 pr-sm-1 pl-sm-1 text-secondary border border-secondary rounded\" for=\"permn%s%d\" title=\"%s\"><span class=\"mdi mdi-eye\"></span><span class=\"mdi mdi-creation\"></span><span class=\"mdi mdi-border-color\"></span><span class=\"mdi mdi-delete\"></span></label>", i, entityID, locales.Translate("permission_crud", HTTPHeaderAcceptLanguage)),
+				"label":     fmt.Sprintf("<label class=\"form-check-label ml-sm-1 pr-sm-1 pl-sm-1 text-secondary border border-secondary rounded\" for=\"permn%s%d\" title=\"%s\"><span class=\"mdi mdi-eye\"></span><span class=\"mdi mdi-creation\"></span><span class=\"mdi mdi-pencil-outline\"></span><span class=\"mdi mdi-delete\"></span></label>", i, entityID, locales.Translate("permission_crud", HTTPHeaderAcceptLanguage)),
 				"perm_name": "w",
 				"item_name": i,
 				"entity_id": fmt.Sprintf("%d", entityID),

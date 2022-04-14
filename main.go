@@ -1,4 +1,4 @@
-//go:build go1.17 && js && wasm
+//go:build go1.18 && js && wasm
 
 package main
 
@@ -26,6 +26,7 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/views/menu"
 	"github.com/tbellembois/gochimitheque-wasm/views/person"
 	"github.com/tbellembois/gochimitheque-wasm/views/personpass"
+	"github.com/tbellembois/gochimitheque-wasm/views/personqrcode"
 	"github.com/tbellembois/gochimitheque-wasm/views/product"
 	"github.com/tbellembois/gochimitheque-wasm/views/storage"
 	"github.com/tbellembois/gochimitheque-wasm/views/storelocation"
@@ -33,6 +34,7 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque/data"
 	"github.com/tbellembois/gochimitheque/models"
+	"github.com/tbellembois/gochimitheque/request"
 )
 
 var (
@@ -67,15 +69,16 @@ func init() {
 	// TODO: factorize the js and wasm functions.
 	CurrentView = "product"
 
-	var c models.ViewContainer
+	var c request.Container
 	cString := js.Global().Get("JSON").Call("stringify", js.Global().Get("c")).String()
 	if err = json.Unmarshal([]byte(cString), &c); err != nil {
 		panic(err)
 	}
 
-	ApplicationProxyPath = c.ProxyPath
+	ApplicationProxyPath = c.AppPath
 	HTTPHeaderAcceptLanguage = c.PersonLanguage
 	DisableCache = c.DisableCache
+	LDAPEnabled = c.LDAPEnabled
 
 	// Initializing the slices of statements for the magic selector.
 	var (
@@ -90,11 +93,11 @@ func init() {
 	// FIXME: we assume here that the id starts by 1 in the DB
 	for id, record := range records {
 		globals.DBPrecautionaryStatements = append(globals.DBPrecautionaryStatements,
-			types.PrecautionaryStatement{
+			types.PrecautionaryStatement{PrecautionaryStatement: &models.PrecautionaryStatement{
 				PrecautionaryStatementID:        id + 1,
 				PrecautionaryStatementLabel:     record[0],
 				PrecautionaryStatementReference: record[1],
-			})
+			}})
 	}
 
 	r = csv.NewReader(strings.NewReader(data.HAZARDSTATEMENT))
@@ -105,11 +108,11 @@ func init() {
 	// FIXME: we assume here that the id starts by 1 in the DB
 	for id, record := range records {
 		globals.DBHazardStatements = append(globals.DBHazardStatements,
-			types.HazardStatement{
+			types.HazardStatement{HazardStatement: &models.HazardStatement{
 				HazardStatementID:        id + 1,
 				HazardStatementLabel:     record[0],
 				HazardStatementReference: record[1],
-			})
+			}})
 	}
 
 }
@@ -159,6 +162,7 @@ func main() {
 	js.Global().Set("Product_dataQueryParams", js.FuncOf(product.DataQueryParams))
 	js.Global().Set("Product_detailFormatter", js.FuncOf(product.DetailFormatter))
 	js.Global().Set("Product_empiricalformulaFormatter", js.FuncOf(product.EmpiricalformulaFormatter))
+	js.Global().Set("Product_twodformulaFormatter", js.FuncOf(product.TwodformulaFormatter))
 	js.Global().Set("Product_nameFormatter", js.FuncOf(product.NameFormatter))
 	js.Global().Set("Product_casnumberFormatter", js.FuncOf(product.CasnumberFormatter))
 	js.Global().Set("Product_productspecificityFormatter", js.FuncOf(product.Product_productSpecificityFormatter))
@@ -188,6 +192,8 @@ func main() {
 	js.Global().Set("Storage_dataQueryParams", js.FuncOf(storage.DataQueryParams))
 	js.Global().Set("Storage_detailFormatter", js.FuncOf(storage.DetailFormatter))
 	js.Global().Set("Storage_productFormatter", js.FuncOf(storage.Storage_productFormatter))
+	js.Global().Set("Storage_batchnumberFormatter", js.FuncOf(storage.Storage_batchnumberFormatter))
+	js.Global().Set("Storage_modificationdateFormatter", js.FuncOf(storage.Storage_modificationdateFormatter))
 	js.Global().Set("Storage_storelocationFormatter", js.FuncOf(storage.Storage_storelocationFormatter))
 	js.Global().Set("Storage_quantityFormatter", js.FuncOf(storage.Storage_quantityFormatter))
 	js.Global().Set("Storage_barecodeFormatter", js.FuncOf(storage.Storage_barecodeFormatter))
@@ -250,6 +256,9 @@ func main() {
 	js.Global().Set("Person_list", js.FuncOf(person.Person_listCallback))
 	js.Global().Set("Person_create", js.FuncOf(person.Person_createCallBack))
 
+	js.Global().Set("Person_scanQRdone", js.FuncOf(login.ScanQRdone))
+	js.Global().Set("Person_generateQRCode", js.FuncOf(person.GenerateQRCode))
+
 	// Welcome announce
 	js.Global().Set("WelcomeAnnounce_saveWelcomeAnnounce", js.FuncOf(welcomeannounce.SaveWelcomeAnnounce))
 	js.Global().Set("WelcomeAnnounce_list", js.FuncOf(welcomeannounce.WelcomeAnnounce_listCallback))
@@ -257,6 +266,7 @@ func main() {
 	// Person password
 	js.Global().Set("PersonPass_savePersonPassword", js.FuncOf(personpass.SavePersonPassword))
 	js.Global().Set("PersonPass_list", js.FuncOf(personpass.PersonPass_listCallback))
+	js.Global().Set("PersonQRCode_list", js.FuncOf(personqrcode.PersonQRCode_listCallback))
 
 	// Login
 	js.Global().Set("Login_getToken", js.FuncOf(login.GetToken))
@@ -272,7 +282,7 @@ func main() {
 	// Menu
 	js.Global().Set("Menu_loadContent", js.FuncOf(menu.LoadContentWrapper))
 
-	jquery.Jq("#loading").Empty()
+	jquery.Jq("#loading").Remove()
 	jquery.Jq("div.container").RemoveClass("invisible")
 
 	// Startup messages

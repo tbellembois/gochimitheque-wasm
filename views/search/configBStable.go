@@ -10,13 +10,22 @@ import (
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 // TODO: move me
 func Select2SymbolTemplateResults(this js.Value, args []js.Value) interface{} {
 
 	data := args[0]
-	symbol := Symbol{}.FromJsJSONValue(data).(Symbol)
+	symbol := Symbol{Symbol: &models.Symbol{}}.FromJsJSONValue(data).(Symbol)
+
+	if symbol.Symbol == nil {
+		return jsutils.CreateJsHTMLElementFromString(widgets.NewDiv(widgets.DivAttributes{}).OuterHTML())
+	}
+
+	if symbol.Symbol == nil {
+		return jsutils.CreateJsHTMLElementFromString(widgets.NewDiv(widgets.DivAttributes{}).OuterHTML())
+	}
 
 	image := widgets.NewImg(widgets.ImgAttributes{
 		BaseAttributes: widgets.BaseAttributes{
@@ -54,7 +63,11 @@ func Select2StoreLocationTemplateResults(this js.Value, args []js.Value) interfa
 
 	data := args[0]
 
-	storelocation := StoreLocation{}.FromJsJSONValue(data).(StoreLocation)
+	storelocation := StoreLocation{StoreLocation: &models.StoreLocation{}}.FromJsJSONValue(data).(StoreLocation)
+
+	if storelocation.StoreLocation == nil {
+		return jsutils.CreateJsHTMLElementFromString(widgets.NewDiv(widgets.DivAttributes{}).OuterHTML())
+	}
 
 	iconColor := widgets.NewIcon(widgets.IconAttributes{
 		BaseAttributes: widgets.BaseAttributes{

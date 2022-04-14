@@ -1,12 +1,12 @@
 package types
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type LinearFormulas struct {
@@ -15,9 +15,7 @@ type LinearFormulas struct {
 }
 
 type LinearFormula struct {
-	C                  int            `json:"c"` // not stored in db but db:"c" set for sqlx
-	LinearFormulaID    sql.NullInt64  `json:"linearformula_id"`
-	LinearFormulaLabel sql.NullString `json:"linearformula_label"`
+	*models.LinearFormula
 }
 
 func (elems LinearFormulas) GetRowConcreteTypeName() string {
@@ -110,6 +108,10 @@ func (e LinearFormula) GetSelect2Id() int {
 
 func (e LinearFormula) GetSelect2Text() string {
 
-	return e.LinearFormulaLabel.String
+	if e.LinearFormula != nil {
+		return e.LinearFormulaLabel.String
+	}
+
+	return ""
 
 }

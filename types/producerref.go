@@ -1,12 +1,12 @@
 package types
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type ProducerRefs struct {
@@ -15,10 +15,7 @@ type ProducerRefs struct {
 }
 
 type ProducerRef struct {
-	C                int            `json:"c"` // not stored in db but db:"c" set for sqlx
-	ProducerRefID    sql.NullInt64  `json:"producerref_id"`
-	ProducerRefLabel sql.NullString `json:"producerref_label"`
-	Producer         *Producer      `json:"producer"`
+	*models.ProducerRef
 }
 
 func (elems ProducerRefs) GetRowConcreteTypeName() string {
@@ -128,6 +125,10 @@ func (r ProducerRef) GetSelect2Id() int {
 
 func (r ProducerRef) GetSelect2Text() string {
 
-	return r.ProducerRefLabel.String
+	if r.ProducerRef != nil {
+		return r.ProducerRefLabel.String
+	}
+
+	return ""
 
 }

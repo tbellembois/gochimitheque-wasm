@@ -344,11 +344,14 @@ func Select2GenericAjaxProcessResults(select2ResultAble Select2ResultAble) func(
 			select2ItemAbles = append(select2ItemAbles, FakeItem{})
 		}
 
+		var pagination Select2Pagination
+		if select2ResultAble.GetRowConcreteTypeName() != "" {
+			pagination.More = (page * 10) < objects.GetTotal()
+		}
+
 		select2Data := Select2Data{
-			Results: select2ItemAbles,
-			Pagination: Select2Pagination{
-				More: (page * 10) < objects.GetTotal(),
-			},
+			Results:    select2ItemAbles,
+			Pagination: pagination,
 		}
 
 		return select2Data.ToJsValue()

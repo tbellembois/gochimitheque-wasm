@@ -1,12 +1,12 @@
 package types
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type StoreLocations struct {
@@ -15,16 +15,7 @@ type StoreLocations struct {
 }
 
 type StoreLocation struct {
-	StoreLocationID       sql.NullInt64  `json:"storelocation_id"`
-	StoreLocationName     sql.NullString `json:"storelocation_name"`
-	StoreLocationCanStore sql.NullBool   `json:"storelocation_canstore"`
-	StoreLocationColor    sql.NullString `json:"storelocation_color"`
-	Entity                `json:"entity"`
-	StoreLocation         *StoreLocation `json:"storelocation"`
-	StoreLocationFullPath string         `json:"storelocation_fullpath"`
-
-	Children []*StoreLocation `json:"children"`
-	Stocks   []Stock          `json:"stock"`
+	*models.StoreLocation
 }
 
 func (elems StoreLocations) GetRowConcreteTypeName() string {
@@ -118,6 +109,10 @@ func (s StoreLocation) GetSelect2Id() int {
 
 func (s StoreLocation) GetSelect2Text() string {
 
-	return s.StoreLocationFullPath
+	if s.StoreLocation != nil {
+		return s.StoreLocationFullPath
+	}
+
+	return ""
 
 }

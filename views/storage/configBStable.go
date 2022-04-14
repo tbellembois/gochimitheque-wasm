@@ -22,6 +22,7 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/validate"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
+	"github.com/tbellembois/gochimitheque/models"
 	"honnef.co/go/js/dom/v2"
 )
 
@@ -107,7 +108,7 @@ func Biofy() {
 func Storage_operateEventsRestore(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	CurrentStorage = Storage{}.FromJsJSONValue(row)
+	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
 	jquery.Jq(fmt.Sprintf("button#restore%d", CurrentStorage.StorageID.Int64)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
@@ -159,7 +160,7 @@ func Storage_operateEventsRestore(this js.Value, args []js.Value) interface{} {
 func Storage_operateEventsClone(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	CurrentStorage = Storage{}.FromJsJSONValue(row)
+	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
 	CurrentStorage.StorageID = sql.NullInt64{
 		Valid: false,
@@ -176,7 +177,7 @@ func Storage_operateEventsClone(this js.Value, args []js.Value) interface{} {
 func Storage_operateEventsHistory(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	CurrentStorage = Storage{}.FromJsJSONValue(row)
+	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
 	BSTableQueryFilter.Lock()
 	BSTableQueryFilter.QueryFilter.StorageHistory = true
@@ -191,7 +192,7 @@ func Storage_operateEventsHistory(this js.Value, args []js.Value) interface{} {
 func Storage_operateEventsBorrow(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	CurrentStorage = Storage{}.FromJsJSONValue(row)
+	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
 	jquery.Jq("input#bstorage_id").SetVal(CurrentStorage.StorageID.Int64)
 
@@ -227,7 +228,7 @@ func Storage_operateEventsBorrow(this js.Value, args []js.Value) interface{} {
 func Storage_operateEventsEdit(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	CurrentStorage = Storage{}.FromJsJSONValue(row)
+	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
 	BSTableQueryFilter.Lock()
 	BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(int(CurrentStorage.StorageID.Int64))
@@ -244,9 +245,31 @@ func Storage_operateEventsEdit(this js.Value, args []js.Value) interface{} {
 func Storage_operateEventsArchive(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	CurrentStorage = Storage{}.FromJsJSONValue(row)
+	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
-	jquery.Jq(fmt.Sprintf("button#archive%d", CurrentStorage.StorageID.Int64)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	confirm := widgets.NewLink(
+		widgets.LinkAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Id:      fmt.Sprintf("archive%d", CurrentStorage.StorageID.Int64),
+				Classes: []string{"text-primary", "iconlabel"},
+				Visible: true,
+			},
+			Href: "#",
+			Label: widgets.NewSpan(
+				widgets.SpanAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Classes: []string{"mdi", themes.MDI_CONFIRM.ToString()},
+						Visible: true,
+					},
+					Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
+				},
+			),
+		},
+	).OuterHTML()
+
+	jquery.Jq(fmt.Sprintf("div#confirm%d", CurrentStorage.StorageID.Int64)).SetHtml(confirm)
+
+	jquery.Jq(fmt.Sprintf("a#archive%d", CurrentStorage.StorageID.Int64)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
 		url := fmt.Sprintf("%sstorages/%d/a", ApplicationProxyPath, CurrentStorage.StorageID.Int64)
 		method := "delete"
@@ -274,17 +297,6 @@ func Storage_operateEventsArchive(this js.Value, args []js.Value) interface{} {
 
 	}))
 
-	buttonTitle := widgets.NewIcon(widgets.IconAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"iconlabel"},
-		},
-		Icon: themes.NewMdiIcon(themes.MDI_CONFIRM, ""),
-		Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
-	})
-	jquery.Jq(fmt.Sprintf("button#archive%d", CurrentStorage.StorageID.Int64)).SetHtml("")
-	jquery.Jq(fmt.Sprintf("button#archive%d", CurrentStorage.StorageID.Int64)).Append(buttonTitle.OuterHTML())
-
 	return nil
 
 }
@@ -292,9 +304,31 @@ func Storage_operateEventsArchive(this js.Value, args []js.Value) interface{} {
 func Storage_operateEventsDelete(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	CurrentStorage = Storage{}.FromJsJSONValue(row)
+	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
-	jquery.Jq(fmt.Sprintf("button#delete%d", CurrentStorage.StorageID.Int64)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	confirm := widgets.NewLink(
+		widgets.LinkAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Id:      fmt.Sprintf("delete%d", CurrentStorage.StorageID.Int64),
+				Classes: []string{"text-primary", "iconlabel"},
+				Visible: true,
+			},
+			Href: "#",
+			Label: widgets.NewSpan(
+				widgets.SpanAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Classes: []string{"mdi", themes.MDI_CONFIRM.ToString()},
+						Visible: true,
+					},
+					Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
+				},
+			),
+		},
+	).OuterHTML()
+
+	jquery.Jq(fmt.Sprintf("div#confirm%d", CurrentStorage.StorageID.Int64)).SetHtml(confirm)
+
+	jquery.Jq(fmt.Sprintf("a#delete%d", CurrentStorage.StorageID.Int64)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
 		url := fmt.Sprintf("%sstorages/%d", ApplicationProxyPath, CurrentStorage.StorageID.Int64)
 		method := "delete"
@@ -325,17 +359,6 @@ func Storage_operateEventsDelete(this js.Value, args []js.Value) interface{} {
 
 	}))
 
-	buttonTitle := widgets.NewIcon(widgets.IconAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"iconlabel"},
-		},
-		Icon: themes.NewMdiIcon(themes.MDI_CONFIRM, ""),
-		Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
-	})
-	jquery.Jq(fmt.Sprintf("button#delete%d", CurrentStorage.StorageID.Int64)).SetHtml("")
-	jquery.Jq(fmt.Sprintf("button#delete%d", CurrentStorage.StorageID.Int64)).Append(buttonTitle.OuterHTML())
-
 	return nil
 
 }
@@ -345,7 +368,7 @@ func ShowIfAuthorizedActionButtons(this js.Value, args []js.Value) interface{} {
 	// Iterating other the button with the class "borrow"
 	// (we could choose "clone" or "delete")
 	// to retrieve once the storage id.
-	buttons := dom.GetWindow().Document().GetElementsByTagName("button")
+	buttons := dom.GetWindow().Document().GetElementsByTagName("a")
 	for _, button := range buttons {
 		if button.Class().Contains("borrow") || button.Class().Contains("restore") {
 			storageId := button.GetAttribute("sid")
@@ -372,10 +395,45 @@ func ShowIfAuthorizedActionButtons(this js.Value, args []js.Value) interface{} {
 
 }
 
+func Storage_modificationdateFormatter(this js.Value, args []js.Value) interface{} {
+
+	row := args[1]
+	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
+
+	return fmt.Sprintf("%s <span class='text-left blockquote-footer'>%s</span>", CurrentStorage.StorageModificationDate.Format("2006-01-02"), CurrentStorage.Person.PersonEmail)
+
+}
+
+func Storage_batchnumberFormatter(this js.Value, args []js.Value) interface{} {
+
+	row := args[1]
+	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
+
+	d := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+		},
+	})
+
+	if CurrentStorage.StorageBatchNumber.Valid {
+		d.AppendChild(
+			widgets.NewSpan(widgets.SpanAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+				},
+				Text: CurrentStorage.StorageBatchNumber.String,
+			}),
+		)
+	}
+
+	return d.OuterHTML()
+
+}
+
 func Storage_productFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
-	CurrentStorage = Storage{}.FromJsJSONValue(row)
+	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
 	d := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
@@ -401,6 +459,57 @@ func Storage_productFormatter(this js.Value, args []js.Value) interface{} {
 		)
 	}
 
+	if CurrentStorage.Product.ProducerRef.ProducerRefID.Valid {
+		d.AppendChild(
+			widgets.NewSpan(widgets.SpanAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+					Attributes: map[string]string{
+						"style": "font-size: 0.8em; font-style: italic; margin-right: 1em;",
+					},
+				},
+				Text: locales.Translate("producerref_label_title", globals.HTTPHeaderAcceptLanguage),
+			}),
+		)
+		d.AppendChild(
+			widgets.NewSpan(widgets.SpanAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+				},
+				Text: CurrentStorage.Product.ProducerRef.ProducerRefLabel.String,
+			}),
+		)
+	}
+
+	// if CurrentStorage.StorageBatchNumber.Valid {
+	// 	d.AppendChild(
+	// 		widgets.NewBr(widgets.BrAttributes{
+	// 			BaseAttributes: widgets.BaseAttributes{
+	// 				Visible: true,
+	// 			},
+	// 		}),
+	// 	)
+	// 	d.AppendChild(
+	// 		widgets.NewSpan(widgets.SpanAttributes{
+	// 			BaseAttributes: widgets.BaseAttributes{
+	// 				Visible: true,
+	// 				Attributes: map[string]string{
+	// 					"style": "font-size: 0.8em; font-style: italic; margin-right: 1em;",
+	// 				},
+	// 			},
+	// 			Text: locales.Translate("storage_batchnumber_title", globals.HTTPHeaderAcceptLanguage),
+	// 		}),
+	// 	)
+	// 	d.AppendChild(
+	// 		widgets.NewSpan(widgets.SpanAttributes{
+	// 			BaseAttributes: widgets.BaseAttributes{
+	// 				Visible: true,
+	// 			},
+	// 			Text: CurrentStorage.StorageBatchNumber.String,
+	// 		}),
+	// 	)
+	// }
+
 	return d.OuterHTML()
 
 }
@@ -408,7 +517,7 @@ func Storage_productFormatter(this js.Value, args []js.Value) interface{} {
 func Storage_storelocationFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
-	CurrentStorage = Storage{}.FromJsJSONValue(row)
+	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
 	iconColor := widgets.NewIcon(widgets.IconAttributes{
 		BaseAttributes: widgets.BaseAttributes{
@@ -446,7 +555,7 @@ func Storage_quantityFormatter(this js.Value, args []js.Value) interface{} {
 	)
 
 	row := args[1]
-	CurrentStorage = Storage{}.FromJsJSONValue(row)
+	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
 	if CurrentStorage.StorageQuantity.Float64 != 0 {
 
@@ -490,7 +599,7 @@ func Storage_quantityFormatter(this js.Value, args []js.Value) interface{} {
 func Storage_barecodeFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
-	CurrentStorage = Storage{}.FromJsJSONValue(row)
+	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
 	d := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
@@ -536,7 +645,7 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 	)
 
 	row := args[1]
-	CurrentStorage = Storage{}.FromJsJSONValue(row)
+	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
 	if CurrentStorage.Borrowing == nil || !CurrentStorage.Borrowing.BorrowingID.Valid {
 		iconBorrowing = themes.MDI_BORROW
@@ -549,206 +658,198 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 	if CurrentStorage.StorageArchive.Valid && CurrentStorage.StorageArchive.Bool {
 
 		// This is an archive.
-		buttonClone = widgets.NewBSButtonWithIcon(
-			widgets.ButtonAttributes{
+		buttonClone = widgets.NewLink(
+			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
 					Id:      "clone" + strconv.Itoa(int(CurrentStorage.StorageID.Int64)),
-					Classes: []string{"clone"},
+					Classes: []string{"clone", "dropdown-item", "text-primary", "iconlabel"},
 					Visible: false,
 				},
-				Title: locales.Translate("storage_clone", HTTPHeaderAcceptLanguage),
+				Href: "#",
+				Label: widgets.NewSpan(
+					widgets.SpanAttributes{
+						BaseAttributes: widgets.BaseAttributes{
+							Classes: []string{"mdi", themes.MDI_CLONE.ToString()},
+							Visible: true,
+						},
+						Text: locales.Translate("storage_clone", HTTPHeaderAcceptLanguage),
+					},
+				),
 			},
-			widgets.IconAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-					Classes: []string{"iconlabel"},
-				},
-				Text: locales.Translate("storage_clone", HTTPHeaderAcceptLanguage),
-				Icon: themes.NewMdiIcon(themes.MDI_CLONE, ""),
-			},
-			[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
 		).OuterHTML()
 
-		buttonRestore = widgets.NewBSButtonWithIcon(
-			widgets.ButtonAttributes{
+		buttonRestore = widgets.NewLink(
+			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
 					Id:         "restore" + strconv.Itoa(int(CurrentStorage.StorageID.Int64)),
-					Classes:    []string{"restore"},
+					Classes:    []string{"restore", "dropdown-item", "text-primary", "iconlabel"},
 					Visible:    false,
 					Attributes: map[string]string{"sid": strconv.Itoa(int(CurrentStorage.StorageID.Int64))},
 				},
-				Title: locales.Translate("storage_restore", HTTPHeaderAcceptLanguage),
+				Href: "#",
+				Label: widgets.NewSpan(
+					widgets.SpanAttributes{
+						BaseAttributes: widgets.BaseAttributes{
+							Classes: []string{"mdi", themes.MDI_RESTORE.ToString()},
+							Visible: true,
+						},
+						Text: locales.Translate("storage_restore", HTTPHeaderAcceptLanguage),
+					},
+				),
 			},
-			widgets.IconAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-					Classes: []string{"iconlabel"},
-				},
-				Text: locales.Translate("storage_restore", HTTPHeaderAcceptLanguage),
-				Icon: themes.NewMdiIcon(themes.MDI_RESTORE, ""),
-			},
-			[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
 		).OuterHTML()
 
-		buttonDelete = widgets.NewBSButtonWithIcon(
-			widgets.ButtonAttributes{
+		buttonDelete = widgets.NewLink(
+			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
 					Id:      "delete" + strconv.Itoa(int(CurrentStorage.StorageID.Int64)),
-					Classes: []string{"storagedelete"},
+					Classes: []string{"storagedelete", "dropdown-item", "text-primary", "iconlabel"},
 					Visible: false,
 				},
-				Title: locales.Translate("delete", HTTPHeaderAcceptLanguage),
+				Href: "#",
+				Label: widgets.NewSpan(
+					widgets.SpanAttributes{
+						BaseAttributes: widgets.BaseAttributes{
+							Classes: []string{"mdi", themes.MDI_DELETE.ToString()},
+							Visible: true,
+						},
+						Text: locales.Translate("delete", HTTPHeaderAcceptLanguage),
+					},
+				),
 			},
-			widgets.IconAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-					Classes: []string{"iconlabel"},
-				},
-				Text: locales.Translate("delete", HTTPHeaderAcceptLanguage),
-				Icon: themes.NewMdiIcon(themes.MDI_DELETE, ""),
-			},
-			[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
 		).OuterHTML()
 
-	} else if CurrentStorage.Storage.StorageID.Valid {
+	} else if CurrentStorage.Storage.Storage.StorageID.Valid {
 
 		// This is an history.
-		buttonClone = widgets.NewBSButtonWithIcon(
-			widgets.ButtonAttributes{
+		buttonClone = widgets.NewLink(
+			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
 					Id:      "clone" + strconv.Itoa(int(CurrentStorage.StorageID.Int64)),
-					Classes: []string{"clone"},
+					Classes: []string{"clone", "dropdown-item", "text-primary", "iconlabel"},
 					Visible: false,
 				},
-				Title: locales.Translate("storage_clone", HTTPHeaderAcceptLanguage),
+				Href: "#",
+				Label: widgets.NewSpan(
+					widgets.SpanAttributes{
+						BaseAttributes: widgets.BaseAttributes{
+							Classes: []string{"mdi", themes.MDI_CLONE.ToString()},
+							Visible: true,
+						},
+						Text: locales.Translate("storage_clone", HTTPHeaderAcceptLanguage),
+					},
+				),
 			},
-			widgets.IconAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-					Classes: []string{"iconlabel"},
-				},
-				Text: locales.Translate("storage_clone", HTTPHeaderAcceptLanguage),
-				Icon: themes.NewMdiIcon(themes.MDI_CLONE, ""),
-			},
-			[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
 		).OuterHTML()
 
 	} else {
 
-		buttonEdit = widgets.NewBSButtonWithIcon(
-			widgets.ButtonAttributes{
+		buttonEdit = widgets.NewLink(
+			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
 					Id:      "edit" + strconv.Itoa(int(CurrentStorage.StorageID.Int64)),
-					Classes: []string{"storageedit"},
+					Classes: []string{"storageedit", "dropdown-item", "text-primary", "iconlabel"},
 					Visible: false,
 				},
-				Title: locales.Translate("edit", HTTPHeaderAcceptLanguage),
+				Href: "#",
+				Label: widgets.NewSpan(
+					widgets.SpanAttributes{
+						BaseAttributes: widgets.BaseAttributes{
+							Classes: []string{"mdi", themes.MDI_EDIT.ToString()},
+							Visible: true,
+						},
+						Text: locales.Translate("edit", HTTPHeaderAcceptLanguage),
+					},
+				),
 			},
-			widgets.IconAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-					Classes: []string{"iconlabel"},
-				},
-				Text: locales.Translate("edit", HTTPHeaderAcceptLanguage),
-				Icon: themes.NewMdiIcon(themes.MDI_EDIT, ""),
-			},
-			[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
 		).OuterHTML()
-		buttonClone = widgets.NewBSButtonWithIcon(
-			widgets.ButtonAttributes{
+
+		buttonClone = widgets.NewLink(
+			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
 					Id:      "clone" + strconv.Itoa(int(CurrentStorage.StorageID.Int64)),
-					Classes: []string{"clone"},
+					Classes: []string{"clone", "dropdown-item", "text-primary", "iconlabel"},
 					Visible: false,
 				},
-				Title: locales.Translate("storage_clone", HTTPHeaderAcceptLanguage),
+				Href: "#",
+				Label: widgets.NewSpan(
+					widgets.SpanAttributes{
+						BaseAttributes: widgets.BaseAttributes{
+							Classes: []string{"mdi", themes.MDI_CLONE.ToString()},
+							Visible: true,
+						},
+						Text: locales.Translate("storage_clone", HTTPHeaderAcceptLanguage),
+					},
+				),
 			},
-			widgets.IconAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-					Classes: []string{"iconlabel"},
-				},
-				Text: locales.Translate("storage_clone", HTTPHeaderAcceptLanguage),
-				Icon: themes.NewMdiIcon(themes.MDI_CLONE, ""),
-			},
-			[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
 		).OuterHTML()
-		buttonArchive = widgets.NewBSButtonWithIcon(
-			widgets.ButtonAttributes{
+
+		buttonArchive = widgets.NewLink(
+			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
 					Id:      "archive" + strconv.Itoa(int(CurrentStorage.StorageID.Int64)),
-					Classes: []string{"archive"},
+					Classes: []string{"archive", "dropdown-item", "text-primary", "iconlabel"},
 					Visible: false,
 				},
-				Title: locales.Translate("delete", HTTPHeaderAcceptLanguage),
+				Href: "#",
+				Label: widgets.NewSpan(
+					widgets.SpanAttributes{
+						BaseAttributes: widgets.BaseAttributes{
+							Classes: []string{"mdi", themes.MDI_ARCHIVE.ToString()},
+							Visible: true,
+						},
+						Text: locales.Translate("archive", HTTPHeaderAcceptLanguage),
+					},
+				),
 			},
-			widgets.IconAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-					Classes: []string{"iconlabel"},
-				},
-				Text: locales.Translate("archive", HTTPHeaderAcceptLanguage),
-				Icon: themes.NewMdiIcon(themes.MDI_ARCHIVE, ""),
-			},
-			[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
 		).OuterHTML()
-		buttonBorrow = widgets.NewBSButtonWithIcon(
-			widgets.ButtonAttributes{
+
+		buttonBorrow = widgets.NewLink(
+			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
 					Id:         "borrow" + strconv.Itoa(int(CurrentStorage.StorageID.Int64)),
-					Classes:    []string{"borrow"},
+					Classes:    []string{"borrow", "dropdown-item", "text-primary", "iconlabel"},
 					Visible:    false,
 					Attributes: map[string]string{"sid": strconv.Itoa(int(CurrentStorage.StorageID.Int64))},
 				},
-				Title: iconBorrowingTitle,
-			},
-			widgets.IconAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-					Attributes: map[string]string{
-						"data-target": "#borrow",
+				Href: "#",
+				Label: widgets.NewSpan(
+					widgets.SpanAttributes{
+						BaseAttributes: widgets.BaseAttributes{
+							Classes: []string{"mdi", iconBorrowing.ToString()},
+							Visible: true,
+						},
+						Text: iconBorrowingTitle,
 					},
-					Classes: []string{"iconlabel"},
-				},
-				Text: iconBorrowingTitle,
-				Icon: themes.NewMdiIcon(iconBorrowing, ""),
+				),
 			},
-			[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
 		).OuterHTML()
 
 	}
 
 	if CurrentStorage.StorageHC != 0 {
 
-		buttonHistory = widgets.NewBSButtonWithIcon(
-			widgets.ButtonAttributes{
+		buttonHistory = widgets.NewLink(
+			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
 					Id:      "history" + strconv.Itoa(int(CurrentStorage.StorageID.Int64)),
-					Classes: []string{"history"},
+					Classes: []string{"history", "dropdown-item", "text-primary", "iconlabel"},
 					Visible: false,
 				},
-				Title: locales.Translate("storage_history", HTTPHeaderAcceptLanguage),
+				Href: "#",
+				Label: widgets.NewSpan(
+					widgets.SpanAttributes{
+						BaseAttributes: widgets.BaseAttributes{
+							Classes: []string{"mdi", themes.MDI_HISTORY.ToString()},
+							Visible: true,
+						},
+						Text: locales.Translate("storage_history", HTTPHeaderAcceptLanguage),
+					},
+				),
 			},
-			widgets.IconAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-					Classes: []string{"iconlabel"},
-				},
-				Text: locales.Translate("storage_history", HTTPHeaderAcceptLanguage),
-				Icon: themes.NewMdiIcon(themes.MDI_HISTORY, ""),
-			},
-			[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
 		).OuterHTML()
 
 	}
-
-	spanId := widgets.NewSpan(widgets.SpanAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"iconlabel"},
-		},
-		Text: fmt.Sprintf("#%d", CurrentStorage.StorageID.Int64),
-	}).OuterHTML()
 
 	if CurrentStorage.Borrowing != nil && CurrentStorage.Borrowing.Borrower != nil && CurrentStorage.Borrowing.Borrower.PersonEmail != "" {
 
@@ -770,7 +871,21 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 
 	}
 
-	return buttonClone + buttonRestore + buttonDelete + buttonArchive + buttonBorrow + buttonEdit + buttonHistory + spanId + commentBorrowing
+	finalDiv := `
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="storageActions` + strconv.Itoa(int(CurrentStorage.StorageID.Int64)) + `" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span class="mdi mdi-menu">&nbsp;</span>
+  </button>
+  <div class="dropdown-menu" aria-labelledby="storageActions` + strconv.Itoa(int(CurrentStorage.StorageID.Int64)) + `">
+  ` + buttonClone + buttonRestore + buttonDelete + buttonArchive + buttonBorrow + buttonEdit + buttonHistory +
+		`
+  </div>
+</div>
+<div id="confirm` + strconv.Itoa(int(CurrentStorage.StorageID.Int64)) + `">
+</div>
+`
+
+	return finalDiv + commentBorrowing
 
 }
 
@@ -781,7 +896,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	)
 
 	row := args[1]
-	CurrentStorage = Storage{}.FromJsJSONValue(row)
+	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
 	if len(CurrentStorage.StorageQRCode) == 0 {
 		qrCode = `iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAACXBIWXMAAAF3AAABdwE7iaVvAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAABh0RVh0VGl0bGUATm8gQ2FtZXJhcyBBbGxvd2VkiLZ8UAAAABR0RVh0QXV0aG9yAEFsZ290IFJ1bmVtYW5Y14DVAAAAGHRFWHRDcmVhdGlvbiBUaW1lADIwMTktMTEtMDY+MGojAAAAWHRFWHRDb3B5cmlnaHQAQ0MwIFB1YmxpYyBEb21haW4gRGVkaWNhdGlvbiBodHRwOi8vY3JlYXRpdmVjb21tb25zLm9yZy9wdWJsaWNkb21haW4vemVyby8xLjAvxuO9+QAAHQ9JREFUeJztfXl4VFWa9++ccytUUtkgCUsnfAmBiiARGwc0hAZFmq27Z3pUWpluGLZOCJjQzEOP8/Tn1ywzSvu1gxsgq81mbBpQBMO+CAQEDSAgKhBAwIQwBhggVZVK5d77fn/cuhhi9nvrViXf/J7nPgRSnHPe9/zqnnPe8y4MbRMdAThrPD0AxHHOO3DOIwE4iChSVVUHAHDO3YyxCsaYR1EUl6qqtwDcBFAM4IL/z2IA3wVDmECCBXsAJiAawEAAg4UQTwB4SFEUh/5LSZIoOTlZ7dq1q4iIiIDD4UBsbCwiIiIQHh4OAPB4PKisrMTt27fhdrvh8Xjw7bffyleuXBGyLN/TkRDCBeALRVH2AzgI4DCACutENR+tkQASgKEARnDOHyeiHxMRlySJ+vXrR/369eNpaWlwOp1wOp1ITk6GJEkt6kiWZVy+fBkXLlxAcXExzp8/j+PHj1NRURFkWWaMMUUIcUqW5Y8B7ASwD4BinqiBR2siwN8B+GchxD8pipIgSRL16dMHw4YNYwMHDsTjjz+O6OhoSwbi8Xhw4sQJHD58GLt376ZDhw5RVVUV55zfVlV1PYC10N4OZMmA2jDSAMzjnF8BQHa7XRkzZgxt3ryZvF4vhQq8Xi99+OGH9Oyzz5LdblcBkBDiCoCXoe1B/gfNAAMwgjG2jTGmSpKkjho1Sl27di1VVFQEe64bxd27d2nNmjU0cuRIVQihMsZUxlgBgJ8GW7GhDgbgKc75KQCUkJAgz507l65fvx7sOW0xrl+/TnPmzKGEhAQZAHHOTwD4B7SupdcSjOScnwZA3bt3l1euXElVVVXBnj/TUFVVRX/5y1+oW7duMgCSJOkUgOFB1nlI4CHG2C4AlJqaKr/77rsky3Kw5ytgqK6upjVr1lBKSooMbZ+wE0DvIM9BUBAOYA7nvDo6Olp+5ZVXQmpTF2j4fD5aunQpdejQQWaMyQDeBBAZ5DmxDMOFEFcZY5SVlUU3b94M9nwEDTdu3KBJkyYRY4xsNtsVaPaNNotwAAsAqGlpaXJhYWGw9R8yOHDgADmdThmACuANv67aFB7inJ9jjNGMGTOosrIy2DoPOXg8Hpo+fToxxkiSpLMAHgz2pJmF33DOPR07dpT37t0bbD2HPHbt2kUJCQmyEMIDYEywJ88IBLTXGQ0aNEgpKysLtm5bDUpLSykzM1OBZkp+za/LVoVIv/WLZsyYQdXV1cHWaauDz+ej6dOnEwBijG0B4GhE5yGDTpzzk0IIdfHixcHWY6vHwoULiXOuSpL0OTQ/B1NhtkkySQjxcVhYWOqmTZv4iBEjTG6++fB6vbhy5cq95/r163C73XC73fD5fFAUBeHh4ff8BNq3b4/U1FR069YNycnJsNlswRYBW7duxejRo1VZli/KsjwEQKlZbZtJgG5CiP3h4eGJO3fuFJmZmSY23TQQEU6ePImjR4/is88+w5EjR5Tz589zIrpPTsaYj3PuZYy5GGOKqqoxqqpGENF9jgOcc+rRo4eamZkpMjIykJGRgYceegicc2sFA1BYWIhRo0YpXq+3VFGUxwFctnwQDSBJCHElNjZWPnbsmKWvSJfLRZs2baLf/va31LFjRxnaxomEEOUAtgCYDWAcgEEA/hc0h5L6EAagK4DBAMYDmAtgsxDiht5ufHy8nJWVRQUFBZYfZ4uKiig2NlYWQlwGkBioyWwuOgkhiiMjIy2d/GPHjlFWVhZFREQo0Cb8LoB1AMYCSA6AnKn+ttcJISoAUEREhJKVlUUnTpywTO6ioiJyOByyJEnnACQEQM5mIZJzfjI8PFw5dOhQwIWXZZnWrl1Lffv2VaBdr3oAvAPgSQBWLtZh0G7z3vGPgfr376+sXbvWksusgwcPkt1uV/zXy0E7HQjGWIEQQt2+fXtABdYnvkePHvq9+hkA0wDEBEv4GogFMN3/jaQePXrIf/3rX0lRlIDqpKCggDjnKmNsMwDrNyXwG3kCfdTbu3evbicnv8/APyI0HSp0h5YzAKhXr17yrl27AqqbBQsWELS9yX9aLexv4DfyBAo3btygCRMmEGOMhBAXATyN0Jz42uAAxgghLgCgsWPH0nfffRcwPeXm5uokeM4qAR/inHsGDRqkBMrCl5+fTx06dJA55z5oO3G7VcKZiHYA5jLGfLGxsfLatWsDoiufz0cDBgxQOOduAL0CLVSEJEnnO3XqJAfStr906VJijBFj7GO/IlszHhRCfAKAJk6cSB6Px3R9lZSUUHx8vCxJ0lcI8JdlAWNMteJWrwYJtqL1k0BAexuo6enp8rlz50zX144dO4gxpl8eBQTDAaiBXPdro42RANC8oW46HI6AXI3n5eURY0yFdiw2FQ4hxNW0tDTZautXGyRBkiRJZ2w2m7Jx40ZTdeXxeMjpdMpCiG9gslfRq4wx2rdvn6kDbipWrFhB/gCLHWidG8LaiBVCHOKcm35jeuDAAX0peNmswT7EGJOzsrJMHWhz0QbfBOG6z8SSJUtM1dXEiROJMVYNM04FjLFdMTExcih477ZBEtgYYwWcc3XDhg2m6am8vJyioqJkv54MYRQAeuONN0wbnFG0weUgnDFWKEmSsmPHDtP09Oqrr+oGogYjkBqyrDFJkk537dq119mzZ0VYWJipUhvBsmXLkJOTAwDbiOhpAFW1PiIB6Anz3hJVAM4CkE1qrzZiJUk6bLfbex4/fpynpaUZbrCqqgppaWlKSUnJF6qqPoIWhKo/BYACZcEyigaWgygAX/gFNvM5hcBG73QVQtxKT0+XzTIWrVy5Uh/73zd3MIxzfrxbt25yKDt01rMcPAXzJ19//rFFU9t0DGWMKZMnTzZFP7IsU2pqqsw5/xzNvEcZAYBWrlxpykDy8/Np6dKlprRVGzXeBAXQ3gRjETgCjDU0vU3DvwOg/Px8U/SzfPlyfexNDztjjG3r2LGjbEaI9o0bN/QgSKtIMAGtmwBCCHGkffv2cnl5uWHdVFZWUlxcnOx3LW8S0hhj6ty5c02YGqIJEyYQ59zHGPvYIhKUInAEWAfg3/zP8wAeMDzddSOdc149fvx4U3Tzxz/+UTcRd29K5/MkSVLNyMyxd+9e3So1F0A7xthWi0gQKALUfqqg7TkCgZcZY2TGncG1a9dICKEC+I/GOmVCiCujRo1SjXYqyzKlpaXJfmcOfYPWFklwwYTJrgvhQohv+vTpo6iq4emgYcOGqf47ggY3gwMB0Lvvvmu4w7Vr1+oKerpWH2GMsS2MMVq0aJHhfuqC/3RgJQkCZZUcC4DWr19vWCc1joSPNtThQrvdrhjNxiXLMjmdTplz/iXqdlhsayQIVDw/lyTpTPfu3Q0fx+/cuUPt2rVTALxeX2eSEOLGmDFjDCu/xre/oXNzW1oOApnQ4RkA9N577xnWxzPPPENCiP9CPdHGIwDQ5s2bDXfUt29fxe8d25jxoa2QoC4CxAL4V3x/avg3aM60zQUTQhRnZGQY9jPfuHGjPt46HUbmt2vXTjGarKmoqEjvZFoTBWwLJKiLAJl1fO5KE3VSG/8CgE6dOmVIDx6Ph2w2mwLglR/0wDk/MWTIEMPbzaysLOKce6F9A5qK1r4nqIsA/ev4XEtPDLGc88pp06YZ1kNmZqYihPi0dgfRjDFl9uzZhhp3uVx6rN47LRCyNb8JahJgLoCL/ucKgKs1nsv+fz8LYEAz9bM6MjLSsHX2xRdf1J1F7gspGwXAsNHhww8/bHCNaQLaMcYKWiEJahLgSBP/z4xm6ubnAMioz8DOnTv1/ofVbPxPNptNdbvdhhqfPHky+SNnmxKo+RNoptWrAHw1laNPUCtdDpr6yH7Z/wptv9AY2gkh3FOnTjUke0VFBUmSdL9VUAhxxOguU1VVPT5/XSOCMADzG1OQPkGt7E1g5PkzGj81bejcubNs1DLYv39/hTF2sCYBXHl5eYYaPXHihC5IYzdm/7upSrGKBFFRURQbGxtsAhC0o2JDmACAzpw5Y0juadOmkRDiDqBZ6TopiuJwOo3VNThy5Ij+48EGPtYFwP9paptEBADIycnB22+/3eKx1Yfs7GwsX74cbrcbGRkZ+Prrr/H666/jiSeeAGNBiUOdBaBzA7//BAA+/fQHm/hmoUePHlAUJRpAHKCtxWQ0xn/8+PEkhGisqtbzqMX6oUOHUllZGd26davO5/r16zRq1KiA7wk45/TII4/QrVu3iEjLQDJ06NBgvAWmNqA/JoT47+zsbEPyfvTRR3pfjwH+18qFCxcMNZqWliZDy8nTEBbVFviFF15otG2v10uZmZmWLAeSJNGvf/1runTpEhFpJ5uYmBgrCbCgER1uS09PN5SG5OzZs3pf4wDgJUmSVCOXDR6PR3c4mN3I4Fe1hABE3/sWWLUxDAsLo5kzZ1JVVRV9/fXX5HQ6rSLAqkZ0OM9ms6lGUtFUVVXp/gFzOQBncnKy0tLSagBw9epVkJaK7WKLG2kENpvtvj3BsmXLTO8jOzsbS5YsAQCoqor58+dj6NCh6NChAz755BN0794kh5pA41J1dTUrKSlpcQNhYWFISkpSADg5gISkpKSWzz6AK1fumbibbeu+fv16sz5HFm0MVVVFTEwMDh06BD3n4ZYtWywrTdcAvgGAS5cuGWokMTFRAEiQhBDRkZHG3N2NEGDNmjUoKipCREREvZ8hIpw5c+a+vzPGkJubC0mSkJ2d3dxuG8TkyZOhKApycnLQqVMnXLx4EaNHj8bu3buxbNkyjBkT1CTeFwGNAEOGDGlxI9HR0UwIEQ2bzXb+ueeeM7R2zp07V1+/GnuTrIKJ66VVewJ9E/jiiy+SqqqUmZkZzD1ABAB65ZVXDMn2q1/9imw221lORJFRUVGN9NkwPB4P/Pl8AhU6VSfIouWgoqICQgi89tprKCkpwfz584NlJwCASgCq2+021IjD4QARRXIichhdAjweDxhjlYYaaSGICDExMcjNzQ0ICSZPnoxly5aBiOD1evHSSy8hIyMDP/7xj03vq4kgIYTXKAGioqJARA6uqmqEw2Es2WQwCQAAv/vd7/Czn/0Mubm5ATkdTJ48GYsXLwYArF69Gm63G7/85S9N76epYIy5XS6XoTYiIyOhqqrDlAyTqqoCWsGjoOCpp57C9OnTAQT+iOjz+TB8+HCMHDnS9D6aASGEOUVEJM65x+VyGTrb+NeT+rfxAQTnHA8++CC2bNkCIkLv3r2Rk5MDWZYxbVpTvdKahuzsbAghkJ2djdmzZ6Ndu3aoqqodmR54qKpqb+jU1BS4XC5wzt3czNeJoUZaiISEBNhsNly7dg0AMGfOHDidzoDvCXbv3h20YhJEZJgAFRUVYIy5OWPMZZQA/g2FDUFI29KlSxcAQFlZGQAgKSkJGRkZABDQPcHbb78Nt9sdjNOAnYh4eLgxT3SXywXGmIurqnrXKAHi4+P1H02vadMYZFk7eeqmbFmWYbfbA242njJlyr2NocUkSAK+J35L4XK5oKrqHa4oimECpKSk3PvRUEMtgP7N/9GPfnTv77pyapJg0aJFpvc9ZcoULF++HIClJEgB7tN5i3D37l1SFOUuB/BdSUmJIQNOamrqvR8NjaoFuHXrFqqqqpCUlAQAOHfuHPr27Xvv9zoJ8vLyAn5EtIgEyYBxApSWlioAygETroN9Ph9xzlUAcxrpdxUCYD4tLCy8F5Dy6KOPksfjoYiICEvNxkuWLDHLx3BVIzqcZ3S+al4HA1pxJCouLjakAL9DyOZgEOD3v/89qapKXbt2JcYYXbp0iXJyciy/OzCJBA0SgDG26+GHHzbVIWQgYNwlbOLEieSvrmU5AZxOJxFpQQ8AaNy4cVRWVkaRkZH1kmDhwoWG5K0PJricN0QAJoS4nZOTY2iMtV3COgKgt956y1CjS5Ys0RttaB8QEAIAoA8++IDu3r1LHTt2JM45HT16lNavX1/nRIQ4CRoigBMAvfPOO4bG99prr+l9xQEAhBAVubm5hho9efKk3mhDbuEBI0DPnj2purqaFi1aRAAoMTGRrl27RvPnz2+QBCG4HDREgIkA6IsvvjA0tppu4ToBPnnssccMBYYoikIJCQkytEgXywkAgObPn09ERGPHjiUA1LdvXyopKaEPPvigTr//ECVBQwT4IDEx0fzAEAB/kiRJdblchhrOysoiIYQLWl09ywkgSRLt2bOHKisrafDgwQSAunTpQgcOHKCbN2/SzJkzKS4uLtSXg/oI0I5z7n7++ecNjafO0DAAIwHQnj17DDVeUFCgC1FfguKAEgAAdejQgb766ivyer00fvz4e5P8zDPP0OnTp0mWZdq/fz+99dZb9Ic//IFeeOEFSk9PJ8aY6WnbdTTzTVAfAX4GGN+s1xccGsUYk2fNmmWo8crKSj08fEWwCACA2rdvTzt37iQi7RvYpUuXe7974IEHaObMmbRo0SLavHkzbd68md58803q3r17qJCgPgLkR0dHy0YTeNQID7/fC4hzfnzw4MGG05DUSBDRvg4hVlpBAPiXg3nz5pHX6yWXy0Xz5s2j3r17N/h/QmQ5WFmH3uI451XTp083PIaf/OQnal0JIgDgP9u1a6cYrQlUI0h0el19WEUA/enWrRvl5+ffK+VaXFxMixcvphkzZtCECRNowoQJNGPGDFq8eDF9+eWX9Itf/CLYb4JX69DbDAB0+vRpQ33XSBHzf+siwDAAtGnTJsNC9u/fX/HX0q1tHH/GagLoT+fOnSk7O5u2bt1KdVU/uXHjBn300Uc0adIkstvtwSRB7cxqXJKk80ZPaURE77//vt5HnYmjJSFE+bPPPmtYwBpp4mqnUQ2D5tceFBLUfKKjoyk1NZVSU1MpKiqq3uXAYhJcwg99Kp4DQH/7298M9zl69OgG08QBwFthYWHKnTt3DHWkJ4r0V7Ks7Xf4BGplBAnVx+I9QRWAwbV0xSVJ+rJnz56y0WrkTUkUCWiJi2jNmjWGhXvvvfd0RT5bRz9DoEURBX2SQ4gEn+GHNZB+DYDMKCi1atUqXab7UsXWXqOZEOLysGHDum7fvt3Q5baqqujTp49y9uzZy4qi9MYP6/rYAfwS2mVUpzrGEirgjLFMAF0WL16MKVOmmN7B0qVLMXXqVADYSloNJB+ACCHE17169Uo8deqU4NyYA/fIkSNpz549VxVF6QaNCPXiZSGEakZx6F27dumsm2to9MHHvexlFuwJCqDtleYxxqiwsNBw22VlZfr9/0tNEdbJGFPnzJljglhE48aNI855NYAHAzlDFsBKEuxnjPmMZgLRMXv2bD1/Q48mScoY2xofH2/Y6kRE9N1331FsbKzsL6FuTjRD8GAZCeLj46v1dDVG4PV6KT4+XmaMfdQcQYcBxu+dddQ4Frb2pQCwiATr1q0zpa0VK1boum960SgAEEIcS0lJMa1snL+erQrt4qm1I4wxtjmQpwMzYKRsHKDt0E05EhJpZsjevXsrQohbALqaPiXWI+BvAqNYvXq1/u1vduFIQCseeTIlJcWU8nFEROfOnSOHwyFLkvQlmpdNPFQRsiTwer2UnJzc4m+/jieB7z1tzMC+ffsoLCxMT1kelHhCkxGSy8Gf//xn/ds/rDEBGgRjbEd0dLR848YN0wa3YcMG4pyr/jNvcCIszUVIvQlqlI/fZoZwvRlj1ZMmTTJ1kLoXsZ8Egay5YxVChgT+DbeptpdXGGO0b98+Uwe6cuVKEkKoQojPoLsot24EfTk4ePCgfrn0JzMFixBCXHY6naaVNtexYcMGstlsin9j2BZOB2HBehN4PB5yOp2yEOIKtGxipmIoANUMt6Ta2Lt3L0VGRupHxLZiJ7CcBHl5eQQtVc9PAyXYG4wx2rVrl+mDP3fuHKWnpyt+Y9G/o/WbjS0lwY4dO/RXf4P3/UYRLknS2YSEBLm0tNR0ITweD02aNIkAkBDiCIDegRTGAoT5L3YCSoLS0lKKj4/XHXBq+xSYjgc55+7MzEzF5/MFRKD8/Hxq37697N/JvmSFUAFABLQrXV98fHy1Wbb92vD5fDRgwACFc+4G0Msq4cYAoEDsB3SUl5fT+PHjiTFG/qrXv0HddYhDDRzAPwkhrjDGKDs7m8y41asP/nWfoPkOWorXAAT8uLNv3z7q06ePAoAkSfoammdxKHoPcQDPSZJ0FgClp6fLZjhzNIQFCxbokz8/GAILxtgWzrlaUFAQUEFVVaX169frSShICFEMrZxqh2AIXgtxAP5FkqTzAKhXr17y+vXryagTZ2MoKCjQrambEcQNs4NzfsJutysHDx4MqMBE2vVmfn4+ZWRkKAD0CKTV0IoqWrlPsEOL1XvPnySbHn30UWXdunUBn3giosLCQrLb7Qrn/ARC4D6loyRJ5x0Oh1xUVBRw4XWcOnWKpk6dSpGRkTI0MrgBbIBWA+kBmL9M9IAWn/8B59wDLbZAzsvLMxyx0xwcO3aMIiMjZf8bx/K0fPUhUQhxOTY21lISEGkJj3bu3ElTp06lzp07y/C7cwshbjPGtgN4GcBvod1spqBhC1kYtIkeCmAytF38Ln8yBQJAiYmJ8rRp02jHjh1khstcc3D8+HFq3769LIS4Cn++QKMw81uSIoQ4YLfbE7dv3y4GDRpkYtNNAxHhq6++wqeffoqjR4/iyJEjyrlz53h1dfUP5BRCVDDGvEQkAZAURflB0QQhBKWnp6sZGRmif//+eOyxx5Cenm6JLLVx6NAhjBo1SqmsrCxVFGUItCgiwzD7NZkoSdLHkiR137hxI//5z39ucvPNh6IoKCkpwcWLF3Hp0iXcvHkTFRUV8Hq9qKioAADExsZCCIGYmBh07twZycnJSElJQVJSEowU0zIL27Ztw+jRo9Xq6uqLsiw/CaDlFaMsQEfO+XHOubpgwQJLX5FtEQsXLiTOuSpJ0gmE0JrfGBz+4wnl5uZSoCyGbRk+n++ekcevy6Dv9psLDn8+gAEDBiglJSXB1mmrQWlpKWVmZir43sjTqi/GnuOcu+Pj4+UdO3YEW7chj507d1J8fLwshPAgCObdQKEX5/xLxhjl5uaS2U4lbQEej4fy8vL0+sVfAegZ7EkzG3Zo9weq0+mU9+/fH2ydhwwOHDhATqdThubM8Tpa5+1nk/Ek5/wbxhhNmDCBysvLg63/oKG8vFx34CQhxGUE0JMn1BAOYA7n3BcREaHMnj2bjCanak3w+Xy0dOlS3edBBvAmaqdt+/8Evfy+65ScnCyvWrWKzIpFDEVUV1fTqlWrKDk5WYZ2vNsGC504Qhk/9d9sUXJysrxixQrL7eyBhNfrpeXLl9+beEmSTsJoxE4bBAPwCyFEEQCKi4uTZ82aRdeuXQv2/LUYZWVlNGvWLIqLi9NvLI9DC9QMRYeWkMKTjLEtjDGVc64OHz5cXbVqFd2+fTvYc9oo7ty5Q6tXr6YRI0aoQgiVMaaHwDUvPv9/AADoDuA/OOeXAFBYWJjy9NNP08aNG0PKluDxeOj999+n0aNH66nY9F39S9CKPIQsWtOrqDeAcUKIiYqidBRC0MMPP4xhw4axgQMHYtCgQYiNtSbi3O124/PPP8fhw4exe/dutbCwED6fj3PO/1tV1Q0A1gI4jEaycYUCWhMBdAgAjwMYzhh7HEB/IhJCCHrkkUfUfv36CafTibS0NDidTnTr1q3FJV6rq6vxzTffoLi4GOfPn0dxcTGOHTumnjhxgimKwhhjCuf8uKIo+wHsArAfgGKSnJagNRKgNhwAMgEMZow9wTnvoyjKvWLYQghKSkpSunbtKkVERCAmJgZRUVFwOBzQ6+96PB643W5UVFTgzp078Hg8+Pbbb+WSkhKhKAqr0dZdVVVPE9F+AAcBfALAbam0JqMtEKAuxEFbe/WnB4AEIUQsYyySMeZQVTVGVdUIAOCcezjnd4jITUQuRVFuQyuqeAHAef+fxQBuBkWaAOL/AaI/QQUYF5clAAAAAElFTkSuQmCC`

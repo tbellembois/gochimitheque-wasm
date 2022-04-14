@@ -1,12 +1,12 @@
 package types
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type PhysicalStates struct {
@@ -15,9 +15,7 @@ type PhysicalStates struct {
 }
 
 type PhysicalState struct {
-	C                  int            `json:"c"` // not stored in db but db:"c" set for sqlx
-	PhysicalStateID    sql.NullInt64  `json:"physicalstate_id"`
-	PhysicalStateLabel sql.NullString `json:"physicalstate_label"`
+	*models.PhysicalState
 }
 
 func (elems PhysicalStates) GetRowConcreteTypeName() string {
@@ -110,6 +108,10 @@ func (p PhysicalState) GetSelect2Id() int {
 
 func (p PhysicalState) GetSelect2Text() string {
 
-	return p.PhysicalStateLabel.String
+	if p.PhysicalState != nil {
+		return p.PhysicalStateLabel.String
+	}
+
+	return ""
 
 }

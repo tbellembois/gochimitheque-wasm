@@ -31,7 +31,7 @@ func Title(msgText string, msgType string) *dom.HTMLDivElement {
 	case "bookmark":
 		icon.Class().SetString("mdi mdi-24px mdi-bookmark")
 	case "entity":
-		icon.Class().SetString("mdi mdi-24px mdi-store")
+		icon.Class().SetString("mdi mdi-24px mdi-home-group")
 	case "storelocation":
 		icon.Class().SetString("mdi mdi-24px mdi-Docker")
 	case "product":

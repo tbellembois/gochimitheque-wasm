@@ -26,9 +26,9 @@ const (
 
 	MDI_OK               IconFace = "mdi-check"
 	MDI_STORELOCATION    IconFace = "mdi-docker"
-	MDI_SUBSTORELOCATION IconFace = "mdi-file-tree-outline"
+	MDI_SUBSTORELOCATION IconFace = "mdi-relation-many-to-many"
 	MDI_PEOPLE           IconFace = "mdi-account-group"
-	MDI_EDIT             IconFace = "mdi-border-color"
+	MDI_EDIT             IconFace = "mdi-pencil-outline"
 	MDI_DELETE           IconFace = "mdi-delete-outline"
 	MDI_ARCHIVE          IconFace = "mdi-archive-outline"
 	MDI_NONE             IconFace = "mdi-border-none-variant"
@@ -37,7 +37,7 @@ const (
 	MDI_NO_CHECK         IconFace = "mdi-checkbox-blank-outline"
 	MDI_INFO             IconFace = "mdi-information-outline"
 	MDI_CLOSE            IconFace = "mdi-close-box"
-	MDI_BUG              IconFace = "mdi-bug"
+	MDI_BUG              IconFace = "mdi-car-brake-alert"
 	MDI_NO_BOOKMARK      IconFace = "mdi-bookmark-outline"
 	MDI_BOOKMARK         IconFace = "mdi-bookmark"
 	MDI_PRODUCT          IconFace = "mdi-tag"
@@ -60,6 +60,7 @@ const (
 	MDI_DOWNLOAD         IconFace = "mdi-cloud-download-outline"
 	MDI_TOTALSTOCK       IconFace = "mdi-sigma"
 	MDI_REMOVEFILTER     IconFace = "mdi-filter-off"
+	MDI_ARROW_RIGHT      IconFace = "mdi-arrow-right-thin"
 
 	MDI_16PX IconSize = "mdi-16px"
 	MDI_24PX IconSize = "mdi-24px"

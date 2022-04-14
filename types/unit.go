@@ -1,12 +1,12 @@
 package types
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type Units struct {
@@ -15,11 +15,7 @@ type Units struct {
 }
 
 type Unit struct {
-	UnitID         sql.NullInt64  `json:"unit_id"`
-	UnitLabel      sql.NullString `json:"unit_label"`
-	UnitType       sql.NullString `json:"unit_type"`
-	Unit           *Unit          `json:"unit"` // reference
-	UnitMultiplier int            `json:"-"`
+	*models.Unit
 }
 
 func (elems Units) GetRowConcreteTypeName() string {
@@ -105,6 +101,10 @@ func (u Unit) GetSelect2Id() int {
 
 func (u Unit) GetSelect2Text() string {
 
-	return u.UnitLabel.String
+	if u.Unit != nil {
+		return u.UnitLabel.String
+	}
+
+	return ""
 
 }

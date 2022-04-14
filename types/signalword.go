@@ -1,12 +1,12 @@
 package types
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type SignalWords struct {
@@ -15,9 +15,7 @@ type SignalWords struct {
 }
 
 type SignalWord struct {
-	// nullable values to handle optional Product foreign key (gorilla shema nil values)
-	SignalWordID    sql.NullInt64  `json:"signalword_id"`
-	SignalWordLabel sql.NullString `json:"signalword_label"`
+	*models.SignalWord
 }
 
 func (elems SignalWords) GetRowConcreteTypeName() string {
@@ -104,6 +102,10 @@ func (s SignalWord) GetSelect2Id() int {
 
 func (s SignalWord) GetSelect2Text() string {
 
-	return s.SignalWordLabel.String
+	if s.SignalWord != nil {
+		return s.SignalWordLabel.String
+	}
+
+	return ""
 
 }

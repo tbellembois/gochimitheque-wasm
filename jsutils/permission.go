@@ -9,6 +9,38 @@ import (
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
 )
 
+func IsLDAPUser(email string, done, fail func()) {
+
+	go func() {
+
+		url := ApplicationProxyPath + "people/isldap/" + email
+
+		ajaxDone := func(data js.Value) {
+
+			isLDAP := js.Global().Get("JSON").Call("parse", data).Bool()
+
+			if isLDAP {
+				done()
+			} else {
+				fail()
+			}
+		}
+		ajaxFail := func(js.Value) {
+			fail()
+		}
+		ajax := ajax.Ajax{
+			URL:    url,
+			Method: "GET",
+			Done:   ajaxDone,
+			Fail:   ajaxFail,
+		}
+
+		ajax.Send()
+
+	}()
+
+}
+
 func HasPermission(item, id, method string, done, fail func()) {
 
 	go func() {

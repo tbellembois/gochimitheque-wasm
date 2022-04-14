@@ -200,11 +200,12 @@ func Storage_createCallback(args ...interface{}) {
 		productName = fmt.Sprintf("%s %s", product.Name.NameLabel, product.ProductSpecificity.String)
 
 		// Chem/Bio/Consu detection.
-		if product.ProductNumberPerCarton.Valid {
+		switch product.ProductType {
+		case "CONS":
 			Consufy()
-		} else if product.ProducerRef.ProducerRefID.Valid {
+		case "BIO":
 			Biofy()
-		} else {
+		default:
 			Chemify()
 		}
 
@@ -219,11 +220,12 @@ func Storage_createCallback(args ...interface{}) {
 		FillInStorageForm(storage, "storage")
 
 		// Chem/Bio/Consu detection.
-		if storage.Product.ProductNumberPerCarton.Valid {
+		switch storage.Product.ProductType {
+		case "CONS":
 			Consufy()
-		} else if storage.Product.ProducerRef.ProducerRefID.Valid {
+		case "BIO":
 			Biofy()
-		} else {
+		default:
 			Chemify()
 		}
 
@@ -232,8 +234,7 @@ func Storage_createCallback(args ...interface{}) {
 			jquery.Jq("input#storage_identicalbarecode").SetProp("disabled", "disabled")
 		}
 
-		globals.CurrentProduct = storage.Product
-
+		globals.CurrentProduct = Product{Product: &storage.Product}
 	}
 
 	title := widgets.NewDiv(widgets.DivAttributes{

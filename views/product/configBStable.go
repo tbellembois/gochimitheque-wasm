@@ -22,13 +22,14 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/views/storage"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
+	"github.com/tbellembois/gochimitheque/models"
 	"honnef.co/go/js/dom/v2"
 )
 
 func OperateEventsBookmark(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	globals.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
+	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
 	url := fmt.Sprintf("%sbookmarks/%d", ApplicationProxyPath, globals.CurrentProduct.ProductID)
 	method := "put"
@@ -68,7 +69,7 @@ func OperateEventsStore(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
 
-	globals.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
+	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
 	BSTableQueryFilter.Lock()
 	BSTableQueryFilter.QueryFilter.Product = strconv.Itoa(globals.CurrentProduct.ProductID)
@@ -89,7 +90,7 @@ func OperateEventsStorages(this js.Value, args []js.Value) interface{} {
 	}
 
 	row := args[2]
-	globals.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
+	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
 	BSTableQueryFilter.Lock()
 	BSTableQueryFilter.QueryFilter.Product = strconv.Itoa(globals.CurrentProduct.ProductID)
@@ -105,7 +106,7 @@ func OperateEventsStorages(this js.Value, args []js.Value) interface{} {
 func OperateEventsOStorages(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	globals.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
+	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
 	url := fmt.Sprintf("%sstorages/others?product=%d", ApplicationProxyPath, globals.CurrentProduct.ProductID)
 	method := "get"
@@ -124,6 +125,21 @@ func OperateEventsOStorages(this js.Value, args []js.Value) interface{} {
 
 		for _, entity := range entities.Rows {
 
+			divEntity := widgets.NewDiv(widgets.DivAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+					Classes: []string{"row"},
+				},
+			})
+
+			managers := strings.Split(entity.EntityDescription, ",")
+
+			divEntityName := widgets.NewDiv(widgets.DivAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+					Classes: []string{"col-sm-auto"},
+				},
+			})
 			spanEntityName := widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
@@ -131,20 +147,29 @@ func OperateEventsOStorages(this js.Value, args []js.Value) interface{} {
 				},
 				Text: entity.EntityName,
 			})
-			spanEntityDescription := widgets.NewSpan(widgets.SpanAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-					Classes: []string{"blockquote-footer"},
-				},
-				Text: entity.EntityDescription,
-			})
-			divEntity := widgets.NewDiv(widgets.DivAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-				},
-			})
-			divEntity.AppendChild(spanEntityName)
-			divEntity.AppendChild(spanEntityDescription)
+			divEntityName.AppendChild(spanEntityName)
+
+			divEntity.AppendChild(divEntityName)
+
+			for _, m := range managers {
+				divEntityDescription := widgets.NewDiv(widgets.DivAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+						Classes: []string{"col-sm-12"},
+					},
+				})
+				spanEntityDescription := widgets.NewSpan(widgets.SpanAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+						Classes: []string{"blockquote-footer"},
+					},
+					Text: m,
+				})
+				divEntityDescription.AppendChild(spanEntityDescription)
+
+				divEntity.AppendChild(divEntityDescription)
+
+			}
 
 			jquery.Jq(fmt.Sprintf("#ostorages-collapse-%d", globals.CurrentProduct.ProductID)).SetHtml(divEntity.OuterHTML())
 
@@ -173,7 +198,7 @@ func OperateEventsOStorages(this js.Value, args []js.Value) interface{} {
 func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	globals.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
+	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
 	BSTableQueryFilter.Lock()
 	BSTableQueryFilter.QueryFilter.Product = strconv.Itoa(globals.CurrentProduct.ProductID)
@@ -190,7 +215,7 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 func OperateEventsTotalStock(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	product := Product{}.ProductFromJsJSONValue(row)
+	product := Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
 	jquery.Jq(fmt.Sprintf("#totalstock-collapse-%d", product.ProductID)).Append(widgets.NewSpan(widgets.SpanAttributes{
 		BaseAttributes: widgets.BaseAttributes{
@@ -207,7 +232,7 @@ func OperateEventsTotalStock(this js.Value, args []js.Value) interface{} {
 	done := func(data js.Value) {
 
 		var (
-			storelocations []StoreLocation
+			storelocations []models.StoreLocation
 			err            error
 		)
 
@@ -217,38 +242,8 @@ func OperateEventsTotalStock(this js.Value, args []js.Value) interface{} {
 
 		jquery.Jq(fmt.Sprintf("#totalstock-collapse-%d", product.ProductID)).SetHtml("")
 
-		// rowButtonClose := widgets.NewDiv(widgets.DivAttributes{
-		// 	BaseAttributes: widgets.BaseAttributes{
-		// 		Visible: true,
-		// 		Classes: []string{"row"},
-		// 	},
-		// })
-		// buttonClose := widgets.NewBSButtonWithIcon(
-		// 	widgets.ButtonAttributes{
-		// 		BaseAttributes: widgets.BaseAttributes{
-		// 			Visible: true,
-		// 			Attributes: map[string]string{
-		// 				"onclick": fmt.Sprintf("$('#totalstock-collapse-%d').html('')", product.ProductID),
-		// 			},
-		// 		},
-		// 		Title: locales.Translate("close", HTTPHeaderAcceptLanguage),
-		// 	},
-		// 	widgets.IconAttributes{
-		// 		BaseAttributes: widgets.BaseAttributes{
-		// 			Visible: true,
-		// 			Classes: []string{"iconlabel"},
-		// 		},
-		// 		Text: locales.Translate("close", HTTPHeaderAcceptLanguage),
-		// 		Icon: themes.NewMdiIcon(themes.MDI_CLOSE, ""),
-		// 	},
-		// 	[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
-		// )
-		// rowButtonClose.AppendChild(buttonClose)
-
-		// jquery.Jq(fmt.Sprintf("#totalstock-collapse-%d", product.ProductID)).Append(rowButtonClose.OuterHTML())
-
 		for _, storelocation := range storelocations {
-			showStockRecursive(&storelocation, 0, fmt.Sprintf("#totalstock-collapse-%d", product.ProductID))
+			jsutils.ShowStockRecursive(&storelocation, 0, fmt.Sprintf("#totalstock-collapse-%d", product.ProductID))
 		}
 
 	}
@@ -271,9 +266,31 @@ func OperateEventsTotalStock(this js.Value, args []js.Value) interface{} {
 func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	globals.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
+	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
-	jquery.Jq(fmt.Sprintf("button#delete%d", globals.CurrentProduct.ProductID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	confirm := widgets.NewLink(
+		widgets.LinkAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Id:      fmt.Sprintf("delete%d", globals.CurrentProduct.ProductID),
+				Classes: []string{"text-primary", "iconlabel"},
+				Visible: true,
+			},
+			Href: "#",
+			Label: widgets.NewSpan(
+				widgets.SpanAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Classes: []string{"mdi", themes.MDI_CONFIRM.ToString()},
+						Visible: true,
+					},
+					Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
+				},
+			),
+		},
+	).OuterHTML()
+
+	jquery.Jq(fmt.Sprintf("div#confirm%d", globals.CurrentProduct.ProductID)).SetHtml(confirm)
+
+	jquery.Jq(fmt.Sprintf("a#delete%d", globals.CurrentProduct.ProductID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
 		url := fmt.Sprintf("%sproducts/%d", ApplicationProxyPath, globals.CurrentProduct.ProductID)
 		method := "delete"
@@ -300,17 +317,6 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 		return nil
 
 	}))
-
-	buttonTitle := widgets.NewIcon(widgets.IconAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"iconlabel"},
-		},
-		Icon: themes.NewMdiIcon(themes.MDI_CONFIRM, ""),
-		Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
-	})
-	jquery.Jq(fmt.Sprintf("button#delete%d", globals.CurrentProduct.ProductID)).SetHtml("")
-	jquery.Jq(fmt.Sprintf("button#delete%d", globals.CurrentProduct.ProductID)).Append(buttonTitle.OuterHTML())
 
 	return nil
 
@@ -567,36 +573,22 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 func DetailFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
-	globals.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
+	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
 	var synonyms strings.Builder
 	for _, synonym := range globals.CurrentProduct.Synonyms {
 		synonyms.WriteString(synonym.NameLabel)
-		synonyms.WriteString("<br/>")
+		synonyms.WriteString(";")
 	}
-
-	// JSMol div.
-	widgets.NewDiv(widgets.DivAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Id:      fmt.Sprintf("jsmol%d", globals.CurrentProduct.ProductID),
-		},
-	})
 
 	//
 	// 2dImage, synonyms, ID and person.
 	//
-	rowSynonymAndID := widgets.NewDiv(widgets.DivAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"row", "mt-sm-3"},
-		},
-	})
 	// 2dimage.
 	col2dimage := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-4"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	if globals.CurrentProduct.ProductTwoDFormula.Valid {
@@ -612,9 +604,17 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	colSynonym := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-4"},
+			Classes: []string{"col-sm-12 m-1"},
 		},
 	})
+	colSynonym.AppendChild(
+		widgets.NewSpan(widgets.SpanAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+				Classes: []string{"iconlabel", "mr-sm-2"},
+			},
+			Text: locales.Translate("synonym_label_title", HTTPHeaderAcceptLanguage),
+		}))
 	colSynonym.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
@@ -625,7 +625,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	colID := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-2"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	colID.AppendChild(
@@ -634,7 +634,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				Visible: true,
 				Classes: []string{"iconlabel", "mr-sm-2"},
 			},
-			Text: "id",
+			Text: "#",
 		}))
 	colID.AppendChild(
 		widgets.NewSpan(widgets.SpanAttributes{
@@ -647,7 +647,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	colPerson := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-2"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	colPerson.AppendChild(
@@ -658,25 +658,15 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			},
 			Text: globals.CurrentProduct.Person.PersonEmail,
 		}))
-	rowSynonymAndID.AppendChild(col2dimage)
-	rowSynonymAndID.AppendChild(colSynonym)
-	rowSynonymAndID.AppendChild(colID)
-	rowSynonymAndID.AppendChild(colPerson)
 
 	//
 	// Category and tags.
 	//
-	rowCategoryAndTags := widgets.NewDiv(widgets.DivAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"row", "mt-sm-3"},
-		},
-	})
 	// Category.
 	colCategory := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-10"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	if globals.CurrentProduct.Category.CategoryID.Valid {
@@ -699,7 +689,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	colTags := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-2"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	for _, tag := range globals.CurrentProduct.Tags {
@@ -712,23 +702,14 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		}))
 	}
 
-	rowCategoryAndTags.AppendChild(colCategory)
-	rowCategoryAndTags.AppendChild(colTags)
-
 	//
 	// Suppliers and producer.
 	//
-	rowSupplierAndProducer := widgets.NewDiv(widgets.DivAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"row", "mt-sm-3"},
-		},
-	})
 	// Producer.
 	colProducer := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-6"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	if globals.CurrentProduct.ProducerRef.ProducerRefID.Valid {
@@ -751,7 +732,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	colSuppliers := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-6"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	if len(globals.CurrentProduct.SupplierRefs) > 0 {
@@ -779,23 +760,14 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		colSuppliers.AppendChild(ul)
 	}
 
-	rowSupplierAndProducer.AppendChild(colProducer)
-	rowSupplierAndProducer.AppendChild(colSuppliers)
-
 	//
 	// Number per carton and per bag.
 	//
-	rowNumberPerCartonAndBag := widgets.NewDiv(widgets.DivAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"row", "mt-sm-3"},
-		},
-	})
 	// Carton.
 	colNumberPerCarton := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-6"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	if globals.CurrentProduct.ProductNumberPerCarton.Valid && globals.CurrentProduct.ProductNumberPerCarton.Int64 > 0 {
@@ -818,7 +790,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	colNumberPerBag := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-6"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	if globals.CurrentProduct.ProductNumberPerBag.Valid {
@@ -838,23 +810,14 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		}))
 	}
 
-	rowNumberPerCartonAndBag.AppendChild(colNumberPerCarton)
-	rowNumberPerCartonAndBag.AppendChild(colNumberPerBag)
-
 	//
 	// Producer sheet.
 	//
-	rowProducerSheet := widgets.NewDiv(widgets.DivAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"row", "mt-sm-3"},
-		},
-	})
 	// Producer sheet.
 	colProducerSheet := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-12"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	if globals.CurrentProduct.ProductSheet.Valid {
@@ -885,22 +848,14 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		}))
 	}
 
-	rowProducerSheet.AppendChild(colProducerSheet)
-
 	//
 	// Cas, Ce and MSDS.
 	//
-	rowCasCeMsds := widgets.NewDiv(widgets.DivAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"row", "mt-sm-3"},
-		},
-	})
 	// Cas.
 	colCas := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-4"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	if globals.CurrentProduct.CasNumber.CasNumberID.Valid {
@@ -949,7 +904,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	colCe := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-4"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	if globals.CurrentProduct.CeNumber.CeNumberID.Valid {
@@ -972,7 +927,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	colMsds := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-4"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	if globals.CurrentProduct.ProductMSDS.Valid {
@@ -990,7 +945,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Icon: themes.NewMdiIcon(themes.MDI_LINK, themes.MDI_24PX),
+			Icon: themes.NewMdiIcon(themes.MDI_LINK, themes.MDI_16PX),
 		})
 
 		colMsds.AppendChild(widgets.NewLink(widgets.LinkAttributes{
@@ -1003,24 +958,14 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		}))
 	}
 
-	rowCasCeMsds.AppendChild(colCas)
-	rowCasCeMsds.AppendChild(colCe)
-	rowCasCeMsds.AppendChild(colMsds)
-
 	//
 	// Recommended storage temperature
 	//
-	rowStorageTemperature := widgets.NewDiv(widgets.DivAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"row", "mt-sm-3"},
-		},
-	})
 	// Storage temperature.
 	colStorageTemperature := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-12"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	if globals.CurrentProduct.ProductTemperature.Valid {
@@ -1040,22 +985,14 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		}))
 	}
 
-	rowStorageTemperature.AppendChild(colStorageTemperature)
-
 	//
 	// Empirical, linear and 3D formulas.
 	//
-	rowFormulas := widgets.NewDiv(widgets.DivAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"row", "mt-sm-3"},
-		},
-	})
 	// Empirical formula.
 	colEmpiricalFormula := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-4"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	if globals.CurrentProduct.EmpiricalFormula.EmpiricalFormulaID.Valid {
@@ -1078,7 +1015,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	colLinearFormula := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-4"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	if globals.CurrentProduct.LinearFormula.LinearFormulaID.Valid {
@@ -1101,7 +1038,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	colTreedFormula := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-4"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	if globals.CurrentProduct.ProductThreeDFormula.Valid && globals.CurrentProduct.ProductThreeDFormula.String != "" {
@@ -1119,7 +1056,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Icon: themes.NewMdiIcon(themes.MDI_LINK, themes.MDI_24PX),
+			Icon: themes.NewMdiIcon(themes.MDI_LINK, themes.MDI_16PX),
 		})
 
 		colTreedFormula.AppendChild(widgets.NewLink(widgets.LinkAttributes{
@@ -1132,24 +1069,14 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		}))
 	}
 
-	rowFormulas.AppendChild(colEmpiricalFormula)
-	rowFormulas.AppendChild(colLinearFormula)
-	rowFormulas.AppendChild(colTreedFormula)
-
 	//
 	// Symbols, signal word and physical state.
 	//
-	rowSymbolsSignalWordPhysicalState := widgets.NewDiv(widgets.DivAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"row", "mt-sm-3"},
-		},
-	})
 	// Symbols.
 	colSymbols := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-4"},
+			Classes: []string{"col-sm-12 m-1"},
 		},
 	})
 	for _, symbol := range globals.CurrentProduct.Symbols {
@@ -1166,7 +1093,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	colSignalWord := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-4"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	if globals.CurrentProduct.SignalWord.SignalWordID.Valid {
@@ -1189,7 +1116,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	colPhysicalState := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-4"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	if globals.CurrentProduct.PhysicalState.PhysicalStateID.Valid {
@@ -1209,24 +1136,14 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		}))
 	}
 
-	rowSymbolsSignalWordPhysicalState.AppendChild(colSymbols)
-	rowSymbolsSignalWordPhysicalState.AppendChild(colSignalWord)
-	rowSymbolsSignalWordPhysicalState.AppendChild(colPhysicalState)
-
 	//
 	// Hazard statements, precautionary statements, classes of compounds
 	//
-	rowHsPsCoc := widgets.NewDiv(widgets.DivAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"row", "mt-sm-3"},
-		},
-	})
 	// Hazard statements.
 	colHs := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-4"},
+			Classes: []string{"col-sm-12 m-1"},
 		},
 	})
 	if len(globals.CurrentProduct.HazardStatements) > 0 {
@@ -1258,7 +1175,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	colPs := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-4"},
+			Classes: []string{"col-sm-12 m-1"},
 		},
 	})
 	if len(globals.CurrentProduct.PrecautionaryStatements) > 0 {
@@ -1290,7 +1207,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	colCoc := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-4"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	if len(globals.CurrentProduct.ClassOfCompound) > 0 {
@@ -1318,24 +1235,14 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		colCoc.AppendChild(ul)
 	}
 
-	rowHsPsCoc.AppendChild(colHs)
-	rowHsPsCoc.AppendChild(colPs)
-	rowHsPsCoc.AppendChild(colCoc)
-
 	//
 	// Disposal comment and remark.
 	//
-	rowDisposalCommentRemark := widgets.NewDiv(widgets.DivAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"row", "mt-sm-3"},
-		},
-	})
 	// Disposal comment.
 	colDisposalComment := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-6"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	if globals.CurrentProduct.ProductDisposalComment.Valid && globals.CurrentProduct.ProductDisposalComment.String != "" {
@@ -1358,7 +1265,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	colRemark := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-6"},
+			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
 	if globals.CurrentProduct.ProductRemark.Valid && globals.CurrentProduct.ProductRemark.String != "" {
@@ -1378,23 +1285,14 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		}))
 	}
 
-	rowDisposalCommentRemark.AppendChild(colDisposalComment)
-	rowDisposalCommentRemark.AppendChild(colRemark)
-
 	//
 	// Radioactive, restricted.
 	//
-	rowRadioactiveRestricted := widgets.NewDiv(widgets.DivAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"row", "mt-sm-3"},
-		},
-	})
 	// Radioactive.
 	colRadioactive := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-1", "iconlabel"},
+			Classes: []string{"col-sm-auto m-1", "iconlabel"},
 		},
 	})
 	if globals.CurrentProduct.ProductRadioactive.Valid && globals.CurrentProduct.ProductRadioactive.Bool {
@@ -1411,7 +1309,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	colRestricted := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Classes: []string{"col-sm-1", "iconlabel"},
+			Classes: []string{"col-sm-auto m-1", "iconlabel"},
 		},
 	})
 	if globals.CurrentProduct.ProductRestricted.Valid && globals.CurrentProduct.ProductRestricted.Bool {
@@ -1425,30 +1323,139 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		}))
 	}
 
-	rowRadioactiveRestricted.AppendChild(colRadioactive)
-	rowRadioactiveRestricted.AppendChild(colRestricted)
+	detailCard := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"card"},
+		}})
+	detailCardBody := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"card-body"},
+		}})
+	detailCard.AppendChild(detailCardBody)
+	detailCardRow := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"row"},
+		}})
+	detailCardBody.AppendChild(detailCardRow)
 
-	return rowSynonymAndID.OuterHTML() +
-		rowCategoryAndTags.OuterHTML() +
-		rowSupplierAndProducer.OuterHTML() +
-		rowProducerSheet.OuterHTML() +
-		rowNumberPerCartonAndBag.OuterHTML() +
-		rowStorageTemperature.OuterHTML() +
-		rowCasCeMsds.OuterHTML() +
-		rowFormulas.OuterHTML() +
-		rowSymbolsSignalWordPhysicalState.OuterHTML() +
-		rowHsPsCoc.OuterHTML() +
-		rowDisposalCommentRemark.OuterHTML() +
-		rowRadioactiveRestricted.OuterHTML()
+	// colPin := widgets.NewDiv(widgets.DivAttributes{
+	// 	BaseAttributes: widgets.BaseAttributes{
+	// 		Visible: true,
+	// 		Classes: []string{"offset-sm-5 col-sm-7 mb-2"},
+	// 	},
+	// })
+	// colPin.AppendChild(widgets.NewSpan(
+	// 	widgets.SpanAttributes{
+	// 		BaseAttributes: widgets.BaseAttributes{
+	// 			Visible: true,
+	// 			Classes: []string{"mdi mdi-clipboard-list-outline mdi-36px"},
+	// 		},
+	// 	},
+	// ))
+
+	// detailCardRow.AppendChild(colPin)
+
+	detailCardRow.AppendChild(colID)
+	if globals.CurrentProduct.Category.CategoryID.Valid {
+		detailCardRow.AppendChild(colCategory)
+	}
+	if len(globals.CurrentProduct.Tags) > 0 {
+		detailCardRow.AppendChild(colTags)
+	}
+	if globals.CurrentProduct.ProductTwoDFormula.Valid && globals.CurrentProduct.ProductTwoDFormula.String != "" {
+		detailCardRow.AppendChild(col2dimage)
+	}
+	if len(globals.CurrentProduct.Synonyms) > 0 {
+		detailCardRow.AppendChild(colSynonym)
+	}
+	if globals.CurrentProduct.EmpiricalFormula.EmpiricalFormulaID.Valid {
+		detailCardRow.AppendChild(colEmpiricalFormula)
+	}
+	if globals.CurrentProduct.LinearFormula.LinearFormulaID.Valid {
+		detailCardRow.AppendChild(colLinearFormula)
+	}
+	if globals.CurrentProduct.ProductThreeDFormula.Valid && globals.CurrentProduct.ProductThreeDFormula.String != "" {
+		detailCardRow.AppendChild(colTreedFormula)
+	}
+	if globals.CurrentProduct.CasNumber.CasNumberID.Valid {
+		detailCardRow.AppendChild(colCas)
+	}
+	if globals.CurrentProduct.CeNumber.CeNumberID.Valid {
+		detailCardRow.AppendChild(colCe)
+	}
+	if globals.CurrentProduct.ProductMSDS.Valid && globals.CurrentProduct.ProductMSDS.String != "" {
+		detailCardRow.AppendChild(colMsds)
+	}
+	if globals.CurrentProduct.Producer.ProducerID.Valid {
+		detailCardRow.AppendChild(colProducer)
+	}
+	if len(globals.CurrentProduct.SupplierRefs) > 0 {
+		detailCardRow.AppendChild(colSuppliers)
+	}
+	if globals.CurrentProduct.ProductNumberPerCarton.Valid {
+		detailCardRow.AppendChild(colNumberPerCarton)
+	}
+	if globals.CurrentProduct.ProductNumberPerBag.Valid {
+		detailCardRow.AppendChild(colNumberPerBag)
+	}
+	if len(globals.CurrentProduct.Symbols) > 0 {
+		detailCardRow.AppendChild(colSymbols)
+	}
+	if globals.CurrentProduct.SignalWord.SignalWordID.Valid {
+		detailCardRow.AppendChild(colSignalWord)
+	}
+	if len(globals.CurrentProduct.HazardStatements) > 0 {
+		detailCardRow.AppendChild(colHs)
+	}
+	if len(globals.CurrentProduct.PrecautionaryStatements) > 0 {
+		detailCardRow.AppendChild(colPs)
+	}
+	if len(globals.CurrentProduct.ClassOfCompound) > 0 {
+		detailCardRow.AppendChild(colCoc)
+	}
+	if globals.CurrentProduct.PhysicalState.PhysicalStateID.Valid {
+		detailCardRow.AppendChild(colPhysicalState)
+	}
+	if globals.CurrentProduct.ProductSheet.Valid && globals.CurrentProduct.ProductSheet.String != "" {
+		detailCardRow.AppendChild(colProducerSheet)
+	}
+	if globals.CurrentProduct.ProductTemperature.Valid {
+		detailCardRow.AppendChild(colStorageTemperature)
+	}
+	if globals.CurrentProduct.ProductDisposalComment.Valid && globals.CurrentProduct.ProductDisposalComment.String != "" {
+		detailCardRow.AppendChild(colDisposalComment)
+	}
+	if globals.CurrentProduct.ProductRemark.Valid && globals.CurrentProduct.ProductRemark.String != "" {
+		detailCardRow.AppendChild(colRemark)
+	}
+	if globals.CurrentProduct.ProductRadioactive.Valid && globals.CurrentProduct.ProductRadioactive.Bool {
+		detailCardRow.AppendChild(colRadioactive)
+	}
+	if globals.CurrentProduct.ProductRestricted.Valid && globals.CurrentProduct.ProductRestricted.Bool {
+		detailCardRow.AppendChild(colRestricted)
+	}
+	detailCardRow.AppendChild(colPerson)
+
+	return detailCard.OuterHTML()
 
 }
 
 func NameFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
-	globals.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
+	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
 	result := fmt.Sprintf("%s <i>%s</i>", globals.CurrentProduct.Name.NameLabel, globals.CurrentProduct.ProductSpecificity.String)
+
+	for _, syn := range globals.CurrentProduct.Synonyms {
+		if strings.HasPrefix(syn.NameLabel, "|") && strings.HasSuffix(syn.NameLabel, "|") {
+			result += fmt.Sprintf(" %s", syn.NameLabel)
+		}
+	}
+
 	if globals.CurrentProduct.ProductSL.Valid && globals.CurrentProduct.ProductSL.String != "" {
 		result += fmt.Sprintf("<div><span class='text-white badge bg-secondary'>%s</span></div>", globals.CurrentProduct.ProductSL.String)
 	}
@@ -1460,7 +1467,7 @@ func NameFormatter(this js.Value, args []js.Value) interface{} {
 func EmpiricalformulaFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
-	globals.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
+	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
 	if globals.CurrentProduct.EmpiricalFormulaID.Valid {
 		return globals.CurrentProduct.EmpiricalFormulaLabel.String
@@ -1470,82 +1477,48 @@ func EmpiricalformulaFormatter(this js.Value, args []js.Value) interface{} {
 
 }
 
+func TwodformulaFormatter(this js.Value, args []js.Value) interface{} {
+
+	row := args[1]
+	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
+
+	var (
+		twodformula string
+	)
+
+	if globals.CurrentProduct.ProductTwoDFormula.Valid {
+
+		twodformula = widgets.NewImg(widgets.ImgAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+			},
+			Height:          "70",
+			Src:             globals.CurrentProduct.ProductTwoDFormula.String,
+			BackgroundColor: "white",
+		}).OuterHTML()
+
+	}
+
+	return twodformula
+
+}
+
 func CasnumberFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
-	globals.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
-
-	if globals.CurrentProduct.CasNumberID.Valid {
-		return globals.CurrentProduct.CasNumberLabel.String
-	} else {
-		return ""
-	}
-
-}
-
-func Product_productSpecificityFormatter(this js.Value, args []js.Value) interface{} {
-
-	row := args[1]
-	globals.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
-
-	if globals.CurrentProduct.ProductSpecificity.Valid {
-		return globals.CurrentProduct.ProductSpecificity.String
-	} else {
-		return ""
-	}
-
-}
-
-func Product_productSlFormatter(this js.Value, args []js.Value) interface{} {
-
-	row := args[1]
-	globals.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
-
-	if globals.CurrentProduct.ProductSL.Valid {
-		return globals.CurrentProduct.ProductSL.String
-	} else {
-		return ""
-	}
-
-}
-
-func OperateFormatter(this js.Value, args []js.Value) interface{} {
+	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
 	var (
-		imgSGH02         string
-		spanCasCMR       string
-		spanHSCMR        string
-		iconRestricted   string
-		buttonStorages   string
-		buttonOStorages  string
-		buttonTotalStock string
-		iconBookmark     themes.IconFace
-		textBookmark     string
+		spanCasNumber, spanCasCMR, spanHSCMR, imgSGH02, iconRestricted string
 	)
 
-	row := args[1]
-	globals.CurrentProduct = Product{}.ProductFromJsJSONValue(row)
-
-	if globals.CurrentProduct.Bookmark.BookmarkID.Valid {
-		iconBookmark = themes.MDI_BOOKMARK
-		textBookmark = locales.Translate("unbookmark", HTTPHeaderAcceptLanguage)
-	} else {
-		iconBookmark = themes.MDI_NO_BOOKMARK
-		textBookmark = locales.Translate("bookmark", HTTPHeaderAcceptLanguage)
-	}
-
-	for _, symbol := range globals.CurrentProduct.Symbols {
-		if symbol.SymbolLabel == "SGH02" {
-			imgSGH02 = widgets.NewImg(widgets.ImgAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-				},
-				Src:   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACYAAAAmCAYAAACoPemuAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAN1wAADdcBQiibeAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAIvSURBVFiFzdgxbI5BGMDx36uNJsJApFtFIh2QEIkBtYiYJFKsrDaJqYOofhKRMFhsFhNNMBgkTAaD0KUiBomN1EpYBHWGnvi8vu9r7/2eti65vHfv3T3P/57nuXvfuyqlJCRVVQuk1AqRl1LqP9NKpJxbETKjocLgYi0VaLl49wXBxUIFwsVDBcGFQWEAg1FwYZbCGMajLBfmPkzgUZRbw2IKFzGPrRFw/bpvD/bn8jUkXM719f3A9eu+k3iXA/92Bnub2yYx1NgDfbrvXIYZx8dcThjBExxvPOmGltqLIzmuEt63QSVczc+z/2whSw2ThpbajS+4UgOq59O4gYFSuGaByWb8zKvwN8RXXKiBPc7PLaWx3ARqY37O1CBe5/cvO1huVy+ZnfSX7y9MYxRTNeX32lZj+/sXWNfVnV3g1tT/aJeQ5vAGp3L9eXbjTFv7NzzM9VncSSnNF2lp4MqjNYvcxwEcy+0HcQg32/q8Kndl+YrcgM9Z4YdsrZ21PtvxHT9yv1vNgr8cbiIrnMUmbKu177PwVZjLgKPNt4sCOKzF0ww32aF9CA+yxSZKoTqDlVnucI6lMxhpg76OuxhrKr8oIENyXx/xxQKTE/hUkIdLJ1tlRd3TwtF/KtcuSalVVdUwdvQe+Fd6ljhfl9NzRKT5I8cvq/B+xi3vzFfk+FaqbEUPvEtVuipXBIspX9VLlW4Q/8U1VGe4EKgYsED3tefBgt271y7dUlV/ygHpF8bRglXiwx7BAAAAAElFTkSuQmCC",
-				Alt:   locales.Translate("product_flammable", HTTPHeaderAcceptLanguage),
-				Title: locales.Translate("product_flammable", HTTPHeaderAcceptLanguage),
-			}).OuterHTML()
-			break
-		}
+	if globals.CurrentProduct.CasNumberID.Valid {
+		spanCasNumber = widgets.NewSpan(widgets.SpanAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Visible: true,
+			},
+			Text: globals.CurrentProduct.CasNumberLabel.String,
+		}).OuterHTML()
 	}
 
 	if globals.CurrentProduct.CasNumberCMR.Valid {
@@ -1570,169 +1543,19 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 		}
 	}
 
-	if globals.CurrentProduct.ProductSC != 0 || globals.CurrentProduct.ProductASC != 0 {
-		buttonStorages = widgets.NewBSButtonWithIcon(
-			widgets.ButtonAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Id:      "storages" + strconv.Itoa(globals.CurrentProduct.ProductID),
-					Classes: []string{"storages"},
-					Visible: false,
-				},
-				Title: locales.Translate("storages", HTTPHeaderAcceptLanguage),
-			},
-			widgets.IconAttributes{
+	for _, symbol := range globals.CurrentProduct.Symbols {
+		if symbol.SymbolLabel == "SGH02" {
+			imgSGH02 = widgets.NewImg(widgets.ImgAttributes{
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
-					Classes: []string{"iconlabel"},
 				},
-				Text: fmt.Sprintf("%s %d  (%d)", locales.Translate("storages", HTTPHeaderAcceptLanguage), globals.CurrentProduct.ProductSC, globals.CurrentProduct.ProductASC),
-				Icon: themes.NewMdiIcon(themes.MDI_STORAGE, ""),
-			},
-			[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
-		).OuterHTML()
+				Src:   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACYAAAAmCAYAAACoPemuAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAN1wAADdcBQiibeAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAIvSURBVFiFzdgxbI5BGMDx36uNJsJApFtFIh2QEIkBtYiYJFKsrDaJqYOofhKRMFhsFhNNMBgkTAaD0KUiBomN1EpYBHWGnvi8vu9r7/2eti65vHfv3T3P/57nuXvfuyqlJCRVVQuk1AqRl1LqP9NKpJxbETKjocLgYi0VaLl49wXBxUIFwsVDBcGFQWEAg1FwYZbCGMajLBfmPkzgUZRbw2IKFzGPrRFw/bpvD/bn8jUkXM719f3A9eu+k3iXA/92Bnub2yYx1NgDfbrvXIYZx8dcThjBExxvPOmGltqLIzmuEt63QSVczc+z/2whSw2ThpbajS+4UgOq59O4gYFSuGaByWb8zKvwN8RXXKiBPc7PLaWx3ARqY37O1CBe5/cvO1huVy+ZnfSX7y9MYxRTNeX32lZj+/sXWNfVnV3g1tT/aJeQ5vAGp3L9eXbjTFv7NzzM9VncSSnNF2lp4MqjNYvcxwEcy+0HcQg32/q8Kndl+YrcgM9Z4YdsrZ21PtvxHT9yv1vNgr8cbiIrnMUmbKu177PwVZjLgKPNt4sCOKzF0ww32aF9CA+yxSZKoTqDlVnucI6lMxhpg76OuxhrKr8oIENyXx/xxQKTE/hUkIdLJ1tlRd3TwtF/KtcuSalVVdUwdvQe+Fd6ljhfl9NzRKT5I8cvq/B+xi3vzFfk+FaqbEUPvEtVuipXBIspX9VLlW4Q/8U1VGe4EKgYsED3tefBgt271y7dUlV/ygHpF8bRglXiwx7BAAAAAElFTkSuQmCC",
+				Alt:   locales.Translate("product_flammable", HTTPHeaderAcceptLanguage),
+				Title: locales.Translate("product_flammable", HTTPHeaderAcceptLanguage),
+			}).OuterHTML()
+			break
+		}
 	}
-
-	if globals.CurrentProduct.ProductTSC != 0 {
-		buttonOStorages = widgets.NewBSButtonWithIcon(
-			widgets.ButtonAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Id:      "ostorages" + strconv.Itoa(globals.CurrentProduct.ProductID),
-					Classes: []string{"ostorages"},
-					Visible: false,
-				},
-				Title: locales.Translate("ostorages", HTTPHeaderAcceptLanguage),
-			},
-			widgets.IconAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-					Classes: []string{"iconlabel"},
-				},
-				Text: locales.Translate("ostorages", HTTPHeaderAcceptLanguage),
-				Icon: themes.NewMdiIcon(themes.MDI_OSTORAGE, ""),
-			},
-			[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
-		).OuterHTML()
-	}
-
-	buttonStore := widgets.NewBSButtonWithIcon(
-		widgets.ButtonAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Id:      "store" + strconv.Itoa(globals.CurrentProduct.ProductID),
-				Classes: []string{"store"},
-				Visible: false,
-			},
-			Title: locales.Translate("store", HTTPHeaderAcceptLanguage),
-		},
-		widgets.IconAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Visible: true,
-				Classes: []string{"iconlabel"},
-			},
-			Text: locales.Translate("store", HTTPHeaderAcceptLanguage),
-			Icon: themes.NewMdiIcon(themes.MDI_STORE, ""),
-		},
-		[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
-	).OuterHTML()
-
-	buttonEdit := widgets.NewBSButtonWithIcon(
-		widgets.ButtonAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Id:      "edit" + strconv.Itoa(globals.CurrentProduct.ProductID),
-				Classes: []string{"productedit"},
-				Visible: false,
-			},
-			Title: locales.Translate("edit", HTTPHeaderAcceptLanguage),
-		},
-		widgets.IconAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Visible: true,
-				Classes: []string{"iconlabel"},
-			},
-			Text: locales.Translate("edit", HTTPHeaderAcceptLanguage),
-			Icon: themes.NewMdiIcon(themes.MDI_EDIT, ""),
-		},
-		[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
-	).OuterHTML()
-
-	buttonDelete := widgets.NewBSButtonWithIcon(
-		widgets.ButtonAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Id:      "delete" + strconv.Itoa(globals.CurrentProduct.ProductID),
-				Classes: []string{"productdelete"},
-				Visible: false,
-			},
-			Title: locales.Translate("delete", HTTPHeaderAcceptLanguage),
-		},
-		widgets.IconAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Visible: true,
-				Classes: []string{"iconlabel"},
-			},
-			Text: locales.Translate("delete", HTTPHeaderAcceptLanguage),
-			Icon: themes.NewMdiIcon(themes.MDI_DELETE, ""),
-		},
-		[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
-	).OuterHTML()
-
-	buttonBookmark := widgets.NewBSButtonWithIcon(
-		widgets.ButtonAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Id:         "bookmark" + strconv.Itoa(globals.CurrentProduct.ProductID),
-				Classes:    []string{"bookmark"},
-				Visible:    false,
-				Attributes: map[string]string{"pid": strconv.Itoa(globals.CurrentProduct.ProductID)},
-			},
-			Title: textBookmark,
-		},
-		widgets.IconAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Visible: true,
-				Classes: []string{"iconlabel"},
-			},
-			Text: textBookmark,
-			Icon: themes.NewMdiIcon(iconBookmark, ""),
-		},
-		[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
-	).OuterHTML()
-
-	if globals.CurrentProduct.ProductSC != 0 {
-		buttonTotalStock = widgets.NewBSButtonWithIcon(
-			widgets.ButtonAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Id:         "totalstock" + strconv.Itoa(globals.CurrentProduct.ProductID),
-					Classes:    []string{"totalstock"},
-					Visible:    false,
-					Attributes: map[string]string{"pid": strconv.Itoa(globals.CurrentProduct.ProductID)},
-				},
-				Title: locales.Translate("totalstock_text", HTTPHeaderAcceptLanguage),
-			},
-			widgets.IconAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-					Classes: []string{"iconlabel"},
-				},
-				Text: locales.Translate("totalstock_text", HTTPHeaderAcceptLanguage),
-				Icon: themes.NewMdiIcon(themes.MDI_TOTALSTOCK, ""),
-			},
-			[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
-		).OuterHTML()
-	}
-
-	ostoragesDiv := widgets.NewDiv(widgets.DivAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Id:      "ostorages-collapse-" + strconv.Itoa(globals.CurrentProduct.ProductID),
-			Classes: []string{"collapse"},
-		},
-	}).OuterHTML()
-
-	totalstockDiv := widgets.NewDiv(widgets.DivAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Id:      "totalstock-collapse-" + strconv.Itoa(globals.CurrentProduct.ProductID),
-			Classes: []string{"collapse", "p-sm-3", "float-right"},
-		},
-	}).OuterHTML()
 
 	if globals.CurrentProduct.ProductRestricted.Valid && globals.CurrentProduct.ProductRestricted.Bool {
 		iconRestricted = widgets.NewIcon(widgets.IconAttributes{
@@ -1744,7 +1567,240 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 		}).OuterHTML()
 	}
 
-	return buttonStorages + buttonOStorages + buttonStore + buttonEdit + buttonDelete + buttonBookmark + buttonTotalStock + ostoragesDiv + totalstockDiv + iconRestricted + spanCasCMR + spanHSCMR + imgSGH02
+	return spanCasNumber + spanCasCMR + spanHSCMR + imgSGH02 + iconRestricted
+
+}
+
+func Product_productSpecificityFormatter(this js.Value, args []js.Value) interface{} {
+
+	row := args[1]
+	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
+
+	if globals.CurrentProduct.ProductSpecificity.Valid {
+		return globals.CurrentProduct.ProductSpecificity.String
+	} else {
+		return ""
+	}
+
+}
+
+func Product_productSlFormatter(this js.Value, args []js.Value) interface{} {
+
+	row := args[1]
+	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
+
+	if globals.CurrentProduct.ProductSL.Valid {
+		return globals.CurrentProduct.ProductSL.String
+	} else {
+		return ""
+	}
+
+}
+
+func OperateFormatter(this js.Value, args []js.Value) interface{} {
+
+	var (
+		buttonStorages   string
+		buttonOStorages  string
+		buttonTotalStock string
+		iconBookmark     themes.IconFace
+		textBookmark     string
+	)
+
+	row := args[1]
+	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
+
+	if globals.CurrentProduct.Bookmark.BookmarkID.Valid {
+		iconBookmark = themes.MDI_BOOKMARK
+		textBookmark = locales.Translate("unbookmark", HTTPHeaderAcceptLanguage)
+	} else {
+		iconBookmark = themes.MDI_NO_BOOKMARK
+		textBookmark = locales.Translate("bookmark", HTTPHeaderAcceptLanguage)
+	}
+
+	if globals.CurrentProduct.ProductSC != 0 || globals.CurrentProduct.ProductASC != 0 {
+
+		buttonStorages = widgets.NewLink(
+			widgets.LinkAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Id:      "storages" + strconv.Itoa(globals.CurrentProduct.ProductID),
+					Classes: []string{"storages", "dropdown-item", "text-primary", "iconlabel"},
+					Visible: false,
+				},
+				Href: "#",
+				Label: widgets.NewSpan(
+					widgets.SpanAttributes{
+						BaseAttributes: widgets.BaseAttributes{
+							Classes: []string{"mdi", themes.MDI_STORAGE.ToString()},
+							Visible: true,
+						},
+						Text: fmt.Sprintf("%s %d  (%d)", locales.Translate("storages", HTTPHeaderAcceptLanguage), globals.CurrentProduct.ProductSC, globals.CurrentProduct.ProductASC),
+					},
+				),
+			},
+		).OuterHTML()
+
+	}
+
+	if globals.CurrentProduct.ProductTSC != 0 {
+
+		buttonOStorages = widgets.NewLink(
+			widgets.LinkAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Id:      "ostorages" + strconv.Itoa(globals.CurrentProduct.ProductID),
+					Classes: []string{"ostorages", "dropdown-item", "text-primary", "iconlabel"},
+					Visible: false,
+				},
+				Href: "#",
+				Label: widgets.NewSpan(
+					widgets.SpanAttributes{
+						BaseAttributes: widgets.BaseAttributes{
+							Classes: []string{"mdi", themes.MDI_OSTORAGE.ToString()},
+							Visible: true,
+						},
+						Text: locales.Translate("ostorages", HTTPHeaderAcceptLanguage),
+					},
+				),
+			},
+		).OuterHTML()
+
+	}
+
+	buttonStore := widgets.NewLink(
+		widgets.LinkAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Id:      "store" + strconv.Itoa(globals.CurrentProduct.ProductID),
+				Classes: []string{"store", "dropdown-item", "text-primary", "iconlabel"},
+				Visible: false,
+			},
+			Href: "#",
+			Label: widgets.NewSpan(
+				widgets.SpanAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Classes: []string{"mdi", themes.MDI_STORE.ToString()},
+						Visible: true,
+					},
+					Text: locales.Translate("store", HTTPHeaderAcceptLanguage),
+				},
+			),
+		},
+	).OuterHTML()
+
+	buttonEdit := widgets.NewLink(
+		widgets.LinkAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Id:      "edit" + strconv.Itoa(globals.CurrentProduct.ProductID),
+				Classes: []string{"productedit", "dropdown-item", "text-primary", "iconlabel"},
+				Visible: false,
+			},
+			Href: "#",
+			Label: widgets.NewSpan(
+				widgets.SpanAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Classes: []string{"mdi", themes.MDI_EDIT.ToString()},
+						Visible: true,
+					},
+					Text: locales.Translate("edit", HTTPHeaderAcceptLanguage),
+				},
+			),
+		},
+	).OuterHTML()
+
+	buttonDelete := widgets.NewLink(
+		widgets.LinkAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Id:      "delete" + strconv.Itoa(globals.CurrentProduct.ProductID),
+				Classes: []string{"productdelete", "dropdown-item", "text-primary", "iconlabel"},
+				Visible: false,
+			},
+			Href: "#",
+			Label: widgets.NewSpan(
+				widgets.SpanAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Classes: []string{"mdi", themes.MDI_DELETE.ToString()},
+						Visible: true,
+					},
+					Text: locales.Translate("delete", HTTPHeaderAcceptLanguage),
+				},
+			),
+		},
+	).OuterHTML()
+
+	buttonBookmark := widgets.NewLink(
+		widgets.LinkAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Id:         "bookmark" + strconv.Itoa(globals.CurrentProduct.ProductID),
+				Classes:    []string{"bookmark", "dropdown-item", "text-primary", "iconlabel"},
+				Visible:    false,
+				Attributes: map[string]string{"pid": strconv.Itoa(globals.CurrentProduct.ProductID)},
+			},
+			Href: "#",
+			Label: widgets.NewSpan(
+				widgets.SpanAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Classes: []string{"mdi", iconBookmark.ToString()},
+						Visible: true,
+					},
+					Text: textBookmark,
+				},
+			),
+		},
+	).OuterHTML()
+
+	if globals.CurrentProduct.ProductSC != 0 {
+
+		buttonTotalStock = widgets.NewLink(
+			widgets.LinkAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Id:      "totalstock" + strconv.Itoa(globals.CurrentProduct.ProductID),
+					Classes: []string{"totalstock", "dropdown-item", "text-primary", "iconlabel"},
+					Visible: false,
+				},
+				Href: "#",
+				Label: widgets.NewSpan(
+					widgets.SpanAttributes{
+						BaseAttributes: widgets.BaseAttributes{
+							Classes: []string{"mdi", themes.MDI_TOTALSTOCK.ToString()},
+							Visible: true,
+						},
+						Text: locales.Translate("totalstock_text", HTTPHeaderAcceptLanguage),
+					},
+				),
+			},
+		).OuterHTML()
+
+	}
+
+	ostoragesDiv := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Id:      "ostorages-collapse-" + strconv.Itoa(globals.CurrentProduct.ProductID),
+			Classes: []string{"collapse", "float-left"},
+		},
+	}).OuterHTML()
+
+	totalstockDiv := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Id:      "totalstock-collapse-" + strconv.Itoa(globals.CurrentProduct.ProductID),
+			Classes: []string{"collapse", "float-left"},
+		},
+	}).OuterHTML()
+
+	finalDiv := `
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="productActions` + strconv.Itoa(globals.CurrentProduct.ProductID) + `" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span class="mdi mdi-menu">&nbsp;</span>
+  </button>
+  <div class="dropdown-menu" aria-labelledby="productActions` + strconv.Itoa(globals.CurrentProduct.ProductID) + `">
+  ` + buttonStorages + buttonOStorages + buttonStore + buttonEdit + buttonDelete + buttonBookmark + buttonTotalStock +
+		`
+  </div>
+</div>
+<div id="confirm` + strconv.Itoa(globals.CurrentProduct.ProductID) + `">
+</div>
+`
+	return finalDiv + ostoragesDiv + totalstockDiv
 
 }
 
@@ -1764,9 +1820,11 @@ func AddProducer(this js.Value, args []js.Value) interface{} {
 	}
 
 	producer = Producer{
-		ProducerLabel: sql.NullString{
-			String: producerLabel,
-			Valid:  true,
+		Producer: &models.Producer{
+			ProducerLabel: sql.NullString{
+				String: producerLabel,
+				Valid:  true,
+			},
 		},
 	}
 	if dataBytes, err = json.Marshal(producer); err != nil {
@@ -1811,9 +1869,11 @@ func AddSupplier(this js.Value, args []js.Value) interface{} {
 	}
 
 	supplier = Supplier{
-		SupplierLabel: sql.NullString{
-			String: supplierLabel,
-			Valid:  true,
+		Supplier: &models.Supplier{
+			SupplierLabel: sql.NullString{
+				String: supplierLabel,
+				Valid:  true,
+			},
 		},
 	}
 	if dataBytes, err = json.Marshal(supplier); err != nil {
@@ -1931,7 +1991,7 @@ func ShowIfAuthorizedActionButtons(this js.Value, args []js.Value) interface{} {
 	// Iterating other the button with the class "storelocation"
 	// (we could choose "members" or "delete")
 	// to retrieve once the product id.
-	buttons := dom.GetWindow().Document().GetElementsByTagName("button")
+	buttons := dom.GetWindow().Document().GetElementsByTagName("a")
 	for _, button := range buttons {
 		if button.Class().Contains("bookmark") {
 			productId := button.GetAttribute("pid")

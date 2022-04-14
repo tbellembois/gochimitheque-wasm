@@ -6,6 +6,7 @@ import (
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type Entities struct {
@@ -14,12 +15,7 @@ type Entities struct {
 }
 
 type Entity struct {
-	EntityID          int       `json:"entity_id"`
-	EntityName        string    `json:"entity_name"`
-	EntityDescription string    `json:"entity_description"`
-	Managers          []*Person `json:"managers"`
-	EntitySLC         int       `json:"entity_slc"`
-	EntityPC          int       `json:"entity_pc"`
+	*models.Entity
 }
 
 func (elems Entities) GetRowConcreteTypeName() string {
@@ -106,6 +102,10 @@ func (e Entity) GetSelect2Id() int {
 
 func (e Entity) GetSelect2Text() string {
 
-	return e.EntityName
+	if e.Entity != nil {
+		return e.EntityName
+	}
+
+	return ""
 
 }

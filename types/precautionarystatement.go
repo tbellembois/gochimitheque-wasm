@@ -1,12 +1,12 @@
 package types
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type PrecautionaryStatements struct {
@@ -15,10 +15,7 @@ type PrecautionaryStatements struct {
 }
 
 type PrecautionaryStatement struct {
-	PrecautionaryStatementID        int            `json:"PrecautionaryStatement_id"`
-	PrecautionaryStatementLabel     string         `json:"PrecautionaryStatement_label"`
-	PrecautionaryStatementReference string         `json:"PrecautionaryStatement_reference"`
-	PrecautionaryStatementCMR       sql.NullString `json:"PrecautionaryStatement_cmr"`
+	*models.PrecautionaryStatement
 }
 
 func (elems PrecautionaryStatements) GetRowConcreteTypeName() string {
@@ -105,6 +102,10 @@ func (s PrecautionaryStatement) GetSelect2Id() int {
 
 func (s PrecautionaryStatement) GetSelect2Text() string {
 
-	return s.PrecautionaryStatementReference
+	if s.PrecautionaryStatement != nil {
+		return s.PrecautionaryStatementReference
+	}
+
+	return ""
 
 }

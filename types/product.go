@@ -7,6 +7,7 @@ import (
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type Products struct {
@@ -34,53 +35,7 @@ type Bookmark struct {
 }
 
 type Product struct {
-	ProductID              int            `json:"product_id"`
-	ProductSpecificity     sql.NullString `json:"product_specificity"`
-	ProductMSDS            sql.NullString `json:"product_msds"`
-	ProductRestricted      sql.NullBool   `json:"product_restricted"`
-	ProductRadioactive     sql.NullBool   `json:"product_radioactive"`
-	ProductThreeDFormula   sql.NullString `json:"product_threedformula"`
-	ProductTwoDFormula     sql.NullString `json:"product_twodformula"`
-	ProductMolFormula      sql.NullString `json:"product_molformula"`
-	ProductDisposalComment sql.NullString `json:"product_disposalcomment"`
-	ProductRemark          sql.NullString `json:"product_remark"`
-	ProductTemperature     sql.NullInt64  `json:"product_temperature"`
-	ProductSheet           sql.NullString `json:"product_sheet"`
-	ProductNumberPerCarton sql.NullInt64  `json:"product_number_per_carton"`
-	ProductNumberPerBag    sql.NullInt64  `json:"product_number_per_bag"`
-	EmpiricalFormula       `json:"empiricalformula"`
-	LinearFormula          `json:"linearformula"`
-	PhysicalState          `json:"physicalstate"`
-	SignalWord             `json:"signalword"`
-	Person                 `json:"person"`
-	CasNumber              `json:"casnumber"`
-	CeNumber               `json:"cenumber"`
-	Name                   `json:"name"`
-	ProducerRef            `json:"producerref"`
-	Category               `json:"category"`
-	UnitTemperature        Unit `json:"unit_temperature"`
-
-	ClassOfCompound         []ClassOfCompound        `json:"classofcompound"`
-	Synonyms                []Name                   `json:"synonyms"`
-	Symbols                 []Symbol                 `json:"symbols"`
-	HazardStatements        []HazardStatement        `json:"hazardstatements"`
-	PrecautionaryStatements []PrecautionaryStatement `json:"precautionarystatements"`
-	SupplierRefs            []SupplierRef            `json:"supplierrefs"`
-	Tags                    []Tag                    `json:"tags"`
-
-	Bookmark *Bookmark `json:"bookmark"` // not in db but sqlx requires the "db" entry
-
-	// archived storage count in the logged user entity(ies)
-	ProductASC int `json:"product_asc"` // not in db but sqlx requires the "db" entry
-	// total storage count
-	ProductTSC int `json:"product_tsc"` // not in db but sqlx requires the "db" entry
-	// storage count in the logged user entity(ies)
-	ProductSC int `json:"product_sc"` // not in db but sqlx requires the "db" entry
-	// storage barecode concatenation
-	ProductSL sql.NullString `json:"product_sl"` // not in db but sqlx requires the "db" entry
-	// hazard statement CMR concatenation
-	HazardStatementCMR sql.NullString `json:"hazardstatement_cmr"` // not in db but sqlx requires the "db" entry
-
+	*models.Product
 }
 
 // ProductFromJsJSONValue converts a JS JSON into a
@@ -167,6 +122,10 @@ func (p Product) GetSelect2Id() int {
 
 func (p Product) GetSelect2Text() string {
 
-	return p.Name.NameLabel
+	if p.Product != nil {
+		return p.Name.NameLabel
+	}
+
+	return ""
 
 }

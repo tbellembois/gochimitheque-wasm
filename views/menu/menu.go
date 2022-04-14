@@ -3,11 +3,14 @@ package menu
 import (
 	"syscall/js"
 
+	"github.com/tbellembois/gochimitheque-wasm/globals"
 	"github.com/tbellembois/gochimitheque-wasm/jquery"
 	"github.com/tbellembois/gochimitheque-wasm/jsutils"
 	"github.com/tbellembois/gochimitheque-wasm/views/about"
 	"github.com/tbellembois/gochimitheque-wasm/views/entity"
 	"github.com/tbellembois/gochimitheque-wasm/views/person"
+	"github.com/tbellembois/gochimitheque-wasm/views/personpass"
+	"github.com/tbellembois/gochimitheque-wasm/views/personqrcode"
 	"github.com/tbellembois/gochimitheque-wasm/views/product"
 	"github.com/tbellembois/gochimitheque-wasm/views/storelocation"
 	"github.com/tbellembois/gochimitheque-wasm/views/welcomeannounce"
@@ -41,6 +44,12 @@ func LoadContentWrapper(this js.Value, args []js.Value) interface{} {
 	personCreateCallbackWrapper := func(args ...interface{}) {
 		person.Person_createCallBack(js.Null(), nil)
 	}
+	personpassListCallbackWrapper := func(args ...interface{}) {
+		personpass.PersonPass_listCallback(js.Null(), nil)
+	}
+	personqrcodeListCallbackWrapper := func(args ...interface{}) {
+		personqrcode.PersonQRCode_listCallback(js.Null(), nil)
+	}
 	aboutListCallbackWrapper := func(args ...interface{}) {
 		about.About_listCallback(js.Null(), nil)
 	}
@@ -68,7 +77,9 @@ func LoadContentWrapper(this js.Value, args []js.Value) interface{} {
 	case "Person_create":
 		callbackFunc = personCreateCallbackWrapper
 	case "PersonPass_list":
-		callbackFunc = aboutListCallbackWrapper
+		callbackFunc = personpassListCallbackWrapper
+	case "PersonQRCode_list":
+		callbackFunc = personqrcodeListCallbackWrapper
 	case "WelcomeAnnounce_list":
 		callbackFunc = welcomeannounceListCallbackWrapper
 	case "About_list":
@@ -82,6 +93,11 @@ func LoadContentWrapper(this js.Value, args []js.Value) interface{} {
 }
 
 func ShowIfAuthorizedMenuItems(args ...interface{}) {
+
+	jsutils.IsLDAPUser(globals.ConnectedUserEmail, func() {
+	}, func() {
+		jquery.Jq("#menu_password").FadeIn()
+	})
 
 	jsutils.HasPermission("products", "-2", "get", func() {
 		jquery.Jq("#menu_scan_qrcode").FadeIn()
@@ -97,36 +113,44 @@ func ShowIfAuthorizedMenuItems(args ...interface{}) {
 
 	jsutils.HasPermission("entities", "-2", "get", func() {
 		jquery.Jq("#menu_entities").FadeIn()
+		jquery.Jq("#menu_management").FadeIn()
 	}, func() {
 	})
 
 	jsutils.HasPermission("entities", "", "post", func() {
 		jquery.Jq("#menu_create_entity").FadeIn()
+		jquery.Jq("#menu_management").FadeIn()
 	}, func() {
 	})
 
 	jsutils.HasPermission("entities", "-2", "put", func() {
 		jquery.Jq("#menu_update_welcomeannounce").FadeIn()
+		jquery.Jq("#menu_settings").FadeIn()
+		jquery.Jq("#menu_management").FadeIn()
 	}, func() {
 	})
 
 	jsutils.HasPermission("storages", "-2", "get", func() {
 		jquery.Jq("#menu_storelocations").FadeIn()
+		jquery.Jq("#menu_management").FadeIn()
 	}, func() {
 	})
 
 	jsutils.HasPermission("storelocations", "", "post", func() {
 		jquery.Jq("#menu_create_storelocation").FadeIn()
+		jquery.Jq("#menu_management").FadeIn()
 	}, func() {
 	})
 
 	jsutils.HasPermission("people", "-2", "get", func() {
 		jquery.Jq("#menu_people").FadeIn()
+		jquery.Jq("#menu_management").FadeIn()
 	}, func() {
 	})
 
 	jsutils.HasPermission("people", "", "post", func() {
 		jquery.Jq("#menu_create_person").FadeIn()
+		jquery.Jq("#menu_management").FadeIn()
 	}, func() {
 	})
 

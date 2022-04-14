@@ -9,7 +9,6 @@ import (
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/ajax"
-	"github.com/tbellembois/gochimitheque-wasm/globals"
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
 	"github.com/tbellembois/gochimitheque-wasm/jquery"
 	"github.com/tbellembois/gochimitheque-wasm/jsutils"
@@ -19,6 +18,7 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/views/menu"
 	"github.com/tbellembois/gochimitheque-wasm/views/product"
 	"github.com/tbellembois/gochimitheque-wasm/views/search"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 func GetAnnounce(this js.Value, args []js.Value) interface{} {
@@ -59,7 +59,7 @@ func GetToken(this js.Value, args []js.Value) interface{} {
 		err       error
 	)
 
-	person = &Person{}
+	person = &Person{Person: &models.Person{}}
 	person.PersonEmail = jquery.Jq("#person_email").GetVal().String()
 	person.PersonPassword = jquery.Jq("#person_password").GetVal().String()
 
@@ -73,8 +73,6 @@ func GetToken(this js.Value, args []js.Value) interface{} {
 		Method: "post",
 		Data:   dataBytes,
 		Done: func(data js.Value) {
-
-			globals.LocalStorage.Clear()
 
 			AfterLogin_listCallback(js.Null(), nil)
 
@@ -90,11 +88,87 @@ func GetToken(this js.Value, args []js.Value) interface{} {
 
 }
 
+func ScanQRdone(this js.Value, args []js.Value) interface{} {
+
+	qr := args[0].String()
+
+	var (
+		person    *Person
+		dataBytes []byte
+		err       error
+	)
+
+	person = &Person{Person: &models.Person{}}
+	person.QRCode = []byte(qr)
+
+	if dataBytes, err = json.Marshal(person); err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	ajax.Ajax{
+		URL:    fmt.Sprintf("%sget-token", ApplicationProxyPath),
+		Method: "post",
+		Data:   dataBytes,
+		Done: func(data js.Value) {
+
+			AfterLogin_listCallback(js.Null(), nil)
+
+		},
+		Fail: func(jqXHR js.Value) {
+
+			jsutils.DisplayGenericErrorMessage()
+
+		},
+	}.Send()
+
+	jsutils.CloseQR(js.Null(), nil)
+
+	return nil
+
+}
+
 func GetCaptcha(this js.Value, args []js.Value) interface{} {
 
 	if !validate.NewValidate(jquery.Jq("#authform"), nil).Valid() {
 		return nil
 	}
+
+	var (
+		err    error
+		isLDAP bool
+	)
+
+	email := jquery.Jq("#person_email").GetVal().String()
+
+	ajax.Ajax{
+		URL:    fmt.Sprintf("%speople/isldap/%s", ApplicationProxyPath, email),
+		Method: "get",
+		Done: func(data js.Value) {
+
+			if err = json.Unmarshal([]byte(data.String()), &isLDAP); err != nil {
+				fmt.Println(err)
+			}
+
+			if isLDAP {
+				jsutils.DisplayErrorMessage(locales.Translate("resetpassword_alert_ldap", HTTPHeaderAcceptLanguage))
+			} else {
+				getCaptcha()
+			}
+
+		},
+		Fail: func(jqXHR js.Value) {
+
+			jsutils.DisplayGenericErrorMessage()
+
+		},
+	}.Send()
+
+	return nil
+
+}
+
+func getCaptcha() {
 
 	type captcha struct {
 		Image string `json:"image"`
@@ -129,8 +203,6 @@ func GetCaptcha(this js.Value, args []js.Value) interface{} {
 		},
 	}.Send()
 
-	return nil
-
 }
 
 func ResetPassword(this js.Value, args []js.Value) interface{} {
@@ -141,7 +213,7 @@ func ResetPassword(this js.Value, args []js.Value) interface{} {
 		err       error
 	)
 
-	person = &Person{}
+	person = &Person{Person: &models.Person{}}
 	person.PersonEmail = jquery.Jq("#person_email").GetVal().String()
 	person.CaptchaText = jquery.Jq("#captcha_text").GetVal().String()
 	person.CaptchaUID = jquery.Jq("#captcha_uid").GetVal().String()

@@ -1,12 +1,12 @@
 package types
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type CeNumbers struct {
@@ -15,9 +15,7 @@ type CeNumbers struct {
 }
 
 type CeNumber struct {
-	C             int            `json:"c"` // not stored in db but db:"c" set for sqlx
-	CeNumberID    sql.NullInt64  `json:"cenumber_id"`
-	CeNumberLabel sql.NullString `json:"cenumber_label"`
+	*models.CeNumber
 }
 
 func (elems CeNumbers) GetRowConcreteTypeName() string {
@@ -111,6 +109,10 @@ func (c CeNumber) GetSelect2Id() int {
 
 func (c CeNumber) GetSelect2Text() string {
 
-	return c.CeNumberLabel.String
+	if c.CeNumber != nil {
+		return c.CeNumberLabel.String
+	}
+
+	return ""
 
 }

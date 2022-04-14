@@ -6,6 +6,7 @@ import (
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type Tags struct {
@@ -14,9 +15,7 @@ type Tags struct {
 }
 
 type Tag struct {
-	C        int    `json:"c"` // not stored in db but db:"c" set for sqlx
-	TagID    int    `json:"tag_id"`
-	TagLabel string `json:"tag_label"`
+	*models.Tag
 }
 
 func (elems Tags) GetRowConcreteTypeName() string {
@@ -109,6 +108,10 @@ func (t Tag) GetSelect2Id() int {
 
 func (t Tag) GetSelect2Text() string {
 
-	return t.TagLabel
+	if t.Tag != nil {
+		return t.TagLabel
+	}
+
+	return ""
 
 }

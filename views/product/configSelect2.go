@@ -14,6 +14,7 @@ import (
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
+	"github.com/tbellembois/gochimitheque/models"
 	"honnef.co/go/js/dom/v2"
 )
 
@@ -26,7 +27,11 @@ func Select2StoreLocationTemplateResults(this js.Value, args []js.Value) interfa
 
 	data := args[0]
 
-	storelocation := StoreLocation{}.FromJsJSONValue(data).(StoreLocation)
+	storelocation := StoreLocation{StoreLocation: &models.StoreLocation{}}.FromJsJSONValue(data).(StoreLocation)
+
+	if storelocation.StoreLocation == nil {
+		return jsutils.CreateJsHTMLElementFromString(widgets.NewDiv(widgets.DivAttributes{}).OuterHTML())
+	}
 
 	iconColor := widgets.NewIcon(widgets.IconAttributes{
 		BaseAttributes: widgets.BaseAttributes{
@@ -84,7 +89,11 @@ func Select2StoreLocationTemplateResults(this js.Value, args []js.Value) interfa
 func Select2SymbolTemplateResults(this js.Value, args []js.Value) interface{} {
 
 	data := args[0]
-	symbol := Symbol{}.FromJsJSONValue(data).(Symbol)
+	symbol := Symbol{Symbol: &models.Symbol{}}.FromJsJSONValue(data).(Symbol)
+
+	if symbol.Symbol == nil {
+		return jsutils.CreateJsHTMLElementFromString(widgets.NewDiv(widgets.DivAttributes{}).OuterHTML())
+	}
 
 	image := widgets.NewImg(widgets.ImgAttributes{
 		BaseAttributes: widgets.BaseAttributes{
@@ -116,7 +125,11 @@ func Select2SymbolTemplateResults(this js.Value, args []js.Value) interface{} {
 func Select2HazardStatementTemplateResults(this js.Value, args []js.Value) interface{} {
 
 	data := args[0]
-	hs := HazardStatement{}.FromJsJSONValue(data).(HazardStatement)
+	hs := HazardStatement{HazardStatement: &models.HazardStatement{}}.FromJsJSONValue(data).(HazardStatement)
+
+	if hs.HazardStatement == nil {
+		return jsutils.CreateJsHTMLElementFromString(widgets.NewDiv(widgets.DivAttributes{}).OuterHTML())
+	}
 
 	spanLabel := widgets.NewSpan(widgets.SpanAttributes{
 		BaseAttributes: widgets.BaseAttributes{
@@ -147,7 +160,11 @@ func Select2HazardStatementTemplateResults(this js.Value, args []js.Value) inter
 func Select2PrecautionaryStatementTemplateResults(this js.Value, args []js.Value) interface{} {
 
 	data := args[0]
-	ps := PrecautionaryStatement{}.FromJsJSONValue(data).(PrecautionaryStatement)
+	ps := PrecautionaryStatement{PrecautionaryStatement: &models.PrecautionaryStatement{}}.FromJsJSONValue(data).(PrecautionaryStatement)
+
+	if ps.PrecautionaryStatement == nil {
+		return jsutils.CreateJsHTMLElementFromString(widgets.NewDiv(widgets.DivAttributes{}).OuterHTML())
+	}
 
 	spanLabel := widgets.NewSpan(widgets.SpanAttributes{
 		BaseAttributes: widgets.BaseAttributes{
@@ -223,7 +240,12 @@ func Select2ProducerRefTemplateSelection(this js.Value, args []js.Value) interfa
 
 	data := args[0]
 
-	producerRef := ProducerRef{}.FromJsJSONValue(data).(ProducerRef)
+	producerRef := ProducerRef{ProducerRef: &models.ProducerRef{}}.FromJsJSONValue(data).(ProducerRef)
+
+	if producerRef.ProducerRef == nil {
+		return data.Get("text")
+		// return jsutils.CreateJsHTMLElementFromString(widgets.NewDiv(widgets.DivAttributes{}).OuterHTML())
+	}
 
 	if !producerRef.ProducerRefID.Valid {
 		return data.Get("text")
@@ -298,9 +320,12 @@ func Select2SupplierRefTemplateSelection(this js.Value, args []js.Value) interfa
 
 	data := args[0]
 
-	jsutils.DumpJsObject(data)
+	supplierRef := SupplierRef{SupplierRef: &models.SupplierRef{}}.FromJsJSONValue(data).(SupplierRef)
 
-	supplierRef := SupplierRef{}.FromJsJSONValue(data).(SupplierRef)
+	if supplierRef.SupplierRef == nil {
+		return data.Get("text")
+		// return jsutils.CreateJsHTMLElementFromString(widgets.NewDiv(widgets.DivAttributes{}).OuterHTML())
+	}
 
 	if supplierRef.SupplierRefID == 0 {
 		// Autofill.

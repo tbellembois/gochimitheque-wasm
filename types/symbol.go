@@ -6,6 +6,7 @@ import (
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type Symbols struct {
@@ -14,9 +15,7 @@ type Symbols struct {
 }
 
 type Symbol struct {
-	SymbolID    int    `json:"symbol_id"`
-	SymbolLabel string `json:"symbol_label"`
-	SymbolImage string `json:"symbol_image"`
+	*models.Symbol
 }
 
 func (elems Symbols) GetRowConcreteTypeName() string {
@@ -103,6 +102,10 @@ func (s Symbol) GetSelect2Id() int {
 
 func (s Symbol) GetSelect2Text() string {
 
-	return s.SymbolLabel
+	if s.Symbol != nil {
+		return s.SymbolLabel
+	}
+
+	return ""
 
 }

@@ -1,12 +1,12 @@
 package types
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type HazardStatements struct {
@@ -15,10 +15,7 @@ type HazardStatements struct {
 }
 
 type HazardStatement struct {
-	HazardStatementID        int            `json:"hazardstatement_id"`
-	HazardStatementLabel     string         `json:"hazardstatement_label"`
-	HazardStatementReference string         `json:"hazardstatement_reference"`
-	HazardStatementCMR       sql.NullString `json:"hazardstatement_cmr"`
+	*models.HazardStatement
 }
 
 func (elems HazardStatements) GetRowConcreteTypeName() string {
@@ -105,6 +102,10 @@ func (s HazardStatement) GetSelect2Id() int {
 
 func (s HazardStatement) GetSelect2Text() string {
 
-	return s.HazardStatementReference
+	if s.HazardStatement != nil {
+		return s.HazardStatementReference
+	}
+
+	return ""
 
 }

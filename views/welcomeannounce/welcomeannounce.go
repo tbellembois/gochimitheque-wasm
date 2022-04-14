@@ -11,6 +11,7 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/jsutils"
 	"github.com/tbellembois/gochimitheque-wasm/locales"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 func WelcomeAnnounce_listCallback(this js.Value, args []js.Value) interface{} {
@@ -54,6 +55,8 @@ func SaveWelcomeAnnounce(this js.Value, args []js.Value) interface{} {
 		dataBytes       []byte
 		err             error
 	)
+
+	welcomeAnnounce = WelcomeAnnounce{WelcomeAnnounce: &models.WelcomeAnnounce{}}
 
 	welcomeAnnounce.WelcomeAnnounceText = jquery.Jq("#welcomeannounce_text").GetVal().String()
 	if dataBytes, err = json.Marshal(welcomeAnnounce); err != nil {

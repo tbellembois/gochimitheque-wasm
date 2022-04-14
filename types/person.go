@@ -6,6 +6,7 @@ import (
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type People struct {
@@ -13,13 +14,7 @@ type People struct {
 	Total int       `json:"total"`
 }
 type Person struct {
-	PersonId       int           `json:"person_id"`
-	PersonEmail    string        `json:"person_email"`
-	PersonPassword string        `json:"person_password"`
-	Entities       []*Entity     `json:"entities"`
-	Permissions    []*Permission `json:"permissions"`
-	CaptchaText    string        `json:"captcha_text"`
-	CaptchaUID     string        `json:"captcha_uid"`
+	*models.Person
 }
 
 func (elems People) GetRowConcreteTypeName() string {
@@ -100,12 +95,16 @@ func (p People) GetTotal() int {
 
 func (p Person) GetSelect2Id() int {
 
-	return p.PersonId
+	return p.PersonID
 
 }
 
 func (p Person) GetSelect2Text() string {
 
-	return p.PersonEmail
+	if p.Person != nil {
+		return p.PersonEmail
+	}
+
+	return ""
 
 }

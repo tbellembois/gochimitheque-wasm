@@ -12,6 +12,7 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/locales"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/validate"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 func PersonPass_listCallback(this js.Value, args []js.Value) interface{} {
@@ -54,6 +55,8 @@ func SavePersonPassword(this js.Value, args []js.Value) interface{} {
 		dataBytes []byte
 		err       error
 	)
+
+	person.Person = &models.Person{}
 
 	if !validate.NewValidate(jquery.Jq("#personp"), nil).Valid() {
 		return nil

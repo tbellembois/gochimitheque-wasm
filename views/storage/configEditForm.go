@@ -19,18 +19,8 @@ import (
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/validate"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
+	"github.com/tbellembois/gochimitheque/models"
 )
-
-func Storage_closeQR(this js.Value, args []js.Value) interface{} {
-
-	js.Global().Get("window").Get("qrScanner").Call("destroy")
-	js.Global().Get("window").Set("qrScanner", nil)
-
-	jquery.Jq("#video").AddClass("invisible")
-
-	return nil
-
-}
 
 func ScanQRdone(this js.Value, args []js.Value) interface{} {
 
@@ -42,7 +32,7 @@ func ScanQRdone(this js.Value, args []js.Value) interface{} {
 		Storage_listCallback(js.Null(), nil)
 	}
 
-	Storage_closeQR(js.Null(), nil)
+	jsutils.CloseQR(js.Null(), nil)
 	jsutils.LoadContent("div#content", "storage", fmt.Sprintf("%sv/storages", ApplicationProxyPath), storageCallbackWrapper)
 
 	return nil
@@ -67,7 +57,7 @@ func SaveBorrowing(this js.Value, args []js.Value) interface{} {
 		// of the borrowing modal.
 
 		row := args[2]
-		globals.CurrentStorage = Storage{}.FromJsJSONValue(row)
+		globals.CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 		s = &globals.CurrentStorage
 
 	} else {
@@ -75,8 +65,8 @@ func SaveBorrowing(this js.Value, args []js.Value) interface{} {
 
 		var storageId int
 
-		s = &Storage{}
-		s.Borrowing = &Borrowing{}
+		s = &Storage{Storage: &models.Storage{}}
+		s.Borrowing = &models.Borrowing{}
 
 		// TODO: do not get value from dom
 		if storageId, err = strconv.Atoi(jquery.Jq("input#bstorage_id").GetVal().String()); err != nil {
@@ -104,8 +94,8 @@ func SaveBorrowing(this js.Value, args []js.Value) interface{} {
 	if len(select2Borrower.Select2Data()) > 0 {
 
 		select2ItemBorrower := select2Borrower.Select2Data()[0]
-		s.Borrowing.Borrower = &Person{}
-		if s.Borrowing.Borrower.PersonId, err = strconv.Atoi(select2ItemBorrower.Id); err != nil {
+		s.Borrowing.Borrower = &models.Person{}
+		if s.Borrowing.Borrower.PersonID, err = strconv.Atoi(select2ItemBorrower.Id); err != nil {
 			fmt.Println(err)
 			return nil
 		}
@@ -157,8 +147,8 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	globals.CurrentStorage = Storage{}
-	globals.CurrentStorage.Product = Product{}
+	globals.CurrentStorage = Storage{Storage: &models.Storage{}}
+	globals.CurrentStorage.Product = models.Product{}
 
 	if globals.CurrentStorage.Product.ProductID, err = strconv.Atoi(jquery.Jq("input#product_id").GetVal().String()); err != nil {
 		fmt.Println(err)
@@ -192,7 +182,7 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 	select2StoreLocation := select2.NewSelect2(jquery.Jq("select#storelocation"), nil)
 	if len(select2StoreLocation.Select2Data()) > 0 {
 		select2ItemStorelocation := select2StoreLocation.Select2Data()[0]
-		globals.CurrentStorage.StoreLocation = StoreLocation{}
+		globals.CurrentStorage.StoreLocation = models.StoreLocation{}
 		var storelocationId int
 		if storelocationId, err = strconv.Atoi(select2ItemStorelocation.Id); err != nil {
 			fmt.Println(err)
@@ -223,7 +213,7 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 	select2UnitQuantity := select2.NewSelect2(jquery.Jq("select#unit_quantity"), nil)
 	if len(select2UnitQuantity.Select2Data()) > 0 {
 		select2ItemUnitQuantity := select2UnitQuantity.Select2Data()[0]
-		globals.CurrentStorage.UnitQuantity = Unit{}
+		globals.CurrentStorage.UnitQuantity = models.Unit{}
 		var unitId int
 		if unitId, err = strconv.Atoi(select2ItemUnitQuantity.Id); err != nil {
 			fmt.Println(err)
@@ -254,7 +244,7 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 	select2UnitConcentration := select2.NewSelect2(jquery.Jq("select#unit_concentration"), nil)
 	if len(select2UnitConcentration.Select2Data()) > 0 {
 		select2ItemUnitConcentration := select2UnitConcentration.Select2Data()[0]
-		globals.CurrentStorage.UnitConcentration = Unit{}
+		globals.CurrentStorage.UnitConcentration = models.Unit{}
 		var unitId int
 		if unitId, err = strconv.Atoi(select2ItemUnitConcentration.Id); err != nil {
 			fmt.Println(err)
@@ -273,7 +263,7 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 	select2Supplier := select2.NewSelect2(jquery.Jq("select#supplier"), nil)
 	if len(select2Supplier.Select2Data()) > 0 {
 		select2ItemSupplier := select2Supplier.Select2Data()[0]
-		globals.CurrentStorage.Supplier = Supplier{}
+		globals.CurrentStorage.Supplier = models.Supplier{}
 		var supplierId = -1
 
 		if select2ItemSupplier.IDIsDigit() {

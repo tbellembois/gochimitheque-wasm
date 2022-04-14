@@ -18,12 +18,13 @@ import (
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	storeLocation := StoreLocation{}.FromJsJSONValue(row).(StoreLocation)
+	storeLocation := StoreLocation{StoreLocation: &models.StoreLocation{}}.FromJsJSONValue(row).(StoreLocation)
 
 	jquery.Jq(fmt.Sprintf("button#delete%d", storeLocation.StoreLocationID.Int64)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
@@ -73,7 +74,7 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
 	index := args[3].Int()
-	storeLocation := StoreLocation{}.FromJsJSONValue(row).(StoreLocation)
+	storeLocation := StoreLocation{StoreLocation: &models.StoreLocation{}}.FromJsJSONValue(row).(StoreLocation)
 
 	url := fmt.Sprintf("%sstorelocations/%d", ApplicationProxyPath, storeLocation.StoreLocationID.Int64)
 	method := "get"
@@ -115,7 +116,7 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 func OperateFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
-	storelocation := StoreLocation{}.FromJsJSONValue(row).(StoreLocation)
+	storelocation := StoreLocation{StoreLocation: &models.StoreLocation{}}.FromJsJSONValue(row).(StoreLocation)
 
 	buttonEdit := widgets.NewBSButtonWithIcon(
 		widgets.ButtonAttributes{
@@ -166,7 +167,7 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 func ColorFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
-	storelocation := StoreLocation{}.FromJsJSONValue(row).(StoreLocation)
+	storelocation := StoreLocation{StoreLocation: &models.StoreLocation{}}.FromJsJSONValue(row).(StoreLocation)
 
 	span := widgets.NewSpan(widgets.SpanAttributes{
 		BaseAttributes: widgets.BaseAttributes{
@@ -191,7 +192,7 @@ func ColorFormatter(this js.Value, args []js.Value) interface{} {
 func CanStoreFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
-	storelocation := StoreLocation{}.FromJsJSONValue(row).(StoreLocation)
+	storelocation := StoreLocation{StoreLocation: &models.StoreLocation{}}.FromJsJSONValue(row).(StoreLocation)
 
 	var icon themes.IconFace
 
@@ -215,12 +216,12 @@ func CanStoreFormatter(this js.Value, args []js.Value) interface{} {
 func StoreLocationFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
-	storelocation := StoreLocation{}.FromJsJSONValue(row).(StoreLocation)
+	storelocation := StoreLocation{StoreLocation: &models.StoreLocation{}}.FromJsJSONValue(row).(StoreLocation)
 
 	var storeLocationName string
 
-	if storelocation.StoreLocation != nil {
-		storeLocationName = storelocation.StoreLocation.StoreLocationName.String
+	if storelocation.StoreLocation.StoreLocation != nil {
+		storeLocationName = storelocation.StoreLocation.StoreLocation.StoreLocationName.String
 	}
 
 	span := widgets.NewSpan(widgets.SpanAttributes{

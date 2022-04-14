@@ -16,6 +16,7 @@ import (
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/validate"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 func FillInStoreLocationForm(s StoreLocation, id string) {
@@ -39,9 +40,9 @@ func FillInStoreLocationForm(s StoreLocation, id string) {
 	select2StoreLocation.Select2Clear()
 
 	var parentId, parentName string
-	if s.StoreLocation != nil {
-		parentId = strconv.Itoa(int(s.StoreLocation.StoreLocationID.Int64))
-		parentName = s.StoreLocation.StoreLocationName.String
+	if s.StoreLocation.StoreLocation != nil {
+		parentId = strconv.Itoa(int(s.StoreLocation.StoreLocation.StoreLocationID.Int64))
+		parentName = s.StoreLocation.StoreLocation.StoreLocationName.String
 	}
 	select2StoreLocation.Select2AppendOption(
 		widgets.NewOption(widgets.OptionAttributes{
@@ -67,21 +68,27 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	storelocation = &StoreLocation{}
+	storelocation = &StoreLocation{StoreLocation: &models.StoreLocation{}}
+
 	if jquery.Jq("input#storelocation_id").GetVal().Truthy() {
 		if storelocationId, err = strconv.Atoi(jquery.Jq("input#storelocation_id").GetVal().String()); err != nil {
 			fmt.Println(err)
 			return nil
 		}
+
 		storelocation.StoreLocationID = sql.NullInt64{
 			Int64: int64(storelocationId),
 			Valid: true,
 		}
 	}
-	storelocation.StoreLocationCanStore = sql.NullBool{
-		Bool:  jquery.Jq("input#storelocation_canstore").Prop("checked").(js.Value).Bool(),
-		Valid: true,
+
+	if jquery.Jq("input#storelocation_canstore:checked").Object.Length() > 0 {
+		storelocation.StoreLocationCanStore = sql.NullBool{
+			Bool:  true,
+			Valid: true,
+		}
 	}
+
 	storelocation.StoreLocationName = sql.NullString{
 		String: jquery.Jq("input#storelocation_name").GetVal().String(),
 		Valid:  true,
@@ -92,23 +99,27 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 	}
 
 	select2ItemEntity := select2.NewSelect2(jquery.Jq("select#entity"), nil)
-	storelocation.Entity = Entity{}
+	storelocation.Entity = models.Entity{}
+
 	if storelocation.Entity.EntityID, err = strconv.Atoi(select2ItemEntity.Select2Data()[0].Id); err != nil {
 		fmt.Println(err)
 		return nil
 	}
+
 	storelocation.Entity.EntityName = select2ItemEntity.Select2Data()[0].Text
 
 	select2StoreLocation := select2.NewSelect2(jquery.Jq("select#storelocation"), nil)
 	if len(select2StoreLocation.Select2Data()) > 0 {
 		select2ItemStoreLocation := select2StoreLocation.Select2Data()[0]
 		if !select2ItemStoreLocation.IsEmpty() {
-			storelocation.StoreLocation = &StoreLocation{}
+			storelocation.StoreLocation.StoreLocation = &models.StoreLocation{}
+
 			if storelocationId, err = strconv.Atoi(select2ItemStoreLocation.Id); err != nil {
 				fmt.Println(err)
 				return nil
 			}
-			storelocation.StoreLocation.StoreLocationID = sql.NullInt64{
+
+			storelocation.StoreLocation.StoreLocation.StoreLocationID = sql.NullInt64{
 				Int64: int64(storelocationId),
 				Valid: true,
 			}

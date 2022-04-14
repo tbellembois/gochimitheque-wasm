@@ -1,12 +1,12 @@
 package types
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type Categories struct {
@@ -15,9 +15,7 @@ type Categories struct {
 }
 
 type Category struct {
-	C             int            `json:"c"` // not stored in db but db:"c" set for sqlx
-	CategoryID    sql.NullInt64  `json:"category_id"`
-	CategoryLabel sql.NullString `json:"category_label"`
+	*models.Category
 }
 
 func (elems Categories) GetRowConcreteTypeName() string {
@@ -111,6 +109,10 @@ func (c Category) GetSelect2Id() int {
 
 func (c Category) GetSelect2Text() string {
 
-	return c.CategoryLabel.String
+	if c.Category != nil {
+		return c.CategoryLabel.String
+	}
+
+	return ""
 
 }

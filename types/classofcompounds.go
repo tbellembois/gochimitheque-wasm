@@ -6,6 +6,7 @@ import (
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type ClassesOfCompound struct {
@@ -14,9 +15,7 @@ type ClassesOfCompound struct {
 }
 
 type ClassOfCompound struct {
-	C                    int    `json:"c"` // not stored in db but db:"c" set for sqlx
-	ClassOfCompoundID    int    `json:"classofcompound_id"`
-	ClassOfCompoundLabel string `json:"classofcompound_label"`
+	*models.ClassOfCompound
 }
 
 func (elems ClassesOfCompound) GetRowConcreteTypeName() string {
@@ -110,6 +109,10 @@ func (c ClassOfCompound) GetSelect2Id() int {
 
 func (c ClassOfCompound) GetSelect2Text() string {
 
-	return c.ClassOfCompoundLabel
+	if c.ClassOfCompound != nil {
+		return c.ClassOfCompoundLabel
+	}
+
+	return ""
 
 }

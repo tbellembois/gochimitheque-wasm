@@ -20,6 +20,7 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/views/storelocation"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 func OperateEventsStorelocations(this js.Value, args []js.Value) interface{} {
@@ -29,7 +30,7 @@ func OperateEventsStorelocations(this js.Value, args []js.Value) interface{} {
 	}
 
 	row := args[2]
-	entity := Entity{}.FromJsJSONValue(row).(Entity)
+	entity := Entity{Entity: &models.Entity{}}.FromJsJSONValue(row).(Entity)
 
 	BSTableQueryFilter.Lock()
 	BSTableQueryFilter.QueryFilter.Entity = strconv.Itoa(entity.EntityID)
@@ -48,7 +49,7 @@ func OperateEventsMembers(this js.Value, args []js.Value) interface{} {
 	}
 
 	row := args[2]
-	entity := Entity{}.FromJsJSONValue(row).(Entity)
+	entity := Entity{Entity: &models.Entity{}}.FromJsJSONValue(row).(Entity)
 
 	BSTableQueryFilter.Lock()
 	BSTableQueryFilter.QueryFilter.Entity = strconv.Itoa(entity.EntityID)
@@ -63,7 +64,7 @@ func OperateEventsMembers(this js.Value, args []js.Value) interface{} {
 func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	entity := Entity{}.FromJsJSONValue(row).(Entity)
+	entity := Entity{Entity: &models.Entity{}}.FromJsJSONValue(row).(Entity)
 
 	jquery.Jq(fmt.Sprintf("button#delete%d", entity.EntityID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
@@ -113,7 +114,7 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
 	index := args[3].Int()
-	entity := Entity{}.FromJsJSONValue(row).(Entity)
+	entity := Entity{Entity: &models.Entity{}}.FromJsJSONValue(row).(Entity)
 
 	url := fmt.Sprintf("%sentities/%d", ApplicationProxyPath, entity.EntityID)
 	method := "get"
@@ -155,7 +156,7 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 func OperateFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
-	entity := Entity{}.FromJsJSONValue(row).(Entity)
+	entity := Entity{Entity: &models.Entity{}}.FromJsJSONValue(row).(Entity)
 
 	buttonStorelocations := widgets.NewBSButtonWithIcon(
 		widgets.ButtonAttributes{
@@ -248,14 +249,14 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 func ManagersFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
-	entity := Entity{}.FromJsJSONValue(row).(Entity)
+	entity := Entity{Entity: &models.Entity{}}.FromJsJSONValue(row).(Entity)
 
 	ul := widgets.NewUl(widgets.UlAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
 		}})
 
-	if entity.Managers != nil {
+	if (entity == Entity{} || entity.Managers != nil) {
 		for _, manager := range entity.Managers {
 			li := widgets.NewLi(widgets.LiAttributes{
 				BaseAttributes: widgets.BaseAttributes{Visible: true},
@@ -331,6 +332,10 @@ func ShowIfAuthorizedActionButtons(this js.Value, args []js.Value) interface{} {
 			}, func() {
 			})
 		}
+	}
+
+	if LDAPEnabled {
+		jquery.Jq("#EntityLDAPGroup").FadeIn()
 	}
 
 	return nil

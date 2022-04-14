@@ -6,6 +6,21 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/ajax"
 )
 
+func Select2LDAPGroupAjaxData(this js.Value, args []js.Value) interface{} {
+
+	params := args[0]
+
+	search := ""
+	if params.Get("term").Truthy() {
+		search = params.Get("term").String()
+	}
+
+	return ajax.QueryFilter{
+		Search: search,
+	}.ToJsValue()
+
+}
+
 func Select2ManagerAjaxData(this js.Value, args []js.Value) interface{} {
 
 	params := args[0]

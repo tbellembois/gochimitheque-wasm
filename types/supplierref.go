@@ -6,6 +6,7 @@ import (
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type SupplierRefs struct {
@@ -14,10 +15,7 @@ type SupplierRefs struct {
 }
 
 type SupplierRef struct {
-	C                int       `json:"c"` // not stored in db but db:"c" set for sqlx
-	SupplierRefID    int       `json:"supplierref_id"`
-	SupplierRefLabel string    `json:"supplierref_label"`
-	Supplier         *Supplier `json:"supplier"`
+	*models.SupplierRef
 }
 
 func (elems SupplierRefs) GetRowConcreteTypeName() string {
@@ -127,6 +125,10 @@ func (s SupplierRef) GetSelect2Id() int {
 
 func (s SupplierRef) GetSelect2Text() string {
 
-	return s.SupplierRefLabel
+	if s.SupplierRef != nil {
+		return s.SupplierRefLabel
+	}
+
+	return ""
 
 }

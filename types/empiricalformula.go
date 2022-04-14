@@ -1,12 +1,12 @@
 package types
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type EmpiricalFormulas struct {
@@ -15,9 +15,7 @@ type EmpiricalFormulas struct {
 }
 
 type EmpiricalFormula struct {
-	C                     int            `json:"c"` // not stored in db but db:"c" set for sqlx
-	EmpiricalFormulaID    sql.NullInt64  `json:"empiricalformula_id"`
-	EmpiricalFormulaLabel sql.NullString `json:"empiricalformula_label"`
+	*models.EmpiricalFormula
 }
 
 func (elems EmpiricalFormulas) GetRowConcreteTypeName() string {
@@ -110,6 +108,10 @@ func (e EmpiricalFormula) GetSelect2Id() int {
 
 func (e EmpiricalFormula) GetSelect2Text() string {
 
-	return e.EmpiricalFormulaLabel.String
+	if e.EmpiricalFormula != nil {
+		return e.EmpiricalFormulaLabel.String
+	}
+
+	return ""
 
 }

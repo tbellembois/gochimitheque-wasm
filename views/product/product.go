@@ -19,6 +19,7 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/validate"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 var (
@@ -257,12 +258,12 @@ func product_common() {
 	jquery.Jq("select#producerref").On("select2:select", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
 		select2ProducerrefSelected := args[0].Get("params").Get("data")
-		producerrefSelected := ProducerRef{}.FromJsJSONValue(select2ProducerrefSelected)
+		producerrefSelected := ProducerRef{ProducerRef: &models.ProducerRef{}}.FromJsJSONValue(select2ProducerrefSelected)
 
 		producerref := producerrefSelected.(ProducerRef)
 
 		// If we create a new producerref
-		if producerref.Producer == nil {
+		if (producerref == ProducerRef{} || producerref.Producer == nil) {
 			return nil
 		}
 
@@ -536,144 +537,6 @@ func product_common() {
 		js.Global().Call("load2dimage")
 		return nil
 	}))
-
-}
-
-func ShowIfAuthorizedMenuItems(args ...interface{}) {
-
-	jsutils.HasPermission("products", "-2", "get", func() {
-		jquery.Jq("#menu_scan_qrcode").FadeIn()
-		jquery.Jq("#menu_list_products").FadeIn()
-		jquery.Jq("#menu_list_bookmarks").FadeIn()
-	}, func() {
-	})
-
-	jsutils.HasPermission("products", "", "post", func() {
-		jquery.Jq("#menu_create_product").FadeIn()
-	}, func() {
-	})
-
-	jsutils.HasPermission("entities", "-2", "get", func() {
-		jquery.Jq("#menu_entities").FadeIn()
-	}, func() {
-	})
-
-	jsutils.HasPermission("entities", "", "post", func() {
-		jquery.Jq("#menu_create_entity").FadeIn()
-	}, func() {
-	})
-
-	jsutils.HasPermission("entities", "-2", "put", func() {
-		jquery.Jq("#menu_update_welcomeannounce").FadeIn()
-	}, func() {
-	})
-
-	jsutils.HasPermission("storages", "-2", "get", func() {
-		jquery.Jq("#menu_storelocations").FadeIn()
-	}, func() {
-	})
-
-	jsutils.HasPermission("storelocations", "", "post", func() {
-		jquery.Jq("#menu_create_storelocation").FadeIn()
-	}, func() {
-	})
-
-	jsutils.HasPermission("people", "-2", "get", func() {
-		jquery.Jq("#menu_people").FadeIn()
-	}, func() {
-	})
-
-	jsutils.HasPermission("people", "", "post", func() {
-		jquery.Jq("#menu_create_person").FadeIn()
-	}, func() {
-	})
-
-}
-
-func showStockRecursive(storelocation *StoreLocation, depth int, jqSelector string) {
-
-	// Checking if there is a stock or not for the store location.
-	hasStock := false
-	for _, stock := range storelocation.Stocks {
-		if stock.Total != 0 || stock.Current != 0 {
-			hasStock = true
-			break
-		}
-	}
-
-	if hasStock {
-
-		// Depth.
-		depthSep := ""
-		for i := 0; i <= depth; i++ {
-			depthSep += "<span class='mdi mdi-square-outline'></span>"
-		}
-
-		rowStorelocation := widgets.NewDiv(widgets.DivAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Visible: true,
-				Classes: []string{"row", "iconlabel"},
-			},
-		})
-		rowStorelocation.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Visible: true,
-				Classes: []string{"iconlabel"},
-			},
-			Text: fmt.Sprintf("%s %s", depthSep, storelocation.StoreLocationName.String),
-		}))
-
-		for _, stock := range storelocation.Stocks {
-
-			if !(stock.Total == 0 && stock.Current == 0) {
-
-				rowStorelocation.AppendChild(widgets.NewIcon(widgets.IconAttributes{
-					BaseAttributes: widgets.BaseAttributes{
-						Visible: true,
-						Classes: []string{"ml-sm-2"},
-					},
-					Icon:  themes.NewMdiIcon(themes.MDI_STORELOCATION, ""),
-					Title: locales.Translate("stock_storelocation_title", HTTPHeaderAcceptLanguage),
-				}))
-				rowStorelocation.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
-					BaseAttributes: widgets.BaseAttributes{
-						Visible: true,
-						Classes: []string{""},
-					},
-					Text: fmt.Sprintf("%g %s", stock.Current, stock.Unit.UnitLabel.String),
-				}))
-				rowStorelocation.AppendChild(widgets.NewIcon(widgets.IconAttributes{
-					BaseAttributes: widgets.BaseAttributes{
-						Visible: true,
-						Classes: []string{"ml-sm-2"},
-					},
-					Icon:  themes.NewMdiIcon(themes.MDI_SUBSTORELOCATION, ""),
-					Title: locales.Translate("stock_storelocation_sub_title", HTTPHeaderAcceptLanguage),
-				}))
-				rowStorelocation.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
-					BaseAttributes: widgets.BaseAttributes{
-						Visible: true,
-						Classes: []string{""},
-					},
-					Text: fmt.Sprintf("%g %s", stock.Total, stock.Unit.UnitLabel.String),
-				}))
-
-			}
-
-		}
-
-		jquery.Jq(jqSelector).Append(rowStorelocation.OuterHTML())
-
-	}
-
-	if len(storelocation.Children) > 0 {
-		depth++
-		for _, child := range storelocation.Children {
-
-			showStockRecursive(child, depth, jqSelector)
-
-		}
-	}
 
 }
 

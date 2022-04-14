@@ -17,6 +17,7 @@ import (
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/validate"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
+	"github.com/tbellembois/gochimitheque/models"
 	"honnef.co/go/js/dom/v2"
 )
 
@@ -52,7 +53,10 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 						e.(*dom.HTMLInputElement).SetChecked(true)
 					}
 				} else {
-					Doc.GetElementByID("permw" + p.PermissionItemName + pentityid).(*dom.HTMLInputElement).SetChecked(true)
+					input := Doc.GetElementByID("permw" + p.PermissionItemName + pentityid)
+					if input != nil {
+						input.(*dom.HTMLInputElement).SetChecked(true)
+					}
 				}
 			case "r":
 				if pentityid == "-1" {
@@ -86,7 +90,10 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 						e.(*dom.HTMLInputElement).SetChecked(true)
 					}
 				} else {
-					Doc.GetElementByID("permw" + p.PermissionItemName + pentityid).(*dom.HTMLInputElement).SetChecked(true)
+					input := Doc.GetElementByID("permw" + p.PermissionItemName + pentityid)
+					if input != nil {
+						input.(*dom.HTMLInputElement).SetChecked(true)
+					}
 				}
 			case "r":
 				if pentityid == "-1" {
@@ -188,7 +195,7 @@ func SelectAllEntity(this js.Value, args []js.Value) interface{} {
 					Selected:        true,
 				}).HTMLElement.OuterHTML())
 
-			jquery.Jq("#permissions").Append(widgets.Permission(entity.EntityID, entity.EntityName, false))
+			jquery.Jq("#permissions").Append(widgets.Permission(entity.EntityID, entity.EntityName, false).OuterHTML())
 
 		}
 
@@ -240,7 +247,7 @@ func FillInPersonForm(p Person, id string) {
 	go func() {
 
 		ajax.Ajax{
-			URL:    fmt.Sprintf("%speople/%d/manageentities", ApplicationProxyPath, p.PersonId),
+			URL:    fmt.Sprintf("%speople/%d/manageentities", ApplicationProxyPath, p.PersonID),
 			Method: "get",
 			Done: func(data js.Value) {
 				if err = json.Unmarshal([]byte(data.String()), &managedEntities); err != nil {
@@ -265,7 +272,7 @@ func FillInPersonForm(p Person, id string) {
 	go func() {
 
 		ajax.Ajax{
-			URL:    fmt.Sprintf("%speople/%d/permissions", ApplicationProxyPath, p.PersonId),
+			URL:    fmt.Sprintf("%speople/%d/permissions", ApplicationProxyPath, p.PersonID),
 			Method: "get",
 			Done: func(data js.Value) {
 				if err = json.Unmarshal([]byte(data.String()), &permissions); err != nil {
@@ -287,7 +294,7 @@ func FillInPersonForm(p Person, id string) {
 	go func() {
 
 		ajax.Ajax{
-			URL:    fmt.Sprintf("%speople/%d/entities", ApplicationProxyPath, p.PersonId),
+			URL:    fmt.Sprintf("%speople/%d/entities", ApplicationProxyPath, p.PersonID),
 			Method: "get",
 			Done: func(data js.Value) {
 				if err = json.Unmarshal([]byte(data.String()), &entities); err != nil {
@@ -306,7 +313,7 @@ func FillInPersonForm(p Person, id string) {
 
 	wg.Wait()
 
-	jquery.Jq(fmt.Sprintf("#%s #person_id", id)).SetVal(p.PersonId)
+	jquery.Jq(fmt.Sprintf("#%s #person_id", id)).SetVal(p.PersonID)
 	jquery.Jq(fmt.Sprintf("#%s #person_email", id)).SetVal(p.PersonEmail)
 	jquery.Jq(fmt.Sprintf("#%s #person_password", id)).SetVal("")
 
@@ -340,7 +347,7 @@ func FillInPersonForm(p Person, id string) {
 	// except for managed entities.
 	for _, entity := range entities {
 		if _, ok := managedEntitiesIds[entity.EntityID]; !ok {
-			jquery.Jq("#permissions").Append(widgets.Permission(entity.EntityID, entity.EntityName, false))
+			jquery.Jq("#permissions").Append(widgets.Permission(entity.EntityID, entity.EntityName, false).OuterHTML())
 		}
 	}
 
@@ -362,9 +369,10 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	person = &Person{}
+	person = &Person{Person: &models.Person{}}
+
 	if jquery.Jq("input#person_id").GetVal().Truthy() {
-		if person.PersonId, err = strconv.Atoi(jquery.Jq("input#person_id").GetVal().String()); err != nil {
+		if person.PersonID, err = strconv.Atoi(jquery.Jq("input#person_id").GetVal().String()); err != nil {
 			fmt.Println(err)
 			return nil
 		}
@@ -376,7 +384,7 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 	select2Entities := select2.NewSelect2(jquery.Jq("select#entities"), nil)
 
 	for _, select2Item := range select2Entities.Select2Data() {
-		entity := &Entity{}
+		entity := &models.Entity{}
 		if entity.EntityID, err = strconv.Atoi(select2Item.Id); err != nil {
 			fmt.Println(err)
 			return nil
@@ -388,7 +396,7 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 
 	permissions := jquery.Jq("input[type=radio]:checked").Object
 	for i := 0; i < permissions.Length(); i++ {
-		permission := &Permission{}
+		permission := &models.Permission{}
 
 		permission.PermissionPermName = permissions.Index(i).Call("getAttribute", "perm_name").String()
 		permission.PermissionItemName = permissions.Index(i).Call("getAttribute", "item_name").String()
@@ -408,7 +416,7 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 	}
 
 	if jquery.Jq("form#person input#person_id").Object.Length() > 0 {
-		ajaxURL = fmt.Sprintf("%speople/%d", ApplicationProxyPath, person.PersonId)
+		ajaxURL = fmt.Sprintf("%speople/%d", ApplicationProxyPath, person.PersonID)
 		ajaxMethod = "put"
 	} else {
 		ajaxURL = fmt.Sprintf("%speople", ApplicationProxyPath)

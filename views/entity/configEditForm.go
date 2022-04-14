@@ -15,6 +15,7 @@ import (
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/validate"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 func FillInEntityForm(e Entity, id string) {
@@ -30,12 +31,24 @@ func FillInEntityForm(e Entity, id string) {
 		select2Managers.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            manager.PersonEmail,
-				Value:           strconv.Itoa(manager.PersonId),
+				Value:           strconv.Itoa(manager.PersonID),
 				DefaultSelected: true,
 				Selected:        true,
 			}).HTMLElement.OuterHTML())
 	}
 
+	select2LDAPGroups := select2.NewSelect2(jquery.Jq("select#ldapgroups"), nil)
+
+	select2LDAPGroups.Select2Clear()
+	for _, group := range e.LDAPGroups {
+		select2LDAPGroups.Select2AppendOption(
+			widgets.NewOption(widgets.OptionAttributes{
+				Text:            group,
+				Value:           group,
+				DefaultSelected: true,
+				Selected:        true,
+			}).HTMLElement.OuterHTML())
+	}
 }
 
 func SaveEntity(this js.Value, args []js.Value) interface{} {
@@ -51,26 +64,33 @@ func SaveEntity(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	entity = &Entity{}
+	entity = &Entity{Entity: &models.Entity{}}
+
 	if jquery.Jq("input#entity_id").GetVal().Truthy() {
 		if entity.EntityID, err = strconv.Atoi(jquery.Jq("input#entity_id").GetVal().String()); err != nil {
 			fmt.Println(err)
 			return nil
 		}
 	}
+
 	entity.EntityName = jquery.Jq("input#entity_name").GetVal().String()
 	entity.EntityDescription = jquery.Jq("input#entity_description").GetVal().String()
 
 	select2Managers := select2.NewSelect2(jquery.Jq("select#managers"), nil)
 	for _, select2Item := range select2Managers.Select2Data() {
-		person := &Person{}
-		if person.PersonId, err = strconv.Atoi(select2Item.Id); err != nil {
+		person := &models.Person{}
+		if person.PersonID, err = strconv.Atoi(select2Item.Id); err != nil {
 			fmt.Println(err)
 			return nil
 		}
 		person.PersonEmail = select2Item.Text
 
 		entity.Managers = append(entity.Managers, person)
+	}
+
+	select2LDAPGroups := select2.NewSelect2(jquery.Jq("select#ldapgroups"), nil)
+	for _, select2Item := range select2LDAPGroups.Select2Data() {
+		entity.LDAPGroups = append(entity.LDAPGroups, select2Item.Text)
 	}
 
 	if dataBytes, err = json.Marshal(entity); err != nil {

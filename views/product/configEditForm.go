@@ -17,6 +17,7 @@ import (
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/validate"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 func FillInProductForm(p Product, id string) {
@@ -290,11 +291,12 @@ func FillInProductForm(p Product, id string) {
 	}
 
 	// Chem/Bio/Consu detection.
-	if p.ProductNumberPerCarton.Valid {
+	switch p.ProductType {
+	case "CONS":
 		Consufy()
-	} else if p.ProducerRef.ProducerRefID.Valid {
+	case "BIO":
 		Biofy()
-	} else {
+	default:
 		Chemify()
 	}
 
@@ -312,7 +314,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	globals.CurrentProduct = Product{}
+	globals.CurrentProduct = Product{Product: &models.Product{}}
 	if jquery.Jq("input#product_id").GetVal().Truthy() {
 		if globals.CurrentProduct.ProductID, err = strconv.Atoi(jquery.Jq("input#product_id").GetVal().String()); err != nil {
 			fmt.Println(err)
@@ -363,6 +365,11 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			String: jquery.Jq("input#product_specificity").GetVal().String(),
 			Valid:  true,
 		}
+	} else {
+		globals.CurrentProduct.ProductSpecificity = sql.NullString{
+			String: "",
+			Valid:  true,
+		}
 	}
 
 	if jquery.Jq("input#hidden_product_twodformula_content").Html() != "" {
@@ -375,6 +382,11 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 	if jquery.Jq("input#product_threedformula").GetVal().Truthy() {
 		globals.CurrentProduct.ProductThreeDFormula = sql.NullString{
 			String: jquery.Jq("input#product_threedformula").GetVal().String(),
+			Valid:  true,
+		}
+	} else {
+		globals.CurrentProduct.ProductThreeDFormula = sql.NullString{
+			String: "",
 			Valid:  true,
 		}
 	}
@@ -391,11 +403,21 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			String: jquery.Jq("input#product_sheet").GetVal().String(),
 			Valid:  true,
 		}
+	} else {
+		globals.CurrentProduct.ProductSheet = sql.NullString{
+			String: "",
+			Valid:  true,
+		}
 	}
 
 	if jquery.Jq("input#product_msds").GetVal().Truthy() {
 		globals.CurrentProduct.ProductMSDS = sql.NullString{
 			String: jquery.Jq("input#product_msds").GetVal().String(),
+			Valid:  true,
+		}
+	} else {
+		globals.CurrentProduct.ProductMSDS = sql.NullString{
+			String: "",
 			Valid:  true,
 		}
 	}
@@ -405,11 +427,21 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			String: jquery.Jq("textarea#product_disposalcomment").GetVal().String(),
 			Valid:  true,
 		}
+	} else {
+		globals.CurrentProduct.ProductDisposalComment = sql.NullString{
+			String: "",
+			Valid:  true,
+		}
 	}
 
 	if jquery.Jq("textarea#product_remark").GetVal().Truthy() {
 		globals.CurrentProduct.ProductRemark = sql.NullString{
 			String: jquery.Jq("textarea#product_remark").GetVal().String(),
+			Valid:  true,
+		}
+	} else {
+		globals.CurrentProduct.ProductRemark = sql.NullString{
+			String: "",
 			Valid:  true,
 		}
 	}
@@ -431,7 +463,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 	select2UnitTemperature := select2.NewSelect2(jquery.Jq("select#unit_temperature"), nil)
 	if len(select2UnitTemperature.Select2Data()) > 0 {
 		select2ItemUnitTemperature := select2UnitTemperature.Select2Data()[0]
-		globals.CurrentProduct.UnitTemperature = Unit{}
+		globals.CurrentProduct.UnitTemperature = models.Unit{}
 		var unitTemperatureId int
 		if unitTemperatureId, err = strconv.Atoi(select2ItemUnitTemperature.Id); err != nil {
 			fmt.Println(err)
@@ -450,7 +482,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 	select2CasNumber := select2.NewSelect2(jquery.Jq("select#casnumber"), nil)
 	if len(select2CasNumber.Select2Data()) > 0 {
 		select2ItemCasNumber := select2CasNumber.Select2Data()[0]
-		globals.CurrentProduct.CasNumber = CasNumber{}
+		globals.CurrentProduct.CasNumber = models.CasNumber{}
 		var casNumberId = -1
 
 		if select2ItemCasNumber.IDIsDigit() {
@@ -473,7 +505,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 	select2CeNumber := select2.NewSelect2(jquery.Jq("select#cenumber"), nil)
 	if len(select2CeNumber.Select2Data()) > 0 {
 		select2ItemCeNumber := select2CeNumber.Select2Data()[0]
-		globals.CurrentProduct.CeNumber = CeNumber{}
+		globals.CurrentProduct.CeNumber = models.CeNumber{}
 		var ceNumberId = -1
 
 		if select2ItemCeNumber.IDIsDigit() {
@@ -496,7 +528,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 	select2EmpiricalFormula := select2.NewSelect2(jquery.Jq("select#empiricalformula"), nil)
 	if len(select2EmpiricalFormula.Select2Data()) > 0 {
 		select2ItemEmpiricalFormula := select2EmpiricalFormula.Select2Data()[0]
-		globals.CurrentProduct.EmpiricalFormula = EmpiricalFormula{}
+		globals.CurrentProduct.EmpiricalFormula = models.EmpiricalFormula{}
 		var empiricalFormulaId = -1
 
 		if select2ItemEmpiricalFormula.IDIsDigit() {
@@ -519,7 +551,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 	select2LinearFormula := select2.NewSelect2(jquery.Jq("select#linearformula"), nil)
 	if len(select2LinearFormula.Select2Data()) > 0 {
 		select2ItemLinearFormula := select2LinearFormula.Select2Data()[0]
-		globals.CurrentProduct.LinearFormula = LinearFormula{}
+		globals.CurrentProduct.LinearFormula = models.LinearFormula{}
 		var linearFormulaId = -1
 
 		if select2ItemLinearFormula.IDIsDigit() {
@@ -542,7 +574,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 	select2Name := select2.NewSelect2(jquery.Jq("select#name"), nil)
 	if len(select2Name.Select2Data()) > 0 {
 		select2ItemName := select2Name.Select2Data()[0]
-		globals.CurrentProduct.Name = Name{}
+		globals.CurrentProduct.Name = models.Name{}
 		var nameId = -1
 
 		if select2ItemName.IDIsDigit() {
@@ -559,7 +591,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 	select2PhysicalState := select2.NewSelect2(jquery.Jq("select#physicalstate"), nil)
 	if len(select2PhysicalState.Select2Data()) > 0 {
 		select2ItemPhysicalState := select2PhysicalState.Select2Data()[0]
-		globals.CurrentProduct.PhysicalState = PhysicalState{}
+		globals.CurrentProduct.PhysicalState = models.PhysicalState{}
 		var physicalStateId = -1
 
 		if select2ItemPhysicalState.IDIsDigit() {
@@ -582,7 +614,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 	select2SignalWord := select2.NewSelect2(jquery.Jq("select#signalword"), nil)
 	if len(select2SignalWord.Select2Data()) > 0 {
 		select2ItemSignalWord := select2SignalWord.Select2Data()[0]
-		globals.CurrentProduct.SignalWord = SignalWord{}
+		globals.CurrentProduct.SignalWord = models.SignalWord{}
 		var signalWordId int
 		if signalWordId, err = strconv.Atoi(select2ItemSignalWord.Id); err != nil {
 			fmt.Println(err)
@@ -601,7 +633,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 	select2Category := select2.NewSelect2(jquery.Jq("select#category"), nil)
 	if len(select2Category.Select2Data()) > 0 {
 		select2ItemCategory := select2Category.Select2Data()[0]
-		globals.CurrentProduct.Category = Category{}
+		globals.CurrentProduct.Category = models.Category{}
 		var categoryId = -1
 
 		if select2ItemCategory.IDIsDigit() {
@@ -624,7 +656,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 	select2ProducerRef := select2.NewSelect2(jquery.Jq("select#producerref"), nil)
 	if len(select2ProducerRef.Select2Data()) > 0 {
 		select2ItemProducerRef := select2ProducerRef.Select2Data()[0]
-		globals.CurrentProduct.ProducerRef = ProducerRef{}
+		globals.CurrentProduct.ProducerRef = models.ProducerRef{}
 		var producerrefId = -1
 
 		if select2ItemProducerRef.IDIsDigit() && !(select2ItemProducerRef.Id == select2ItemProducerRef.Text) {
@@ -649,7 +681,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		globals.CurrentProduct.ProducerRef.Producer = &Producer{
+		globals.CurrentProduct.ProducerRef.Producer = &models.Producer{
 			ProducerID: sql.NullInt64{
 				Int64: int64(producerId),
 				Valid: true,
@@ -659,7 +691,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 
 	select2Coc := select2.NewSelect2(jquery.Jq("select#classofcompound"), nil)
 	for _, select2Item := range select2Coc.Select2Data() {
-		classofcompound := ClassOfCompound{}
+		classofcompound := models.ClassOfCompound{}
 		var classofcompoundID = -1
 
 		if select2Item.IDIsDigit() {
@@ -676,7 +708,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 
 	select2Synonyms := select2.NewSelect2(jquery.Jq("select#synonyms"), nil)
 	for _, select2Item := range select2Synonyms.Select2Data() {
-		synonym := Name{}
+		synonym := models.Name{}
 		var nameID = -1
 
 		if select2Item.IDIsDigit() {
@@ -693,7 +725,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 
 	select2Symbols := select2.NewSelect2(jquery.Jq("select#symbols"), nil)
 	for _, select2Item := range select2Symbols.Select2Data() {
-		symbol := Symbol{}
+		symbol := models.Symbol{}
 		if symbol.SymbolID, err = strconv.Atoi(select2Item.Id); err != nil {
 			fmt.Println(err)
 			return nil
@@ -705,7 +737,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 
 	select2HS := select2.NewSelect2(jquery.Jq("select#hazardstatements"), nil)
 	for _, select2Item := range select2HS.Select2Data() {
-		hazardstatement := HazardStatement{}
+		hazardstatement := models.HazardStatement{}
 		if hazardstatement.HazardStatementID, err = strconv.Atoi(select2Item.Id); err != nil {
 			fmt.Println(err)
 			return nil
@@ -717,7 +749,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 
 	select2PS := select2.NewSelect2(jquery.Jq("select#precautionarystatements"), nil)
 	for _, select2Item := range select2PS.Select2Data() {
-		precautionarystatement := PrecautionaryStatement{}
+		precautionarystatement := models.PrecautionaryStatement{}
 		if precautionarystatement.PrecautionaryStatementID, err = strconv.Atoi(select2Item.Id); err != nil {
 			fmt.Println(err)
 			return nil
@@ -729,7 +761,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 
 	select2Tags := select2.NewSelect2(jquery.Jq("select#tags"), nil)
 	for _, select2Item := range select2Tags.Select2Data() {
-		tag := Tag{}
+		tag := models.Tag{}
 		var tagId = -1
 
 		if select2Item.IDIsDigit() {
@@ -746,7 +778,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 
 	select2SupplierRefs := select2.NewSelect2(jquery.Jq("select#supplierrefs"), nil)
 	for _, select2Item := range select2SupplierRefs.Select2Data() {
-		supplierref := SupplierRef{}
+		supplierref := models.SupplierRef{}
 		var supplierrefId = -1
 
 		if select2Item.IDIsDigit() && !strings.HasPrefix(select2Item.Text, fmt.Sprintf("%s@", select2Item.Id)) {
@@ -761,7 +793,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 
 		supplierId := supplierrefToSupplier[supplierref.SupplierRefLabel]
 
-		supplierref.Supplier = &Supplier{
+		supplierref.Supplier = &models.Supplier{
 			SupplierID: sql.NullInt64{
 				Valid: true,
 				Int64: supplierId,

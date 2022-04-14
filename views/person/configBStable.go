@@ -16,17 +16,18 @@ import (
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
+	"github.com/tbellembois/gochimitheque/models"
 	"honnef.co/go/js/dom/v2"
 )
 
 func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
-	person := Person{}.FromJsJSONValue(row).(Person)
+	person := Person{Person: &models.Person{}}.FromJsJSONValue(row).(Person)
 
-	jquery.Jq(fmt.Sprintf("button#delete%d", person.PersonId)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq(fmt.Sprintf("button#delete%d", person.PersonID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-		url := fmt.Sprintf("%speople/%d", ApplicationProxyPath, person.PersonId)
+		url := fmt.Sprintf("%speople/%d", ApplicationProxyPath, person.PersonID)
 		method := "delete"
 
 		done := func(data js.Value) {
@@ -61,8 +62,8 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 		Icon: themes.NewMdiIcon(themes.MDI_CONFIRM, ""),
 		Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
 	})
-	jquery.Jq(fmt.Sprintf("button#delete%d", person.PersonId)).SetHtml("")
-	jquery.Jq(fmt.Sprintf("button#delete%d", person.PersonId)).Append(buttonTitle.OuterHTML())
+	jquery.Jq(fmt.Sprintf("button#delete%d", person.PersonID)).SetHtml("")
+	jquery.Jq(fmt.Sprintf("button#delete%d", person.PersonID)).Append(buttonTitle.OuterHTML())
 
 	return nil
 
@@ -72,9 +73,9 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
 	index := args[3].Int()
-	person := Person{}.FromJsJSONValue(row).(Person)
+	person := Person{Person: &models.Person{}}.FromJsJSONValue(row).(Person)
 
-	url := fmt.Sprintf("%speople/%d", ApplicationProxyPath, person.PersonId)
+	url := fmt.Sprintf("%speople/%d", ApplicationProxyPath, person.PersonID)
 	method := "get"
 
 	done := func(data js.Value) {
@@ -114,22 +115,22 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 func OperateFormatter(this js.Value, args []js.Value) interface{} {
 
 	row := args[1]
-	person := Person{}.FromJsJSONValue(row).(Person)
+	person := Person{Person: &models.Person{}}.FromJsJSONValue(row).(Person)
 
 	buttonEdit := widgets.NewBSButtonWithIcon(
 		widgets.ButtonAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:         "edit" + strconv.Itoa(person.PersonId),
+				Id:         "edit" + strconv.Itoa(person.PersonID),
 				Classes:    []string{"edit"},
 				Visible:    false,
-				Attributes: map[string]string{"pid": strconv.Itoa(person.PersonId)},
+				Attributes: map[string]string{"pid": strconv.Itoa(person.PersonID)},
 			},
 			Title: locales.Translate("edit", HTTPHeaderAcceptLanguage),
 		},
 		widgets.IconAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible:    true,
-				Attributes: map[string]string{"pid": strconv.Itoa(person.PersonId)},
+				Attributes: map[string]string{"pid": strconv.Itoa(person.PersonID)},
 			},
 			Text: "",
 			Icon: themes.NewMdiIcon(themes.MDI_EDIT, ""),
@@ -140,17 +141,17 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	buttonDelete := widgets.NewBSButtonWithIcon(
 		widgets.ButtonAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:         "delete" + strconv.Itoa(person.PersonId),
+				Id:         "delete" + strconv.Itoa(person.PersonID),
 				Classes:    []string{"delete"},
 				Visible:    false,
-				Attributes: map[string]string{"pid": strconv.Itoa(person.PersonId)},
+				Attributes: map[string]string{"pid": strconv.Itoa(person.PersonID)},
 			},
 			Title: locales.Translate("delete", HTTPHeaderAcceptLanguage),
 		},
 		widgets.IconAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible:    true,
-				Attributes: map[string]string{"pid": strconv.Itoa(person.PersonId)},
+				Attributes: map[string]string{"pid": strconv.Itoa(person.PersonID)},
 			},
 			Text: "",
 			Icon: themes.NewMdiIcon(themes.MDI_DELETE, ""),
