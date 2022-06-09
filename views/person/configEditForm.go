@@ -86,7 +86,8 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 			switch p.PermissionPermName {
 			case "w", "all":
 				if pentityid == "-1" {
-					for _, e := range Doc.GetElementsByClassName("permwrproducts") {
+					// for _, e := range Doc.GetElementsByClassName("permwrproducts") {
+					for _, e := range Doc.GetElementsByClassName("permrrproducts") {
 						e.(*dom.HTMLInputElement).SetChecked(true)
 					}
 				} else {
