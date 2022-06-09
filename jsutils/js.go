@@ -530,10 +530,11 @@ func ShowStockRecursive(storelocation *models.StoreLocation, depth int, jqSelect
 
 	// Checking if there is a stock or not for the store location.
 	hasStock := false
+
 	for _, stock := range storelocation.Stocks {
 		if stock.Total != 0 || stock.Current != 0 {
 			hasStock = true
-			break
+			continue
 		}
 	}
 
