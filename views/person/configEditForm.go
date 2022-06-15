@@ -100,16 +100,18 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 				if pentityid == "-1" {
 					for _, e := range Doc.GetElementsByClassName("permrrproducts") {
 						// avoid selecting r if w is already selected
-						eid := e.GetAttribute("entity_id")
-						if !Doc.GetElementByID("permw" + p.PermissionItemName + eid).(*dom.HTMLInputElement).Checked() {
-							e.(*dom.HTMLInputElement).SetChecked(true)
-						}
+						e.(*dom.HTMLInputElement).SetChecked(true)
+						// eid := e.GetAttribute("entity_id")
+						// if !Doc.GetElementByID("permw" + p.PermissionItemName + eid).(*dom.HTMLInputElement).Checked() {
+						// 	e.(*dom.HTMLInputElement).SetChecked(true)
+						// }
 					}
 				} else {
 					// avoid selecting r if w is already selected
-					if !Doc.GetElementByID("permw" + p.PermissionItemName + pentityid).(*dom.HTMLInputElement).Checked() {
-						Doc.GetElementByID("permr" + p.PermissionItemName + pentityid).(*dom.HTMLInputElement).SetChecked(true)
-					}
+					Doc.GetElementByID("permr" + p.PermissionItemName + pentityid).(*dom.HTMLInputElement).SetChecked(true)
+					// if !Doc.GetElementByID("permw" + p.PermissionItemName + pentityid).(*dom.HTMLInputElement).Checked() {
+					// 	Doc.GetElementByID("permr" + p.PermissionItemName + pentityid).(*dom.HTMLInputElement).SetChecked(true)
+					// }
 				}
 			case "n":
 				if pentityid == "-1" {

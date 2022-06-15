@@ -365,11 +365,6 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			String: jquery.Jq("input#product_specificity").GetVal().String(),
 			Valid:  true,
 		}
-	} else {
-		globals.CurrentProduct.ProductSpecificity = sql.NullString{
-			String: "",
-			Valid:  true,
-		}
 	}
 
 	if jquery.Jq("input#hidden_product_twodformula_content").Html() != "" {
@@ -382,11 +377,6 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 	if jquery.Jq("input#product_threedformula").GetVal().Truthy() {
 		globals.CurrentProduct.ProductThreeDFormula = sql.NullString{
 			String: jquery.Jq("input#product_threedformula").GetVal().String(),
-			Valid:  true,
-		}
-	} else {
-		globals.CurrentProduct.ProductThreeDFormula = sql.NullString{
-			String: "",
 			Valid:  true,
 		}
 	}
@@ -403,21 +393,11 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			String: jquery.Jq("input#product_sheet").GetVal().String(),
 			Valid:  true,
 		}
-	} else {
-		globals.CurrentProduct.ProductSheet = sql.NullString{
-			String: "",
-			Valid:  true,
-		}
 	}
 
 	if jquery.Jq("input#product_msds").GetVal().Truthy() {
 		globals.CurrentProduct.ProductMSDS = sql.NullString{
 			String: jquery.Jq("input#product_msds").GetVal().String(),
-			Valid:  true,
-		}
-	} else {
-		globals.CurrentProduct.ProductMSDS = sql.NullString{
-			String: "",
 			Valid:  true,
 		}
 	}
@@ -427,21 +407,11 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 			String: jquery.Jq("textarea#product_disposalcomment").GetVal().String(),
 			Valid:  true,
 		}
-	} else {
-		globals.CurrentProduct.ProductDisposalComment = sql.NullString{
-			String: "",
-			Valid:  true,
-		}
 	}
 
 	if jquery.Jq("textarea#product_remark").GetVal().Truthy() {
 		globals.CurrentProduct.ProductRemark = sql.NullString{
 			String: jquery.Jq("textarea#product_remark").GetVal().String(),
-			Valid:  true,
-		}
-	} else {
-		globals.CurrentProduct.ProductRemark = sql.NullString{
-			String: "",
 			Valid:  true,
 		}
 	}
