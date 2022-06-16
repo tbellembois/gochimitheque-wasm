@@ -459,6 +459,18 @@ func Storage_productFormatter(this js.Value, args []js.Value) interface{} {
 		)
 	}
 
+	if CurrentStorage.Product.ProductSpecificity.Valid {
+		d.AppendChild(
+			widgets.NewSpan(widgets.SpanAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+					Classes: []string{"font-italic"},
+				},
+				Text: CurrentStorage.Product.ProductSpecificity.String,
+			}),
+		)
+	}
+
 	if CurrentStorage.Product.ProducerRef.ProducerRefID.Valid {
 		d.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
