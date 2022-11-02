@@ -110,7 +110,29 @@ func Storage_operateEventsRestore(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
-	jquery.Jq(fmt.Sprintf("button#restore%d", CurrentStorage.StorageID.Int64)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	confirm := widgets.NewLink(
+		widgets.LinkAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Id:      fmt.Sprintf("restore%d", CurrentStorage.StorageID.Int64),
+				Classes: []string{"text-primary", "iconlabel"},
+				Visible: true,
+			},
+			Href: "#",
+			Label: widgets.NewSpan(
+				widgets.SpanAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Classes: []string{"mdi", themes.MDI_CONFIRM.ToString()},
+						Visible: true,
+					},
+					Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
+				},
+			),
+		},
+	).OuterHTML()
+
+	jquery.Jq(fmt.Sprintf("div#confirm%d", CurrentStorage.StorageID.Int64)).SetHtml(confirm)
+
+	jquery.Jq(fmt.Sprintf("a#restore%d", CurrentStorage.StorageID.Int64)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
 		url := fmt.Sprintf("%sstorages/%d/r", ApplicationProxyPath, CurrentStorage.StorageID.Int64)
 		method := "put"
@@ -141,17 +163,6 @@ func Storage_operateEventsRestore(this js.Value, args []js.Value) interface{} {
 		return nil
 
 	}))
-
-	buttonTitle := widgets.NewIcon(widgets.IconAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"iconlabel"},
-		},
-		Icon: themes.NewMdiIcon(themes.MDI_CONFIRM, ""),
-		Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
-	})
-	jquery.Jq(fmt.Sprintf("button#restore%d", CurrentStorage.StorageID.Int64)).SetHtml("")
-	jquery.Jq(fmt.Sprintf("button#restore%d", CurrentStorage.StorageID.Int64)).Append(buttonTitle.OuterHTML())
 
 	return nil
 
