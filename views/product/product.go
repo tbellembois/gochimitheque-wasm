@@ -41,9 +41,9 @@ func LinearToEmpirical(this js.Value, args []js.Value) interface{} {
 	empiricalFormula, err := convert.ToEmpiricalFormula(select2LinearFormula[0].Text)
 
 	if err != nil {
-		jquery.Jq("#convertedEmpiricalFormula").SetHtml(empiricalFormula)
-	} else {
 		jsutils.DisplayErrorMessage(err.Error())
+	} else {
+		jquery.Jq("#convertedEmpiricalFormula").SetHtml(empiricalFormula)
 	}
 
 	return nil
