@@ -1663,6 +1663,14 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 			queryFilter.StoreLocationFilterLabel = i[0].Text
 		}
 	}
+	select2SEntity := select2.NewSelect2(jquery.Jq("select#s_entity"), nil)
+	if select2SEntity.Select2IsInitialized() {
+		i := select2SEntity.Select2Data()
+		if len(i) > 0 {
+			queryFilter.Entity = i[0].Id
+			queryFilter.EntityFilterLabel = i[0].Text
+		}
+	}
 	select2SName := select2.NewSelect2(jquery.Jq("select#s_name"), nil)
 	if select2SName.Select2IsInitialized() {
 		i := select2SName.Select2Data()

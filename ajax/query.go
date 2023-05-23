@@ -41,6 +41,7 @@ type QueryFilter struct {
 	StoreLocationCanStore              bool   `json:"storelocation_canstore,omitempty"`
 	StoreLocationFilterLabel           string
 	Entity                             string `json:"entity,omitempty"`
+	EntityFilterLabel                  string
 	Name                               string `json:"name,omitempty"`
 	NameFilterLabel                    string
 	CasNumber                          string `json:"casnumber,omitempty"`
