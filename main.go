@@ -1,4 +1,4 @@
-//go:build go1.18 && js && wasm
+//go:build go1.21 && js && wasm
 
 package main
 
