@@ -25,8 +25,6 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/views/login"
 	"github.com/tbellembois/gochimitheque-wasm/views/menu"
 	"github.com/tbellembois/gochimitheque-wasm/views/person"
-	"github.com/tbellembois/gochimitheque-wasm/views/personpass"
-	"github.com/tbellembois/gochimitheque-wasm/views/personqrcode"
 	"github.com/tbellembois/gochimitheque-wasm/views/product"
 	"github.com/tbellembois/gochimitheque-wasm/views/storage"
 	"github.com/tbellembois/gochimitheque-wasm/views/storelocation"
@@ -78,7 +76,6 @@ func init() {
 	ApplicationProxyPath = c.AppPath
 	HTTPHeaderAcceptLanguage = c.PersonLanguage
 	DisableCache = c.DisableCache
-	LDAPEnabled = c.LDAPEnabled
 
 	// Initializing the slices of statements for the magic selector.
 	var (
@@ -256,25 +253,12 @@ func main() {
 	js.Global().Set("Person_list", js.FuncOf(person.Person_listCallback))
 	js.Global().Set("Person_create", js.FuncOf(person.Person_createCallBack))
 
-	js.Global().Set("Person_scanQRdone", js.FuncOf(login.ScanQRdone))
-	js.Global().Set("Person_generateQRCode", js.FuncOf(person.GenerateQRCode))
-
 	// Welcome announce
 	js.Global().Set("WelcomeAnnounce_saveWelcomeAnnounce", js.FuncOf(welcomeannounce.SaveWelcomeAnnounce))
 	js.Global().Set("WelcomeAnnounce_list", js.FuncOf(welcomeannounce.WelcomeAnnounce_listCallback))
 
-	// Person password
-	js.Global().Set("PersonPass_savePersonPassword", js.FuncOf(personpass.SavePersonPassword))
-	js.Global().Set("PersonPass_list", js.FuncOf(personpass.PersonPass_listCallback))
-	js.Global().Set("PersonQRCode_list", js.FuncOf(personqrcode.PersonQRCode_listCallback))
-
 	// Login
-	js.Global().Set("Login_getToken", js.FuncOf(login.GetToken))
-	js.Global().Set("Login_getCaptcha", js.FuncOf(login.GetCaptcha))
-	js.Global().Set("Login_resetPassword", js.FuncOf(login.ResetPassword))
 	js.Global().Set("Login_getAnnounce", js.FuncOf(login.GetAnnounce))
-
-	js.Global().Set("Login_list", js.FuncOf(login.Login_listCallback))
 
 	// About
 	js.Global().Set("About_list", js.FuncOf(about.About_listCallback))

@@ -22,13 +22,13 @@ type QueryParams struct {
 // results ("/entities", "/people"...).
 // It is especially used by select2 and bootstraptable.
 type QueryFilter struct {
-	ShowBio                            bool   `json:"showbio,omitempty"`
-	ShowChem                           bool   `json:"showchem,omitempty"`
-	ShowConsu                          bool   `json:"showconsu,omitempty"`
+	ShowBio                            bool   `json:"show_bio,omitempty"`
+	ShowChem                           bool   `json:"show_chem,omitempty"`
+	ShowConsu                          bool   `json:"show_consu,omitempty"`
 	Product                            string `json:"product,omitempty"`
 	ProductFilterLabel                 string
 	ProductBookmark                    bool   `json:"bookmark,omitempty"`
-	ProducerRef                        string `json:"producerref,omitempty"`
+	ProducerRef                        string `json:"producer_ref,omitempty"`
 	ProducerRefFilterLabel             string
 	Storage                            string `json:"storage,omitempty"`
 	StorageFilterLabel                 string
@@ -37,22 +37,22 @@ type QueryFilter struct {
 	UnitType                           string `json:"unit_type,omitempty"`
 	Supplier                           string `json:"supplier,omitempty"`
 	Producer                           string `json:"producer,omitempty"`
-	StoreLocation                      string `json:"storelocation,omitempty"`
-	StoreLocationCanStore              bool   `json:"storelocation_canstore,omitempty"`
+	StoreLocation                      string `json:"store_location,omitempty"`
+	StoreLocationCanStore              bool   `json:"store_location_can_store,omitempty"`
 	StoreLocationFilterLabel           string
 	Entity                             string `json:"entity,omitempty"`
 	EntityFilterLabel                  string
 	Name                               string `json:"name,omitempty"`
 	NameFilterLabel                    string
-	CasNumber                          string `json:"casnumber,omitempty"`
+	CasNumber                          string `json:"cas_number,omitempty"`
 	CasNumberFilterLabel               string
-	EmpiricalFormula                   string `json:"empiricalformula,omitempty"`
+	EmpiricalFormula                   string `json:"empirical_formula,omitempty"`
 	EmpiricalFormulaFilterLabel        string
-	SignalWord                         string `json:"signalword,omitempty"`
+	SignalWord                         string `json:"signal_word,omitempty"`
 	SignalWordFilterLabel              string
-	HazardStatements                   []string `json:"hazardstatements,omitempty"`
+	HazardStatements                   []string `json:"hazard_statements,omitempty"`
 	HazardStatementsFilterLabel        string
-	PrecautionaryStatements            []string `json:"precautionarystatements,omitempty"`
+	PrecautionaryStatements            []string `json:"precautionary_statements,omitempty"`
 	PrecautionaryStatementsFilterLabel string
 	Symbols                            []string `json:"symbols,omitempty"`
 	SymbolsFilterLabel                 string
@@ -64,7 +64,7 @@ type QueryFilter struct {
 	StorageBarecodeFilterLabel         string
 	CustomNamePartOf                   string `json:"custom_name_part_of,omitempty"`
 	CustomNamePartOfFilterLabel        string
-	CasNumberCMR                       bool `json:"casnumber_cmr,omitempty"`
+	CasNumberCMR                       bool `json:"cas_number_cmr,omitempty"`
 	CasNumberCMRFilterLabel            string
 	Borrowing                          bool `json:"borrowing,omitempty"`
 	BorrowingFilterLabel               string
@@ -72,7 +72,7 @@ type QueryFilter struct {
 	StorageToDestroyFilterLabel        string
 	StorageArchive                     bool   `json:"storage_archive,omitempty"`
 	StorageHistory                     bool   `json:"storage_history,omitempty"`
-	StorageBatchNumber                 string `json:"storage_batchnumber,omitempty"`
+	StorageBatchNumber                 string `json:"storage_batch_number,omitempty"`
 	StorageBatchNumberFilterLabel      string
 	Export                             bool `json:"export,omitempty"`
 
@@ -156,10 +156,10 @@ func (q QueryFilter) ToRawQuery() string {
 		values.Set("producer", q.Producer)
 	}
 	if q.StoreLocation != "" {
-		values.Set("storelocation", q.StoreLocation)
+		values.Set("store_location", q.StoreLocation)
 	}
 	if q.ProducerRef != "" {
-		values.Set("producerref", q.ProducerRef)
+		values.Set("producer_ref", q.ProducerRef)
 	}
 	if q.Entity != "" {
 		values.Set("entity", q.Entity)
@@ -168,43 +168,52 @@ func (q QueryFilter) ToRawQuery() string {
 		values.Set("name", q.Name)
 	}
 	if q.CasNumber != "" {
-		values.Set("casnumber", q.CasNumber)
+		values.Set("cas_number", q.CasNumber)
 	}
 	if q.EmpiricalFormula != "" {
-		values.Set("empiricalformula", q.EmpiricalFormula)
+		values.Set("empirical_formula", q.EmpiricalFormula)
 	}
 	if q.SignalWord != "" {
-		values.Set("signalword", q.SignalWord)
+		values.Set("signal_word", q.SignalWord)
 	}
 	if q.Category != "" {
 		values.Set("category", q.Category)
 	}
 	if len(q.HazardStatements) > 0 {
+		hs_ids := ""
 		for _, hs := range q.HazardStatements {
-			values.Set("hazardstatements[]", hs)
+			hs_ids = "," + hs
 		}
+		values.Set("hazard_statements", hs_ids)
 	}
 	if len(q.PrecautionaryStatements) > 0 {
+		ps_ids := ""
 		for _, ps := range q.PrecautionaryStatements {
-			values.Set("precautionarystatements[]", ps)
+			ps_ids = "," + ps
 		}
+		values.Set("precautionary_statements", ps_ids)
+
 	}
 	if len(q.Symbols) > 0 {
+		symbol_ids := ""
 		for _, s := range q.Symbols {
-			values.Set("symbols[]", s)
+			symbol_ids = "," + s
 		}
+		values.Set("symbols", symbol_ids)
 	}
 	if len(q.Tags) > 0 {
+		tag_ids := ""
 		for _, tag := range q.Tags {
-			values.Set("tags[]", tag)
+			tag_ids = "," + tag
 		}
+		values.Set("tags", tag_ids)
 	}
 
 	if q.UnitType != "" {
 		values.Set("unit_type", q.UnitType)
 	}
 	if q.StorageBatchNumber != "" {
-		values.Set("storage_batchnumber", q.StorageBatchNumber)
+		values.Set("storage_batch_number", q.StorageBatchNumber)
 	}
 	if q.StorageBarecode != "" {
 		values.Set("storage_barecode", q.StorageBarecode)
@@ -213,7 +222,7 @@ func (q QueryFilter) ToRawQuery() string {
 		values.Set("custom_name_part_of", q.CustomNamePartOf)
 	}
 	if q.CasNumberCMR {
-		values.Set("casnumber_cmr", strconv.FormatBool(true))
+		values.Set("cas_number_cmr", strconv.FormatBool(true))
 	}
 	if q.Borrowing {
 		values.Set("borrowing", strconv.FormatBool(true))
@@ -235,13 +244,13 @@ func (q QueryFilter) ToRawQuery() string {
 	}
 
 	if q.ShowBio {
-		values.Set("showbio", strconv.FormatBool(true))
+		values.Set("show_bio", strconv.FormatBool(true))
 	}
 	if q.ShowChem {
-		values.Set("showchem", strconv.FormatBool(true))
+		values.Set("show_chem", strconv.FormatBool(true))
 	}
 	if q.ShowConsu {
-		values.Set("showconsu", strconv.FormatBool(true))
+		values.Set("show_consu", strconv.FormatBool(true))
 	}
 
 	return values.Encode()

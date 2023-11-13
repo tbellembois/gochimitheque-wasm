@@ -382,7 +382,6 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 	}
 
 	person.PersonEmail = jquery.Jq("input#person_email").GetVal().String()
-	person.PersonPassword = jquery.Jq("input#person_password").GetVal().String()
 
 	select2Entities := select2.NewSelect2(jquery.Jq("select#entities"), nil)
 

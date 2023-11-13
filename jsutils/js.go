@@ -17,6 +17,10 @@ import (
 	"github.com/tbellembois/gochimitheque/models"
 )
 
+func ConsoleLog(s string) {
+	js.Global().Get("console").Call("log", s)
+}
+
 func CloseQR(this js.Value, args []js.Value) interface{} {
 
 	js.Global().Get("window").Get("qrScanner").Call("destroy")

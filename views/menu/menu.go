@@ -3,14 +3,11 @@ package menu
 import (
 	"syscall/js"
 
-	"github.com/tbellembois/gochimitheque-wasm/globals"
 	"github.com/tbellembois/gochimitheque-wasm/jquery"
 	"github.com/tbellembois/gochimitheque-wasm/jsutils"
 	"github.com/tbellembois/gochimitheque-wasm/views/about"
 	"github.com/tbellembois/gochimitheque-wasm/views/entity"
 	"github.com/tbellembois/gochimitheque-wasm/views/person"
-	"github.com/tbellembois/gochimitheque-wasm/views/personpass"
-	"github.com/tbellembois/gochimitheque-wasm/views/personqrcode"
 	"github.com/tbellembois/gochimitheque-wasm/views/product"
 	"github.com/tbellembois/gochimitheque-wasm/views/storelocation"
 	"github.com/tbellembois/gochimitheque-wasm/views/welcomeannounce"
@@ -44,12 +41,6 @@ func LoadContentWrapper(this js.Value, args []js.Value) interface{} {
 	personCreateCallbackWrapper := func(args ...interface{}) {
 		person.Person_createCallBack(js.Null(), nil)
 	}
-	personpassListCallbackWrapper := func(args ...interface{}) {
-		personpass.PersonPass_listCallback(js.Null(), nil)
-	}
-	personqrcodeListCallbackWrapper := func(args ...interface{}) {
-		personqrcode.PersonQRCode_listCallback(js.Null(), nil)
-	}
 	aboutListCallbackWrapper := func(args ...interface{}) {
 		about.About_listCallback(js.Null(), nil)
 	}
@@ -76,10 +67,6 @@ func LoadContentWrapper(this js.Value, args []js.Value) interface{} {
 		callbackFunc = personCallbackWrapper
 	case "Person_create":
 		callbackFunc = personCreateCallbackWrapper
-	case "PersonPass_list":
-		callbackFunc = personpassListCallbackWrapper
-	case "PersonQRCode_list":
-		callbackFunc = personqrcodeListCallbackWrapper
 	case "WelcomeAnnounce_list":
 		callbackFunc = welcomeannounceListCallbackWrapper
 	case "About_list":
@@ -93,11 +80,6 @@ func LoadContentWrapper(this js.Value, args []js.Value) interface{} {
 }
 
 func ShowIfAuthorizedMenuItems(args ...interface{}) {
-
-	jsutils.IsLDAPUser(globals.ConnectedUserEmail, func() {
-	}, func() {
-		jquery.Jq("#menu_password").FadeIn()
-	})
 
 	jsutils.HasPermission("products", "-2", "get", func() {
 		jquery.Jq("#menu_scan_qrcode").FadeIn()

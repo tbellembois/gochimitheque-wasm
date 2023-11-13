@@ -1,15 +1,11 @@
 package person
 
 import (
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"strconv"
 	"syscall/js"
 
-	"github.com/tbellembois/gochimitheque-wasm/ajax"
 	"github.com/tbellembois/gochimitheque-wasm/bstable"
-	"github.com/tbellembois/gochimitheque-wasm/globals"
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
 	"github.com/tbellembois/gochimitheque-wasm/jquery"
 	"github.com/tbellembois/gochimitheque-wasm/jsutils"
@@ -19,50 +15,6 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/validate"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 )
-
-func GenerateQRCode(this js.Value, args []js.Value) interface{} {
-
-	ajax.Ajax{
-		URL:    fmt.Sprintf("%speople/generateqrcode/%d", ApplicationProxyPath, globals.ConnectedUserID),
-		Method: "get",
-		Done: func(data js.Value) {
-
-			var (
-				person Person
-				err    error
-			)
-
-			if err = json.Unmarshal([]byte(data.String()), &person); err != nil {
-				jsutils.DisplayGenericErrorMessage()
-				return
-			}
-
-			qrcode := base64.StdEncoding.EncodeToString(person.QRCode)
-			qrcodeImg := widgets.NewImg(widgets.ImgAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-					Attributes: map[string]string{
-						"style": "border: 1px solid black;",
-					},
-				},
-				Height: "128px",
-				Width:  "128px",
-				Src:    fmt.Sprintf("data:image/png;base64,%s", qrcode),
-			})
-			jquery.Jq("#qrcode").Empty()
-			jquery.Jq("#qrcode").Append(qrcodeImg.OuterHTML())
-
-		},
-		Fail: func(jqXHR js.Value) {
-
-			jsutils.DisplayGenericErrorMessage()
-
-		},
-	}.Send()
-
-	return nil
-
-}
 
 func person_common() {
 

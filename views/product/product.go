@@ -1,13 +1,14 @@
 package product
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"regexp"
 	"strconv"
 	"syscall/js"
 
-	"github.com/tbellembois/gochimitheque-utils/convert"
+	"github.com/tbellembois/gochimitheque-wasm/ajax"
 	"github.com/tbellembois/gochimitheque-wasm/bstable"
 	"github.com/tbellembois/gochimitheque-wasm/globals"
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
@@ -38,13 +39,32 @@ func LinearToEmpirical(this js.Value, args []js.Value) interface{} {
 		return ""
 	}
 
-	empiricalFormula, err := convert.ToEmpiricalFormula(select2LinearFormula[0].Text)
-
-	if err != nil {
-		jsutils.DisplayErrorMessage(err.Error())
-	} else {
-		jquery.Jq("#convertedEmpiricalFormula").SetHtml(empiricalFormula)
+	ajaxData := struct {
+		EmpiricalFormula string `json:"empiricalformula"`
+	}{
+		EmpiricalFormula: select2LinearFormula[0].Text,
 	}
+
+	var (
+		ajaxDataJson []byte
+		err          error
+	)
+	if ajaxDataJson, err = json.Marshal(ajaxData); err != nil {
+		fmt.Println(err)
+		return ""
+	}
+
+	ajax.Ajax{
+		URL:    fmt.Sprintf("%sformat/product/empiricalformula/", ApplicationProxyPath),
+		Method: "post",
+		Data:   ajaxDataJson,
+		Done: func(data js.Value) {
+			jquery.Jq("#convertedEmpiricalFormula").SetHtml(data)
+		},
+		Fail: func(jqXHR js.Value) {
+			jsutils.DisplayErrorMessage(locales.Translate("empirical_formula_convert_failed", HTTPHeaderAcceptLanguage))
+		},
+	}.Send()
 
 	return nil
 
