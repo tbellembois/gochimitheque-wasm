@@ -37,18 +37,18 @@ func FillInEntityForm(e Entity, id string) {
 			}).HTMLElement.OuterHTML())
 	}
 
-	select2LDAPGroups := select2.NewSelect2(jquery.Jq("select#ldapgroups"), nil)
+	// select2LDAPGroups := select2.NewSelect2(jquery.Jq("select#ldapgroups"), nil)
 
-	select2LDAPGroups.Select2Clear()
-	for _, group := range e.LDAPGroups {
-		select2LDAPGroups.Select2AppendOption(
-			widgets.NewOption(widgets.OptionAttributes{
-				Text:            group,
-				Value:           group,
-				DefaultSelected: true,
-				Selected:        true,
-			}).HTMLElement.OuterHTML())
-	}
+	// select2LDAPGroups.Select2Clear()
+	// for _, group := range e.LDAPGroups {
+	// 	select2LDAPGroups.Select2AppendOption(
+	// 		widgets.NewOption(widgets.OptionAttributes{
+	// 			Text:            group,
+	// 			Value:           group,
+	// 			DefaultSelected: true,
+	// 			Selected:        true,
+	// 		}).HTMLElement.OuterHTML())
+	// }
 }
 
 func SaveEntity(this js.Value, args []js.Value) interface{} {
@@ -88,10 +88,10 @@ func SaveEntity(this js.Value, args []js.Value) interface{} {
 		entity.Managers = append(entity.Managers, person)
 	}
 
-	select2LDAPGroups := select2.NewSelect2(jquery.Jq("select#ldapgroups"), nil)
-	for _, select2Item := range select2LDAPGroups.Select2Data() {
-		entity.LDAPGroups = append(entity.LDAPGroups, select2Item.Text)
-	}
+	// select2LDAPGroups := select2.NewSelect2(jquery.Jq("select#ldapgroups"), nil)
+	// for _, select2Item := range select2LDAPGroups.Select2Data() {
+	// 	entity.LDAPGroups = append(entity.LDAPGroups, select2Item.Text)
+	// }
 
 	if dataBytes, err = json.Marshal(entity); err != nil {
 		fmt.Println(err)

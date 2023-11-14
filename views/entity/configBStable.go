@@ -334,10 +334,6 @@ func ShowIfAuthorizedActionButtons(this js.Value, args []js.Value) interface{} {
 		}
 	}
 
-	if LDAPEnabled {
-		jquery.Jq("#EntityLDAPGroup").FadeIn()
-	}
-
 	return nil
 
 }

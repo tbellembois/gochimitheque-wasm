@@ -14,7 +14,6 @@ var (
 	ConnectedUserEmail                             string
 	ConnectedUserID                                int
 	DisableCache                                   bool
-	LDAPEnabled                                    bool
 	CurrentView                                    string
 	BSTableQueryFilter                             ajax.SafeQueryFilter
 	LocalStorage                                   localstorage.LocalStorage
