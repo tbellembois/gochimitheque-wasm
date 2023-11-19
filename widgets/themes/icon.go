@@ -61,6 +61,7 @@ const (
 	MDI_TOTALSTOCK       IconFace = "mdi-sigma"
 	MDI_REMOVEFILTER     IconFace = "mdi-filter-off"
 	MDI_ARROW_RIGHT      IconFace = "mdi-arrow-right-thin"
+	MDI_VIEW             IconFace = "mdi-eye-outline"
 
 	MDI_16PX IconSize = "mdi-16px"
 	MDI_24PX IconSize = "mdi-24px"

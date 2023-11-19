@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"regexp"
 	"strconv"
+	"strings"
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/ajax"
@@ -609,6 +610,172 @@ func Product_listCallback(this js.Value, args []js.Value) interface{} {
 
 	return nil
 
+}
+
+func Product_pubchemCallback(args ...interface{}) {
+
+	jquery.Jq("#searchbar").Hide()
+	jquery.Jq("#actions").Hide()
+
+}
+
+func PubchemGetCompoundByName(this js.Value, args []js.Value) interface{} {
+
+	var (
+		compounds Compounds
+		err       error
+	)
+
+	name := args[0].String()
+
+	if name == "" {
+		return nil
+	}
+
+	ajax.Ajax{
+		URL:    ApplicationProxyPath + "products/pubchemgetcompoundbyname/" + name,
+		Method: "get",
+		Done: func(data js.Value) {
+
+			if err = json.Unmarshal([]byte(data.String()), &compounds); err != nil {
+				fmt.Println(err)
+			}
+
+			jquery.Jq("#pubchemcompound").Empty()
+
+			for _, pccompound := range compounds.PCCompounds {
+				jquery.Jq("#pubchemcompound").Append(
+					widgets.NewSpan(widgets.SpanAttributes{
+						BaseAttributes: widgets.BaseAttributes{
+							Visible: true,
+							Classes: []string{"iconlabel"},
+						},
+						Text: "cid ",
+					}).OuterHTML())
+				jquery.Jq("#pubchemcompound").Append(
+					widgets.NewSpan(widgets.SpanAttributes{
+						BaseAttributes: widgets.BaseAttributes{
+							Visible: true,
+						},
+						Text: fmt.Sprint(pccompound.ID.ID.CID),
+					}).OuterHTML())
+				jquery.Jq("#pubchemcompound").Append(widgets.NewBr(widgets.BrAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+					},
+				}).OuterHTML())
+
+				for _, prop := range pccompound.Props {
+
+					propval := ""
+					if prop.Value.Ival != nil {
+						propval = fmt.Sprint(*prop.Value.Ival)
+					} else if prop.Value.Fval != nil {
+						propval = strconv.FormatFloat(*prop.Value.Fval, 'f', 64, 64)
+					} else if prop.Value.Sval != nil {
+						propval = *prop.Value.Sval
+					} else {
+						propval = *prop.Value.Binary
+					}
+
+					jquery.Jq("#pubchemcompound").Append(
+						widgets.NewSpan(widgets.SpanAttributes{
+							BaseAttributes: widgets.BaseAttributes{
+								Visible: true,
+								Classes: []string{"iconlabel"},
+							},
+							Text: prop.URN.Name + " " + prop.URN.Label + " ",
+						}).OuterHTML())
+					jquery.Jq("#pubchemcompound").Append(
+						widgets.NewSpan(widgets.SpanAttributes{
+							BaseAttributes: widgets.BaseAttributes{
+								Visible: true,
+							},
+							Text: propval,
+						}).OuterHTML())
+					jquery.Jq("#pubchemcompound").Append(widgets.NewBr(widgets.BrAttributes{
+						BaseAttributes: widgets.BaseAttributes{
+							Visible: true,
+						},
+					}).OuterHTML())
+				}
+			}
+
+		},
+		Fail: func(jqXHR js.Value) {
+
+			jsutils.DisplayGenericErrorMessage()
+
+		},
+	}.Send()
+	return nil
+}
+
+func PubchemSearch(this js.Value, args []js.Value) interface{} {
+
+	var (
+		autocomplete Autocomplete
+		err          error
+	)
+
+	search := jquery.Jq("input#searchpubchem").GetVal().String()
+	search = strings.Trim(search, " ")
+
+	if search == "" {
+		return nil
+	}
+
+	ajax.Ajax{
+		URL:    ApplicationProxyPath + "products/pubchemautocomplete/" + search,
+		Method: "get",
+		Done: func(data js.Value) {
+
+			if err = json.Unmarshal([]byte(data.String()), &autocomplete); err != nil {
+				fmt.Println(err)
+			}
+
+			jquery.Jq("#pubchemsearchresult").Empty()
+			jquery.Jq("#pubchemcompound").Empty()
+
+			for _, compound := range autocomplete.DictionaryTerms.Compound {
+
+				var icon widgets.Widget
+				icon.HTMLElement = widgets.NewIcon(widgets.IconAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+					},
+					Text: compound,
+					Icon: themes.NewMdiIcon(themes.MDI_VIEW, themes.MDI_24PX),
+				})
+
+				compoundLink := widgets.NewLink(widgets.LinkAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+						Classes: []string{"iconlabel"},
+					},
+					Onclick: "Product_pubchemGetCompoundByName('" + compound + "')",
+					Title:   compound,
+					Href:    "#",
+					Label:   icon,
+				})
+
+				jquery.Jq("#pubchemsearchresult").Append(compoundLink.OuterHTML())
+				jquery.Jq("#pubchemsearchresult").Append(widgets.NewBr(widgets.BrAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+					},
+				}).OuterHTML())
+
+			}
+
+		},
+		Fail: func(jqXHR js.Value) {
+
+			jsutils.DisplayGenericErrorMessage()
+
+		},
+	}.Send()
+	return nil
 }
 
 var ProductCreateCallbackWrapper = func(this js.Value, args []js.Value) interface{} {

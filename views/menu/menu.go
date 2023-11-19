@@ -23,6 +23,9 @@ func LoadContentWrapper(this js.Value, args []js.Value) interface{} {
 	productCreateCallbackWrapper := func(args ...interface{}) {
 		product.Product_createCallback(js.Null(), nil)
 	}
+	productPubchemCallbackWrapper := func(args ...interface{}) {
+		product.Product_pubchemCallback(js.Null(), nil)
+	}
 	entityCallbackWrapper := func(args ...interface{}) {
 		entity.Entity_listCallback(js.Null(), nil)
 	}
@@ -55,6 +58,8 @@ func LoadContentWrapper(this js.Value, args []js.Value) interface{} {
 		callbackFunc = productCallbackWrapper
 	case "Product_create":
 		callbackFunc = productCreateCallbackWrapper
+	case "Product_pubchem":
+		callbackFunc = productPubchemCallbackWrapper
 	case "Entity_list":
 		callbackFunc = entityCallbackWrapper
 	case "Entity_create":
@@ -85,6 +90,7 @@ func ShowIfAuthorizedMenuItems(args ...interface{}) {
 		jquery.Jq("#menu_scan_qrcode").FadeIn()
 		jquery.Jq("#menu_list_products").FadeIn()
 		jquery.Jq("#menu_list_bookmarks").FadeIn()
+		jquery.Jq("#menu_pubchem").FadeIn()
 	}, func() {
 	})
 
