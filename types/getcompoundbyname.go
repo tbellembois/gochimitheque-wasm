@@ -32,4 +32,5 @@ type PCCompound struct {
 
 type Compounds struct {
 	PCCompounds []PCCompound `json:"PC_Compounds"`
+	Base64Png   string       `json:"base64_png"`
 }

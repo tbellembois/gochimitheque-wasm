@@ -645,6 +645,21 @@ func PubchemGetCompoundByName(this js.Value, args []js.Value) interface{} {
 
 			for _, pccompound := range compounds.PCCompounds {
 				jquery.Jq("#pubchemcompound").Append(
+					widgets.NewImg(widgets.ImgAttributes{
+						BaseAttributes: widgets.BaseAttributes{
+							Visible: true,
+						},
+						Src:   fmt.Sprintf("data:image/png;base64,%s", compounds.Base64Png),
+						Alt:   "2dpng",
+						Title: "2dpng",
+					}).OuterHTML())
+				jquery.Jq("#pubchemcompound").Append(widgets.NewBr(widgets.BrAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+					},
+				}).OuterHTML())
+
+				jquery.Jq("#pubchemcompound").Append(
 					widgets.NewSpan(widgets.SpanAttributes{
 						BaseAttributes: widgets.BaseAttributes{
 							Visible: true,
