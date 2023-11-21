@@ -619,6 +619,49 @@ func Product_pubchemCallback(args ...interface{}) {
 
 }
 
+func displaySection(section Section) {
+
+	if section.Information != nil {
+		for _, information := range *section.Information {
+
+			jquery.Jq("#pubchemcompound").Append(
+				widgets.NewSpan(widgets.SpanAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+						Classes: []string{"iconlabel"},
+					},
+					Text: information.Name,
+				}).OuterHTML())
+
+			if information.Value.StringWithMarkup != nil {
+				for _, value := range *information.Value.StringWithMarkup {
+					jquery.Jq("#pubchemcompound").Append(
+						widgets.NewSpan(widgets.SpanAttributes{
+							BaseAttributes: widgets.BaseAttributes{
+								Visible: true,
+							},
+							Text: value.String,
+						}).OuterHTML())
+				}
+			}
+
+			jquery.Jq("#pubchemcompound").Append(widgets.NewBr(widgets.BrAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+				},
+			}).OuterHTML())
+
+		}
+	}
+
+	if section.Section != nil {
+		for _, sectionChild := range *section.Section {
+			displaySection(sectionChild)
+		}
+	}
+
+}
+
 func PubchemGetCompoundByName(this js.Value, args []js.Value) interface{} {
 
 	var (
@@ -679,6 +722,10 @@ func PubchemGetCompoundByName(this js.Value, args []js.Value) interface{} {
 						Visible: true,
 					},
 				}).OuterHTML())
+
+				for _, section := range compounds.Record.Record.Section {
+					displaySection(section)
+				}
 
 				for _, prop := range pccompound.Props {
 
