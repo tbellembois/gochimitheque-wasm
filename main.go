@@ -176,6 +176,7 @@ func main() {
 
 	js.Global().Set("Product_pubchemSearch", js.FuncOf(product.PubchemSearch))
 	js.Global().Set("Product_pubchemGetCompoundByName", js.FuncOf(product.PubchemGetCompoundByName))
+	js.Global().Set("Product_pubchemGetProductByName", js.FuncOf(product.PubchemGetProductByName))
 
 	js.Global().Set("Common_search", js.FuncOf(jsutils.Search))
 	js.Global().Set("Common_clearSearch", js.FuncOf(jsutils.ClearSearch))
