@@ -696,47 +696,35 @@ func PubchemGetProductByName(this js.Value, args []js.Value) interface{} {
 			jquery.Jq("#pubchemcompound").Empty()
 
 			// 2dpicture.
-			jquery.Jq("#pubchemcompound").Append(
-				widgets.NewImg(widgets.ImgAttributes{
-					BaseAttributes: widgets.BaseAttributes{
-						Visible: true,
-					},
-					Src:   fmt.Sprintf("data:image/png;base64,%s", *pubchemProduct.Twodpicture),
-					Alt:   "2dpng",
-					Title: "2dpng",
-				}).OuterHTML())
-			jquery.Jq("#pubchemcompound").Append(widgets.NewBr(widgets.BrAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-				},
-			}).OuterHTML())
+			jquery.Jq("#pubchemcompound").Append(`<div id="2dimage" class="row pb-3"></div>`)
+			jquery.Jq("#pubchemcompound #2dimage").Append(`<img alt="2dpng" style="border: 1px solid grey;" title="2dpng" src="` + fmt.Sprintf("data:image/png;base64,%s", *pubchemProduct.Twodpicture) + `"></img>`)
 
 			// Name.
 			if pubchemProduct.Name != nil {
-				jquery.Jq("#pubchemcompound").Append(`<div id="name" class="row"></div>`)
-				jquery.Jq("#pubchemcompound #name").Append(`<div class="iconlabel col-sm-3">name</div>`)
-				jquery.Jq("#pubchemcompound #name").Append(`<div class="col-sm-9">` + trimDoubleQuotes(*pubchemProduct.Name) + `</div>`)
+				jquery.Jq("#pubchemcompound").Append(`<div id="name" class="row pb-3"></div>`)
+				jquery.Jq("#pubchemcompound #name").Append(`<div class="iconlabel col-sm-auto">name</div>`)
+				jquery.Jq("#pubchemcompound #name").Append(`<div class="col-sm-auto">` + trimDoubleQuotes(*pubchemProduct.Name) + `</div>`)
 			}
 
 			// Molecular formula
 			if pubchemProduct.MolecularFormula != nil {
-				jquery.Jq("#pubchemcompound").Append(`<div id="molecular_formula" class="row"></div>`)
-				jquery.Jq("#pubchemcompound #molecular_formula").Append(`<div class="iconlabel col-sm-3">molecular_formula</div>`)
-				jquery.Jq("#pubchemcompound #molecular_formula").Append(`<div class="col-sm-9">` + trimDoubleQuotes(*pubchemProduct.MolecularFormula) + `</div>`)
+				jquery.Jq("#pubchemcompound").Append(`<div id="molecular_formula" class="row pb-3"></div>`)
+				jquery.Jq("#pubchemcompound #molecular_formula").Append(`<div class="iconlabel col-sm-auto">molecular_formula</div>`)
+				jquery.Jq("#pubchemcompound #molecular_formula").Append(`<div class="col-sm-auto">` + trimDoubleQuotes(*pubchemProduct.MolecularFormula) + `</div>`)
 			}
 
 			// CAS
 			if pubchemProduct.Cas != nil {
-				jquery.Jq("#pubchemcompound").Append(`<div id="cas" class="row"></div>`)
-				jquery.Jq("#pubchemcompound #cas").Append(`<div class="iconlabel col-sm-3">cas</div>`)
-				jquery.Jq("#pubchemcompound #cas").Append(`<div class="col-sm-9">` + trimDoubleQuotes(*pubchemProduct.Cas) + `</div>`)
+				jquery.Jq("#pubchemcompound").Append(`<div id="cas" class="row pb-3"></div>`)
+				jquery.Jq("#pubchemcompound #cas").Append(`<div class="iconlabel col-sm-auto">cas</div>`)
+				jquery.Jq("#pubchemcompound #cas").Append(`<div class="col-sm-auto">` + trimDoubleQuotes(*pubchemProduct.Cas) + `</div>`)
 			}
 
 			// EC
 			if pubchemProduct.Ec != nil {
-				jquery.Jq("#pubchemcompound").Append(`<div id="ec" class="row"></div>`)
-				jquery.Jq("#pubchemcompound #ec").Append(`<div class="iconlabel col-sm-3">ec</div>`)
-				jquery.Jq("#pubchemcompound #ec").Append(`<div class="col-sm-9">` + trimDoubleQuotes(*pubchemProduct.Ec) + `</div>`)
+				jquery.Jq("#pubchemcompound").Append(`<div id="ec" class="row pb-3"></div>`)
+				jquery.Jq("#pubchemcompound #ec").Append(`<div class="iconlabel col-sm-auto">ec</div>`)
+				jquery.Jq("#pubchemcompound #ec").Append(`<div class="col-sm-auto">` + trimDoubleQuotes(*pubchemProduct.Ec) + `</div>`)
 			}
 
 			// Molecular weight
@@ -747,37 +735,37 @@ func PubchemGetProductByName(this js.Value, args []js.Value) interface{} {
 					mw += " " + *pubchemProduct.MolecularWeightUnit
 				}
 
-				jquery.Jq("#pubchemcompound").Append(`<div id="molecular_weight" class="row"></div>`)
-				jquery.Jq("#pubchemcompound #molecular_weight").Append(`<div class="iconlabel col-sm-3">molecular_weight</div>`)
-				jquery.Jq("#pubchemcompound #molecular_weight").Append(`<div class="col-sm-9">` + trimDoubleQuotes(mw) + `</div>`)
+				jquery.Jq("#pubchemcompound").Append(`<div id="molecular_weight" class="row pb-3"></div>`)
+				jquery.Jq("#pubchemcompound #molecular_weight").Append(`<div class="iconlabel col-sm-auto">molecular_weight</div>`)
+				jquery.Jq("#pubchemcompound #molecular_weight").Append(`<div class="col-sm-auto">` + trimDoubleQuotes(mw) + `</div>`)
 			}
 
 			// Inchi
 			if pubchemProduct.Inchi != nil {
-				jquery.Jq("#pubchemcompound").Append(`<div id="inchi" class="row"></div>`)
-				jquery.Jq("#pubchemcompound #inchi").Append(`<div class="iconlabel col-sm-3">inchi</div>`)
-				jquery.Jq("#pubchemcompound #inchi").Append(`<div class="col-sm-9">` + trimDoubleQuotes(*pubchemProduct.Inchi) + `</div>`)
+				jquery.Jq("#pubchemcompound").Append(`<div id="inchi" class="row pb-3"></div>`)
+				jquery.Jq("#pubchemcompound #inchi").Append(`<div class="iconlabel col-sm-auto">inchi</div>`)
+				jquery.Jq("#pubchemcompound #inchi").Append(`<div class="col-sm-auto">` + trimDoubleQuotes(*pubchemProduct.Inchi) + `</div>`)
 			}
 
 			// Inchi key
 			if pubchemProduct.InchiKey != nil {
-				jquery.Jq("#pubchemcompound").Append(`<div id="inchi_key" class="row"></div>`)
-				jquery.Jq("#pubchemcompound #inchi_key").Append(`<div class="iconlabel col-sm-3">inchi_key</div>`)
-				jquery.Jq("#pubchemcompound #inchi_key").Append(`<div class="col-sm-9">` + trimDoubleQuotes(*pubchemProduct.InchiKey) + `</div>`)
+				jquery.Jq("#pubchemcompound").Append(`<div id="inchi_key" class="row pb-3"></div>`)
+				jquery.Jq("#pubchemcompound #inchi_key").Append(`<div class="iconlabel col-sm-auto">inchi_key</div>`)
+				jquery.Jq("#pubchemcompound #inchi_key").Append(`<div class="col-sm-auto">` + trimDoubleQuotes(*pubchemProduct.InchiKey) + `</div>`)
 			}
 
 			// Canonical SMILES
 			if pubchemProduct.CanonicalSmiles != nil {
-				jquery.Jq("#pubchemcompound").Append(`<div id="canonical_smiles" class="row"></div>`)
-				jquery.Jq("#pubchemcompound #canonical_smiles").Append(`<div class="iconlabel col-sm-3">canonical_smiles</div>`)
-				jquery.Jq("#pubchemcompound #canonical_smiles").Append(`<div class="col-sm-9">` + trimDoubleQuotes(*pubchemProduct.CanonicalSmiles) + `</div>`)
+				jquery.Jq("#pubchemcompound").Append(`<div id="canonical_smiles" class="row pb-3"></div>`)
+				jquery.Jq("#pubchemcompound #canonical_smiles").Append(`<div class="iconlabel col-sm-auto">canonical_smiles</div>`)
+				jquery.Jq("#pubchemcompound #canonical_smiles").Append(`<div class="col-sm-auto">` + trimDoubleQuotes(*pubchemProduct.CanonicalSmiles) + `</div>`)
 			}
 
 			// Symbols.
 			if pubchemProduct.Symbols != nil {
-				jquery.Jq("#pubchemcompound").Append(`<div id="symbols" class="row"></div>`)
-				jquery.Jq("#pubchemcompound #symbols").Append(`<div class="iconlabel col-sm-3">symbols</div>`)
-				jquery.Jq("#pubchemcompound #symbols").Append(`<div id="symbols_content" class="col-sm-9"></div>`)
+				jquery.Jq("#pubchemcompound").Append(`<div id="symbols" class="row pb-3"></div>`)
+				jquery.Jq("#pubchemcompound #symbols").Append(`<div class="iconlabel col-sm-auto">symbols</div>`)
+				jquery.Jq("#pubchemcompound #symbols").Append(`<div id="symbols_content" class="col-sm-auto"></div>`)
 
 				for _, sym := range *pubchemProduct.Symbols {
 					jquery.Jq("#pubchemcompound #symbols #symbols_content").Append(`<img src='` + trimDoubleQuotes(sym) + `' alt="symbol">`)
@@ -786,9 +774,9 @@ func PubchemGetProductByName(this js.Value, args []js.Value) interface{} {
 
 			// Signal.
 			if pubchemProduct.Signal != nil {
-				jquery.Jq("#pubchemcompound").Append(`<div id="signal" class="row"></div>`)
-				jquery.Jq("#pubchemcompound #signal").Append(`<div class="iconlabel col-sm-3">signal</div>`)
-				jquery.Jq("#pubchemcompound #signal").Append(`<div id="signal_content" class="col-sm-9"></div>`)
+				jquery.Jq("#pubchemcompound").Append(`<div id="signal" class="row pb-3"></div>`)
+				jquery.Jq("#pubchemcompound #signal").Append(`<div class="iconlabel col-sm-auto">signal</div>`)
+				jquery.Jq("#pubchemcompound #signal").Append(`<div id="signal_content" class="col-sm-auto"></div>`)
 
 				for _, syn := range *pubchemProduct.Signal {
 					jquery.Jq("#pubchemcompound #signal #signal_content").Append(`<li>` + trimDoubleQuotes(syn) + `</li>`)
@@ -797,31 +785,31 @@ func PubchemGetProductByName(this js.Value, args []js.Value) interface{} {
 
 			// HS.
 			if pubchemProduct.Hs != nil {
-				jquery.Jq("#pubchemcompound").Append(`<div id="hazard_statement" class="row"></div>`)
-				jquery.Jq("#pubchemcompound #hazard_statement").Append(`<div class="iconlabel col-sm-3">hazard statements</div>`)
-				jquery.Jq("#pubchemcompound #hazard_statement").Append(`<div id="hazard_statement_content" class="col-sm-9"></div>`)
+				jquery.Jq("#pubchemcompound").Append(`<div id="hazard_statement" class="row pb-3"></div>`)
+				jquery.Jq("#pubchemcompound #hazard_statement").Append(`<div class="iconlabel col-sm-auto">hazard statements</div>`)
+				jquery.Jq("#pubchemcompound #hazard_statement").Append(`<div id="hazard_statement_content" class="col-sm-auto"></div>`)
 
 				for _, hs := range *pubchemProduct.Hs {
-					jquery.Jq("#pubchemcompound #hazard_statement #hazard_statement_content").Append(`<li>` + trimDoubleQuotes(hs) + `</li>`)
+					jquery.Jq("#pubchemcompound #hazard_statement #hazard_statement_content").Append(`<span class="badge badge-secondary mr-1">` + trimDoubleQuotes(hs) + `</span>`)
 				}
 			}
 
 			// PS.
 			if pubchemProduct.Ps != nil {
-				jquery.Jq("#pubchemcompound").Append(`<div id="precautionary_statement" class="row"></div>`)
-				jquery.Jq("#pubchemcompound #precautionary_statement").Append(`<div class="iconlabel col-sm-3">precautionary statements</div>`)
-				jquery.Jq("#pubchemcompound #precautionary_statement").Append(`<div id="precautionary_statement_content" class="col-sm-9"></div>`)
+				jquery.Jq("#pubchemcompound").Append(`<div id="precautionary_statement" class="row pb-3"></div>`)
+				jquery.Jq("#pubchemcompound #precautionary_statement").Append(`<div class="iconlabel col-sm-auto">precautionary statements</div>`)
+				jquery.Jq("#pubchemcompound #precautionary_statement").Append(`<div id="precautionary_statement_content" class="col-sm-auto"></div>`)
 
 				for _, ps := range *pubchemProduct.Ps {
-					jquery.Jq("#pubchemcompound #precautionary_statement #precautionary_statement_content").Append(`<li>` + trimDoubleQuotes(ps) + `</li>`)
+					jquery.Jq("#pubchemcompound #precautionary_statement #precautionary_statement_content").Append(`<span class="badge badge-secondary mr-1">` + trimDoubleQuotes(ps) + `</span>`)
 				}
 			}
 
 			// Synonyms.
 			if pubchemProduct.Synonyms != nil {
-				jquery.Jq("#pubchemcompound").Append(`<div id="synonyms" class="row"></div>`)
-				jquery.Jq("#pubchemcompound #synonyms").Append(`<div class="iconlabel col-sm-3">synonyms</div>`)
-				jquery.Jq("#pubchemcompound #synonyms").Append(`<div id="synonyms_content" class="col-sm-9"></div>`)
+				jquery.Jq("#pubchemcompound").Append(`<div id="synonyms" class="row pb-3"></div>`)
+				jquery.Jq("#pubchemcompound #synonyms").Append(`<div class="iconlabel col-sm-auto">synonyms</div>`)
+				jquery.Jq("#pubchemcompound #synonyms").Append(`<div id="synonyms_content" class="col-sm-auto"></div>`)
 
 				for _, syn := range *pubchemProduct.Synonyms {
 					jquery.Jq("#pubchemcompound #synonyms #synonyms_content").Append(`<li>` + trimDoubleQuotes(syn) + `</li>`)
@@ -979,34 +967,7 @@ func PubchemSearch(this js.Value, args []js.Value) interface{} {
 			jquery.Jq("#pubchemcompound").Empty()
 
 			for _, compound := range autocomplete.DictionaryTerms.Compound {
-
-				var icon widgets.Widget
-				icon.HTMLElement = widgets.NewIcon(widgets.IconAttributes{
-					BaseAttributes: widgets.BaseAttributes{
-						Visible: true,
-					},
-					Text: compound,
-					Icon: themes.NewMdiIcon(themes.MDI_VIEW, themes.MDI_24PX),
-				})
-
-				compoundLink := widgets.NewLink(widgets.LinkAttributes{
-					BaseAttributes: widgets.BaseAttributes{
-						Visible: true,
-						Classes: []string{"iconlabel"},
-					},
-					Onclick: "Product_pubchemGetProductByName('" + compound + "')",
-					Title:   compound,
-					Href:    "#",
-					Label:   icon,
-				})
-
-				jquery.Jq("#pubchemsearchresult").Append(compoundLink.OuterHTML())
-				jquery.Jq("#pubchemsearchresult").Append(widgets.NewBr(widgets.BrAttributes{
-					BaseAttributes: widgets.BaseAttributes{
-						Visible: true,
-					},
-				}).OuterHTML())
-
+				jquery.Jq("#pubchemcompound").Append(`<div class="row"><div class="col-sm-auto mx-auto"><a href="#" onclick="Product_pubchemGetProductByName('` + compound + `')">` + compound + `</a></div></div>`)
 			}
 
 		},
