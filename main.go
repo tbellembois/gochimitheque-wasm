@@ -30,9 +30,8 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/views/storelocation"
 	"github.com/tbellembois/gochimitheque-wasm/views/welcomeannounce"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
-	"github.com/tbellembois/gochimitheque/data"
-	"github.com/tbellembois/gochimitheque/models"
-	"github.com/tbellembois/gochimitheque/request"
+
+	"github.com/tbellembois/gochimitheque-wasm/models"
 )
 
 var (
@@ -45,6 +44,17 @@ func keepAlive() {
 	for {
 		<-signal
 	}
+}
+
+// Container is a struct passed to the view.
+type Container struct {
+	PersonEmail    string `json:"PersonEmail"`
+	PersonLanguage string `json:"PersonLanguage"`
+	PersonID       int    `json:"PersonID"`
+	AppURL         string `json:"AppURL"`
+	AppPath        string `json:"AppPath"`
+	BuildID        string `json:"BuildID"`
+	DisableCache   bool   `json:"DisableCache"`
 }
 
 func init() {
@@ -67,7 +77,7 @@ func init() {
 	// TODO: factorize the js and wasm functions.
 	CurrentView = "product"
 
-	var c request.Container
+	var c Container
 	cString := js.Global().Get("JSON").Call("stringify", js.Global().Get("c")).String()
 	if err = json.Unmarshal([]byte(cString), &c); err != nil {
 		panic(err)
@@ -82,7 +92,7 @@ func init() {
 		r       *csv.Reader
 		records [][]string
 	)
-	r = csv.NewReader(strings.NewReader(data.PRECAUTIONARYSTATEMENT))
+	r = csv.NewReader(strings.NewReader(globals.PRECAUTIONARYSTATEMENT))
 	r.Comma = '\t'
 	if records, err = r.ReadAll(); err != nil {
 		panic(err)
@@ -97,7 +107,7 @@ func init() {
 			}})
 	}
 
-	r = csv.NewReader(strings.NewReader(data.HAZARDSTATEMENT))
+	r = csv.NewReader(strings.NewReader(globals.HAZARDSTATEMENT))
 	r.Comma = '\t'
 	if records, err = r.ReadAll(); err != nil {
 		panic(err)
@@ -285,6 +295,8 @@ func main() {
 		login.Login_listCallback(js.Null(), nil)
 	}
 	jsutils.LoadContent("div#content", "login", fmt.Sprintf("%slogin", ApplicationProxyPath), loginCallbackWrapper)
+
+	fmt.Println("wasm loaded")
 
 	keepAlive()
 

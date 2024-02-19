@@ -1,15 +1,17 @@
 package types
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
+	"github.com/barweiss/go-tuple"
+	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
-	"github.com/tbellembois/gochimitheque/models"
 )
 
-type Suppliers struct {
+type Select2Suppliers struct {
 	Rows  []*Supplier `json:"rows"`
 	Total int         `json:"total"`
 }
@@ -18,13 +20,13 @@ type Supplier struct {
 	*models.Supplier
 }
 
-func (elems Suppliers) GetRowConcreteTypeName() string {
+func (elems Select2Suppliers) GetRowConcreteTypeName() string {
 
 	return "Supplier"
 
 }
 
-func (elems Suppliers) IsExactMatch() bool {
+func (elems Select2Suppliers) IsExactMatch() bool {
 
 	return false
 
@@ -46,23 +48,42 @@ func (s *Supplier) MarshalJSON() ([]byte, error) {
 
 }
 
-func (Suppliers) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
+func (Select2Suppliers) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 
 	var (
-		suppliers Suppliers
-		err       error
+		suppliersAjaxResponse tuple.T2[[]struct {
+			MatchExactSearch bool   `json:"match_exact_search"`
+			SupplierID       int64  `json:"supplier_id"`
+			SupplierLabel    string `json:"supplier_label"`
+		}, int]
+		select2Suppliers Select2Suppliers
+		err              error
 	)
 
 	jsSuppliersString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
-	if err = json.Unmarshal([]byte(jsSuppliersString), &suppliers); err != nil {
-		fmt.Println(err)
+	if err = json.Unmarshal([]byte(jsSuppliersString), &suppliersAjaxResponse); err != nil {
+		fmt.Println("(Suppliers) FromJsJSONValue:" + err.Error())
 	}
 
-	return suppliers
+	for _, supplier := range suppliersAjaxResponse.V1 {
+		select2Suppliers.Rows = append(select2Suppliers.Rows, &Supplier{
+			&models.Supplier{
+				MatchExactSearch: supplier.MatchExactSearch,
+				SupplierID:       sql.NullInt64{Int64: supplier.SupplierID, Valid: true},
+				SupplierLabel:    sql.NullString{String: supplier.SupplierLabel, Valid: true},
+			},
+		})
+	}
+
+	select2Suppliers.Total = suppliersAjaxResponse.V2
+
+	fmt.Println(select2Suppliers)
+
+	return select2Suppliers
 
 }
 
-func (s Suppliers) GetRows() []select2.Select2ItemAble {
+func (s Select2Suppliers) GetRows() []select2.Select2ItemAble {
 
 	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(s.Rows))
 
@@ -74,7 +95,7 @@ func (s Suppliers) GetRows() []select2.Select2ItemAble {
 
 }
 
-func (r Suppliers) GetTotal() int {
+func (r Select2Suppliers) GetTotal() int {
 
 	return r.Total
 

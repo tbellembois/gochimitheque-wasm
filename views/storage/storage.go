@@ -142,7 +142,7 @@ func storage_common() {
 			URL:            ApplicationProxyPath + "products/suppliers/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Suppliers{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Suppliers{})),
 		},
 	}).Select2ify()
 

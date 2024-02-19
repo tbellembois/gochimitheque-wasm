@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"syscall/js"
 
-	"github.com/tbellembois/gochimitheque/models"
+	"github.com/tbellembois/gochimitheque-wasm/models"
 )
 
 type Storages struct {

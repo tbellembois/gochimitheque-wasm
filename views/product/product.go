@@ -16,12 +16,12 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/jquery"
 	"github.com/tbellembois/gochimitheque-wasm/jsutils"
 	"github.com/tbellembois/gochimitheque-wasm/locales"
+	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/validate"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
-	"github.com/tbellembois/gochimitheque/models"
 )
 
 var (
@@ -341,7 +341,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "products/suppliers/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Suppliers{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Suppliers{})),
 		},
 	}).Select2ify()
 
@@ -806,15 +806,15 @@ func PubchemGetProductByName(this js.Value, args []js.Value) interface{} {
 			}
 
 			// Synonyms.
-			if pubchemProduct.Synonyms != nil {
-				jquery.Jq("#pubchemcompound").Append(`<div id="synonyms" class="row pb-3"></div>`)
-				jquery.Jq("#pubchemcompound #synonyms").Append(`<div class="iconlabel col-sm-auto">synonyms</div>`)
-				jquery.Jq("#pubchemcompound #synonyms").Append(`<div id="synonyms_content" class="col-sm-auto"></div>`)
+			// if pubchemProduct.Synonyms != nil {
+			// 	jquery.Jq("#pubchemcompound").Append(`<div id="synonyms" class="row pb-3"></div>`)
+			// 	jquery.Jq("#pubchemcompound #synonyms").Append(`<div class="iconlabel col-sm-auto">synonyms</div>`)
+			// 	jquery.Jq("#pubchemcompound #synonyms").Append(`<div id="synonyms_content" class="col-sm-auto"></div>`)
 
-				for _, syn := range *pubchemProduct.Synonyms {
-					jquery.Jq("#pubchemcompound #synonyms #synonyms_content").Append(`<li>` + trimDoubleQuotes(syn) + `</li>`)
-				}
-			}
+			// 	for _, syn := range *pubchemProduct.Synonyms {
+			// 		jquery.Jq("#pubchemcompound #synonyms #synonyms_content").Append(`<li>` + trimDoubleQuotes(syn) + `</li>`)
+			// 	}
+			// }
 		},
 		Fail: func(jqXHR js.Value) {
 
