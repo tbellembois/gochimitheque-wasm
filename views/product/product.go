@@ -329,7 +329,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "products/supplierrefs/",
 			DataType:       "json",
 			Data:           js.FuncOf(Select2SupplierRefAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(SupplierRefs{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2SupplierRefs{})),
 		},
 	}).Select2ify()
 

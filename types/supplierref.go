@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"syscall/js"
 
+	"github.com/barweiss/go-tuple"
 	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
-type SupplierRefs struct {
+type Select2SupplierRefs struct {
 	Rows  []*SupplierRef `json:"rows"`
 	Total int            `json:"total"`
 }
@@ -18,7 +19,7 @@ type SupplierRef struct {
 	*models.SupplierRef
 }
 
-func (elems SupplierRefs) GetRowConcreteTypeName() string {
+func (elems Select2SupplierRefs) GetRowConcreteTypeName() string {
 
 	return "SupplierRef"
 
@@ -40,10 +41,10 @@ func (s SupplierRef) ToJsValue() js.Value {
 
 }
 
-func (elems SupplierRefs) IsExactMatch() bool {
+func (elems Select2SupplierRefs) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {
-		if elem.C == 1 {
+		if elem.MatchExactSearch {
 			return true
 		}
 	}
@@ -67,23 +68,40 @@ func (s SupplierRef) MarshalJSON() ([]byte, error) {
 
 }
 
-func (SupplierRefs) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
+func (Select2SupplierRefs) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 
 	var (
-		supplierRefs SupplierRefs
-		err          error
+		suppliersAjaxResponse tuple.T2[[]struct {
+			MatchExactSearch bool   `json:"match_exact_search"`
+			SupplierRefID    int64  `json:"supplierref_id"`
+			SupplierRefLabel string `json:"supplierref_label"`
+		}, int]
+		select2SupplierRefs Select2SupplierRefs
+		err                 error
 	)
 
-	jsSupplierRefsString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
-	if err = json.Unmarshal([]byte(jsSupplierRefsString), &supplierRefs); err != nil {
-		fmt.Println(err)
+	jsSuppliersString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
+	if err = json.Unmarshal([]byte(jsSuppliersString), &suppliersAjaxResponse); err != nil {
+		fmt.Println("(Select2SupplierRefs) FromJsJSONValue:" + err.Error())
 	}
 
-	return supplierRefs
+	for _, supplierref := range suppliersAjaxResponse.V1 {
+		select2SupplierRefs.Rows = append(select2SupplierRefs.Rows, &SupplierRef{
+			&models.SupplierRef{
+				MatchExactSearch: supplierref.MatchExactSearch,
+				SupplierRefID:    int(supplierref.SupplierRefID),
+				SupplierRefLabel: supplierref.SupplierRefLabel,
+			},
+		})
+	}
+
+	select2SupplierRefs.Total = suppliersAjaxResponse.V2
+
+	return select2SupplierRefs
 
 }
 
-func (s SupplierRefs) GetRows() []select2.Select2ItemAble {
+func (s Select2SupplierRefs) GetRows() []select2.Select2ItemAble {
 
 	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(s.Rows))
 
@@ -95,7 +113,7 @@ func (s SupplierRefs) GetRows() []select2.Select2ItemAble {
 
 }
 
-func (s SupplierRefs) GetTotal() int {
+func (s Select2SupplierRefs) GetTotal() int {
 
 	return s.Total
 
