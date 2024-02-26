@@ -1,15 +1,17 @@
 package types
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
+	"github.com/barweiss/go-tuple"
 	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
-type Producers struct {
+type Select2Producers struct {
 	Rows  []*Producer `json:"rows"`
 	Total int         `json:"total"`
 }
@@ -18,13 +20,13 @@ type Producer struct {
 	*models.Producer
 }
 
-func (elems Producers) GetRowConcreteTypeName() string {
+func (elems Select2Producers) GetRowConcreteTypeName() string {
 
 	return "Producer"
 
 }
 
-func (elems Producers) IsExactMatch() bool {
+func (elems Select2Producers) IsExactMatch() bool {
 
 	return false
 
@@ -46,23 +48,40 @@ func (r *Producer) MarshalJSON() ([]byte, error) {
 
 }
 
-func (Producers) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
+func (Select2Producers) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 
 	var (
-		producers Producers
-		err       error
+		producersAjaxResponse tuple.T2[[]struct {
+			MatchExactSearch bool   `json:"match_exact_search"`
+			ProducerID       int64  `json:"producer_id"`
+			ProducerLabel    string `json:"producer_label"`
+		}, int]
+		select2Producers Select2Producers
+		err              error
 	)
 
 	jsProducersString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
-	if err = json.Unmarshal([]byte(jsProducersString), &producers); err != nil {
-		fmt.Println(err)
+	if err = json.Unmarshal([]byte(jsProducersString), &producersAjaxResponse); err != nil {
+		fmt.Println("(Select2Producers) FromJsJSONValue:" + err.Error())
 	}
 
-	return producers
+	for _, producer := range producersAjaxResponse.V1 {
+		select2Producers.Rows = append(select2Producers.Rows, &Producer{
+			&models.Producer{
+				MatchExactSearch: producer.MatchExactSearch,
+				ProducerID:       sql.NullInt64{Int64: producer.ProducerID, Valid: true},
+				ProducerLabel:    sql.NullString{String: producer.ProducerLabel, Valid: true},
+			},
+		})
+	}
+
+	select2Producers.Total = producersAjaxResponse.V2
+
+	return select2Producers
 
 }
 
-func (r Producers) GetRows() []select2.Select2ItemAble {
+func (r Select2Producers) GetRows() []select2.Select2ItemAble {
 
 	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(r.Rows))
 
@@ -74,7 +93,7 @@ func (r Producers) GetRows() []select2.Select2ItemAble {
 
 }
 
-func (r Producers) GetTotal() int {
+func (r Select2Producers) GetTotal() int {
 
 	return r.Total
 

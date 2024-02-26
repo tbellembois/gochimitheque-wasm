@@ -276,7 +276,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "products/producerrefs/",
 			DataType:       "json",
 			Data:           js.FuncOf(Select2ProducerRefAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(ProducerRefs{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2ProducerRefs{})),
 		},
 	}).Select2ify()
 	jquery.Jq("select#producerref").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -314,7 +314,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "products/producers/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Producers{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Producers{})),
 		},
 	}).Select2ify()
 

@@ -114,7 +114,7 @@ func Search_listCallback(args ...interface{}) {
 			URL:            ApplicationProxyPath + "products/producerrefs/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(ProducerRefs{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2ProducerRefs{})),
 		},
 	}).Select2ify()
 
