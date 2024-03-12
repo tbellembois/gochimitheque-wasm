@@ -7,7 +7,7 @@ type PrecautionaryStatement struct {
 	PrecautionaryStatementReference string `db:"precautionarystatement_reference" json:"precautionarystatement_reference" schema:"precautionarystatement_reference"`
 }
 
-func (ps PrecautionaryStatement) SetC(count int) Searchable {
+func (ps PrecautionaryStatement) SetMatchExactSearch(MatchExactSearch bool) Searchable {
 	return ps
 }
 

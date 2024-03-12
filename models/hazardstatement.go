@@ -10,7 +10,7 @@ type HazardStatement struct {
 	HazardStatementCMR       sql.NullString `db:"hazardstatement_cmr" json:"hazardstatement_cmr" schema:"hazardstatement_cmr" `
 }
 
-func (hs HazardStatement) SetC(count int) Searchable {
+func (hs HazardStatement) SetMatchExactSearch(MatchExactSearch bool) Searchable {
 	return hs
 }
 

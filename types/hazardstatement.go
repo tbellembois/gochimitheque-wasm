@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"syscall/js"
 
+	"github.com/barweiss/go-tuple"
 	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
-type HazardStatements struct {
+type Select2HazardStatements struct {
 	Rows  []*HazardStatement `json:"rows"`
 	Total int                `json:"total"`
 }
@@ -18,13 +19,13 @@ type HazardStatement struct {
 	*models.HazardStatement
 }
 
-func (elems HazardStatements) GetRowConcreteTypeName() string {
+func (elems Select2HazardStatements) GetRowConcreteTypeName() string {
 
 	return "HazardStatement"
 
 }
 
-func (elems HazardStatements) IsExactMatch() bool {
+func (elems Select2HazardStatements) IsExactMatch() bool {
 
 	return false
 
@@ -44,23 +45,38 @@ func (s *HazardStatement) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (HazardStatements) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
-
+func (Select2HazardStatements) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 	var (
-		hazardStatements HazardStatements
-		err              error
+		hazardstatementsAjaxResponse tuple.T2[[]struct {
+			// MatchExactSearch     bool   `json:"match_exact_search"`
+			HazardStatementID    int64  `json:"hazardstatement_id"`
+			HazardStatementLabel string `json:"hazardstatement_label"`
+		}, int]
+		select2HazardStatements Select2HazardStatements
+		err                     error
 	)
 
 	jsHazardStatementsString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
-	if err = json.Unmarshal([]byte(jsHazardStatementsString), &hazardStatements); err != nil {
-		fmt.Println(err)
+	if err = json.Unmarshal([]byte(jsHazardStatementsString), &hazardstatementsAjaxResponse); err != nil {
+		fmt.Println("(Select2HazardStatements) FromJsJSONValue:" + err.Error())
 	}
 
-	return hazardStatements
+	for _, hazardstatement := range hazardstatementsAjaxResponse.V1 {
+		select2HazardStatements.Rows = append(select2HazardStatements.Rows, &HazardStatement{
+			&models.HazardStatement{
+				// MatchExactSearch:     hazardstatement.MatchExactSearch,
+				HazardStatementID:    int(hazardstatement.HazardStatementID),
+				HazardStatementLabel: hazardstatement.HazardStatementLabel,
+			},
+		})
+	}
 
+	select2HazardStatements.Total = hazardstatementsAjaxResponse.V2
+
+	return select2HazardStatements
 }
 
-func (s HazardStatements) GetRows() []select2.Select2ItemAble {
+func (s Select2HazardStatements) GetRows() []select2.Select2ItemAble {
 
 	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(s.Rows))
 
@@ -72,7 +88,7 @@ func (s HazardStatements) GetRows() []select2.Select2ItemAble {
 
 }
 
-func (s HazardStatements) GetTotal() int {
+func (s Select2HazardStatements) GetTotal() int {
 
 	return s.Total
 

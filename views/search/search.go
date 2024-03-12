@@ -21,7 +21,6 @@ import (
 )
 
 func Search_listCallback(args ...interface{}) {
-
 	select2.NewSelect2(jquery.Jq("select#s_tags"), &select2.Select2Config{
 		Placeholder:    locales.Translate("s_tags", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Tag{})),
@@ -30,7 +29,7 @@ func Search_listCallback(args ...interface{}) {
 			URL:            ApplicationProxyPath + "products/tags/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Tags{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Tags{})),
 		},
 	}).Select2ify()
 
@@ -42,7 +41,7 @@ func Search_listCallback(args ...interface{}) {
 			URL:            ApplicationProxyPath + "products/categories/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Categories{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Categories{})),
 		},
 	}).Select2ify()
 
@@ -54,7 +53,7 @@ func Search_listCallback(args ...interface{}) {
 			URL:            ApplicationProxyPath + "entities",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Entities{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Entities{})),
 		},
 	}).Select2ify()
 
@@ -78,7 +77,7 @@ func Search_listCallback(args ...interface{}) {
 			URL:            ApplicationProxyPath + "products/casnumbers/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(CasNumbers{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2CasNumbers{})),
 		},
 	}).Select2ify()
 
@@ -90,7 +89,7 @@ func Search_listCallback(args ...interface{}) {
 			URL:            ApplicationProxyPath + "products/names/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Names{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Names{})),
 		},
 	}).Select2ify()
 
@@ -102,7 +101,7 @@ func Search_listCallback(args ...interface{}) {
 			URL:            ApplicationProxyPath + "products/empiricalformulas/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(EmpiricalFormulas{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2EmpiricalFormulas{})),
 		},
 	}).Select2ify()
 
@@ -126,7 +125,7 @@ func Search_listCallback(args ...interface{}) {
 			URL:            ApplicationProxyPath + "products/signalwords/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(SignalWords{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2SignalWords{})),
 		},
 	}).Select2ify()
 
@@ -138,7 +137,7 @@ func Search_listCallback(args ...interface{}) {
 			URL:            ApplicationProxyPath + "products/symbols/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Symbols{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Symbols{})),
 		},
 	}).Select2ify()
 
@@ -150,7 +149,7 @@ func Search_listCallback(args ...interface{}) {
 			URL:            ApplicationProxyPath + "products/hazardstatements/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(HazardStatements{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2HazardStatements{})),
 		},
 	}).Select2ify()
 
@@ -162,13 +161,12 @@ func Search_listCallback(args ...interface{}) {
 			URL:            ApplicationProxyPath + "products/precautionarystatements/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(PrecautionaryStatements{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2PrecautionaryStatements{})),
 		},
 	}).Select2ify()
 
 	// Works only with no select2.
 	jquery.Jq("#search input").On("keyup", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-
 		event := args[0]
 		if !event.Get("which").IsUndefined() && event.Get("which").Int() == 13 {
 
@@ -178,12 +176,10 @@ func Search_listCallback(args ...interface{}) {
 		}
 
 		return nil
-
 	}))
 
 	// Stock.
 	jquery.Jq("#s_storage_stock_button").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-
 		jquery.Jq("#stock").Append(widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -195,7 +191,6 @@ func Search_listCallback(args ...interface{}) {
 		method := "get"
 
 		done := func(data js.Value) {
-
 			var (
 				storelocations []models.StoreLocation
 				err            error
@@ -249,18 +244,15 @@ func Search_listCallback(args ...interface{}) {
 			// 	Text: CurrentProduct.Name.NameLabel,
 			// }))
 
-			//jquery.Jq("#stock").Append(rowButtonClose.OuterHTML())
+			// jquery.Jq("#stock").Append(rowButtonClose.OuterHTML())
 			// jquery.Jq("#stock").Append(rowProduct.OuterHTML())
 
 			for _, storelocation := range storelocations {
 				jsutils.ShowStockRecursive(&storelocation, 0, "#stock")
 			}
-
 		}
 		fail := func(data js.Value) {
-
 			jsutils.DisplayGenericErrorMessage()
-
 		}
 
 		ajax.Ajax{
@@ -271,12 +263,10 @@ func Search_listCallback(args ...interface{}) {
 		}.Send()
 
 		return nil
-
 	}))
 
 	// Show/Hide archives.
 	jquery.Jq("#s_storage_archive_button").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-
 		var (
 			btnIcon  themes.IconFace
 			btnLabel string
@@ -311,7 +301,5 @@ func Search_listCallback(args ...interface{}) {
 		jquery.Jq("#Storage_table").On("load-success.bs.table", js.FuncOf(storage.ShowIfAuthorizedActionButtons))
 
 		return nil
-
 	}))
-
 }

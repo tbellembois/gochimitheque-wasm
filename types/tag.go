@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"syscall/js"
 
+	"github.com/barweiss/go-tuple"
 	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
-type Tags struct {
+type Select2Tags struct {
 	Rows  []*Tag `json:"rows"`
 	Total int    `json:"total"`
 }
@@ -18,16 +19,16 @@ type Tag struct {
 	*models.Tag
 }
 
-func (elems Tags) GetRowConcreteTypeName() string {
+func (elems Select2Tags) GetRowConcreteTypeName() string {
 
 	return "Tag"
 
 }
 
-func (elems Tags) IsExactMatch() bool {
+func (elems Select2Tags) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {
-		if elem.C == 1 {
+		if elem.MatchExactSearch {
 			return true
 		}
 	}
@@ -50,20 +51,35 @@ func (t *Tag) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (Tags) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
-
+func (Select2Tags) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 	var (
-		tags Tags
-		err  error
+		tagsAjaxResponse tuple.T2[[]struct {
+			MatchExactSearch bool   `json:"match_exact_search"`
+			TagID            int64  `json:"tag_id"`
+			TagLabel         string `json:"tag_label"`
+		}, int]
+		select2Tags Select2Tags
+		err         error
 	)
 
 	jsTagsString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
-	if err = json.Unmarshal([]byte(jsTagsString), &tags); err != nil {
-		fmt.Println(err)
+	if err = json.Unmarshal([]byte(jsTagsString), &tagsAjaxResponse); err != nil {
+		fmt.Println("(Select2Tags) FromJsJSONValue:" + err.Error())
 	}
 
-	return tags
+	for _, tag := range tagsAjaxResponse.V1 {
+		select2Tags.Rows = append(select2Tags.Rows, &Tag{
+			&models.Tag{
+				MatchExactSearch: tag.MatchExactSearch,
+				TagID:            int(tag.TagID),
+				TagLabel:         tag.TagLabel,
+			},
+		})
+	}
 
+	select2Tags.Total = tagsAjaxResponse.V2
+
+	return select2Tags
 }
 
 func (t Tag) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
@@ -82,7 +98,7 @@ func (t Tag) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 
 }
 
-func (t Tags) GetRows() []select2.Select2ItemAble {
+func (t Select2Tags) GetRows() []select2.Select2ItemAble {
 
 	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(t.Rows))
 
@@ -94,7 +110,7 @@ func (t Tags) GetRows() []select2.Select2ItemAble {
 
 }
 
-func (t Tags) GetTotal() int {
+func (t Select2Tags) GetTotal() int {
 
 	return t.Total
 

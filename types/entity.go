@@ -9,7 +9,7 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
-type Entities struct {
+type Select2Entities struct {
 	Rows  []*Entity `json:"rows"`
 	Total int       `json:"total"`
 }
@@ -18,13 +18,13 @@ type Entity struct {
 	*models.Entity
 }
 
-func (elems Entities) GetRowConcreteTypeName() string {
+func (elems Select2Entities) GetRowConcreteTypeName() string {
 
 	return "Entity"
 
 }
 
-func (elems Entities) IsExactMatch() bool {
+func (elems Select2Entities) IsExactMatch() bool {
 
 	return false
 
@@ -44,10 +44,10 @@ func (e *Entity) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (Entities) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
+func (Select2Entities) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 
 	var (
-		entities Entities
+		entities Select2Entities
 		err      error
 	)
 
@@ -60,7 +60,7 @@ func (Entities) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 
 }
 
-func (e Entities) GetRows() []select2.Select2ItemAble {
+func (e Select2Entities) GetRows() []select2.Select2ItemAble {
 
 	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(e.Rows))
 
@@ -72,7 +72,7 @@ func (e Entities) GetRows() []select2.Select2ItemAble {
 
 }
 
-func (e Entities) GetTotal() int {
+func (e Select2Entities) GetTotal() int {
 
 	return e.Total
 

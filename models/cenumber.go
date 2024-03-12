@@ -4,13 +4,13 @@ import "database/sql"
 
 // CeNumber is a product CE number.
 type CeNumber struct {
-	C             int            `db:"c" json:"c"` // not stored in db but db:"c" set for sqlx
-	CeNumberID    sql.NullInt64  `db:"cenumber_id" json:"cenumber_id" schema:"cenumber_id" `
-	CeNumberLabel sql.NullString `db:"cenumber_label" json:"cenumber_label" schema:"cenumber_label" `
+	MatchExactSearch bool           `db:"match_exact_search" json:"match_exact_search"` // not stored in db but db:"c" set for sqlx	CeNumberID    sql.NullInt64  `db:"cenumber_id" json:"cenumber_id" schema:"cenumber_id" `
+	CeNumberID       sql.NullInt64  `db:"cenumber_id" json:"cenumber_id" schema:"cenumber_id"`
+	CeNumberLabel    sql.NullString `db:"cenumber_label" json:"cenumber_label" schema:"cenumber_label" `
 }
 
-func (cenumber CeNumber) SetC(count int) Searchable {
-	cenumber.C = count
+func (cenumber CeNumber) SetMatchExactSearch(MatchExactSearch bool) Searchable {
+	cenumber.MatchExactSearch = MatchExactSearch
 
 	return cenumber
 }

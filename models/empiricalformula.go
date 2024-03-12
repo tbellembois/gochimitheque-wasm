@@ -4,13 +4,13 @@ import "database/sql"
 
 // EmpiricalFormula is a product empirical formula.
 type EmpiricalFormula struct {
-	C                     int            `db:"c" json:"c"` // not stored in db but db:"c" set for sqlx
+	MatchExactSearch      bool           `db:"match_exact_search" json:"match_exact_search"` // not stored in db but db:"c" set for sqlx	CeNumberID    sql.NullInt64  `db:"cenumber_id" json:"cenumber_id" schema:"cenumber_id" `
 	EmpiricalFormulaID    sql.NullInt64  `db:"empiricalformula_id" json:"empiricalformula_id" schema:"empiricalformula_id" `
 	EmpiricalFormulaLabel sql.NullString `db:"empiricalformula_label" json:"empiricalformula_label" schema:"empiricalformula_label" `
 }
 
-func (empiricalformula EmpiricalFormula) SetC(count int) Searchable {
-	empiricalformula.C = count
+func (empiricalformula EmpiricalFormula) SetMatchExactSearch(MatchExactSearch bool) Searchable {
+	empiricalformula.MatchExactSearch = MatchExactSearch
 
 	return empiricalformula
 }

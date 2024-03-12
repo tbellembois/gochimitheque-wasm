@@ -1,15 +1,17 @@
 package types
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
+	"github.com/barweiss/go-tuple"
 	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
-type Units struct {
+type Select2Units struct {
 	Rows  []*Unit `json:"rows"`
 	Total int     `json:"total"`
 }
@@ -18,13 +20,13 @@ type Unit struct {
 	*models.Unit
 }
 
-func (elems Units) GetRowConcreteTypeName() string {
+func (elems Select2Units) GetRowConcreteTypeName() string {
 
 	return "Unit"
 
 }
 
-func (elems Units) IsExactMatch() bool {
+func (elems Select2Units) IsExactMatch() bool {
 
 	return false
 
@@ -43,20 +45,35 @@ func (u *Unit) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (Units) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
-
+func (Select2Units) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 	var (
-		units Units
-		err   error
+		unitsAjaxResponse tuple.T2[[]struct {
+			// MatchExactSearch bool   `json:"match_exact_search"`
+			UnitID    int64  `json:"unit_id"`
+			UnitLabel string `json:"unit_label"`
+		}, int]
+		select2Units Select2Units
+		err          error
 	)
 
 	jsUnitsString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
-	if err = json.Unmarshal([]byte(jsUnitsString), &units); err != nil {
-		fmt.Println(err)
+	if err = json.Unmarshal([]byte(jsUnitsString), &unitsAjaxResponse); err != nil {
+		fmt.Println("(Select2Units) FromJsJSONValue:" + err.Error())
 	}
 
-	return units
+	for _, unit := range unitsAjaxResponse.V1 {
+		select2Units.Rows = append(select2Units.Rows, &Unit{
+			&models.Unit{
+				// MatchExactSearch: unit.MatchExactSearch,
+				UnitID:    sql.NullInt64{Int64: unit.UnitID, Valid: true},
+				UnitLabel: sql.NullString{String: unit.UnitLabel, Valid: true},
+			},
+		})
+	}
 
+	select2Units.Total = unitsAjaxResponse.V2
+
+	return select2Units
 }
 
 func (u Unit) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
@@ -75,7 +92,7 @@ func (u Unit) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 
 }
 
-func (u Units) GetRows() []select2.Select2ItemAble {
+func (u Select2Units) GetRows() []select2.Select2ItemAble {
 
 	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(u.Rows))
 
@@ -87,7 +104,7 @@ func (u Units) GetRows() []select2.Select2ItemAble {
 
 }
 
-func (u Units) GetTotal() int {
+func (u Select2Units) GetTotal() int {
 
 	return u.Total
 

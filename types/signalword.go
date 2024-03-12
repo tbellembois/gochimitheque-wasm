@@ -1,15 +1,17 @@
 package types
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
+	"github.com/barweiss/go-tuple"
 	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
-type SignalWords struct {
+type Select2SignalWords struct {
 	Rows  []*SignalWord `json:"rows"`
 	Total int           `json:"total"`
 }
@@ -18,13 +20,13 @@ type SignalWord struct {
 	*models.SignalWord
 }
 
-func (elems SignalWords) GetRowConcreteTypeName() string {
+func (elems Select2SignalWords) GetRowConcreteTypeName() string {
 
 	return "SignalWord"
 
 }
 
-func (elems SignalWords) IsExactMatch() bool {
+func (elems Select2SignalWords) IsExactMatch() bool {
 
 	return false
 
@@ -44,23 +46,38 @@ func (s *SignalWord) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (SignalWords) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
-
+func (Select2SignalWords) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 	var (
-		signalWords SignalWords
-		err         error
+		signalwordsAjaxResponse tuple.T2[[]struct {
+			// MatchExactSearch bool   `json:"match_exact_search"`
+			SignalWordID    int64  `json:"signalword_id"`
+			SignalWordLabel string `json:"signalword_label"`
+		}, int]
+		select2SignalWords Select2SignalWords
+		err                error
 	)
 
 	jsSignalWordsString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
-	if err = json.Unmarshal([]byte(jsSignalWordsString), &signalWords); err != nil {
-		fmt.Println(err)
+	if err = json.Unmarshal([]byte(jsSignalWordsString), &signalwordsAjaxResponse); err != nil {
+		fmt.Println("(Select2SignalWords) FromJsJSONValue:" + err.Error())
 	}
 
-	return signalWords
+	for _, signalword := range signalwordsAjaxResponse.V1 {
+		select2SignalWords.Rows = append(select2SignalWords.Rows, &SignalWord{
+			&models.SignalWord{
+				// MatchExactSearch: signalword.MatchExactSearch,
+				SignalWordID:    sql.NullInt64{Int64: signalword.SignalWordID, Valid: true},
+				SignalWordLabel: sql.NullString{String: signalword.SignalWordLabel, Valid: true},
+			},
+		})
+	}
 
+	select2SignalWords.Total = signalwordsAjaxResponse.V2
+
+	return select2SignalWords
 }
 
-func (s SignalWords) GetRows() []select2.Select2ItemAble {
+func (s Select2SignalWords) GetRows() []select2.Select2ItemAble {
 
 	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(s.Rows))
 
@@ -72,7 +89,7 @@ func (s SignalWords) GetRows() []select2.Select2ItemAble {
 
 }
 
-func (s SignalWords) GetTotal() int {
+func (s Select2SignalWords) GetTotal() int {
 
 	return s.Total
 

@@ -1,15 +1,17 @@
 package types
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
+	"github.com/barweiss/go-tuple"
 	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
-type Categories struct {
+type Select2Categories struct {
 	Rows  []*Category `json:"rows"`
 	Total int         `json:"total"`
 }
@@ -18,16 +20,16 @@ type Category struct {
 	*models.Category
 }
 
-func (elems Categories) GetRowConcreteTypeName() string {
+func (elems Select2Categories) GetRowConcreteTypeName() string {
 
 	return "Category"
 
 }
 
-func (elems Categories) IsExactMatch() bool {
+func (elems Select2Categories) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {
-		if elem.C == 1 {
+		if elem.MatchExactSearch {
 			return true
 		}
 	}
@@ -51,20 +53,35 @@ func (c *Category) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (Categories) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
-
+func (Select2Categories) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 	var (
-		categories Categories
-		err        error
+		categoriesAjaxResponse tuple.T2[[]struct {
+			MatchExactSearch bool   `json:"match_exact_search"`
+			CategoryID       int64  `json:"category_id"`
+			CategoryLabel    string `json:"category_label"`
+		}, int]
+		select2Categories Select2Categories
+		err               error
 	)
 
 	jsCategoriesString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
-	if err = json.Unmarshal([]byte(jsCategoriesString), &categories); err != nil {
-		fmt.Println(err)
+	if err = json.Unmarshal([]byte(jsCategoriesString), &categoriesAjaxResponse); err != nil {
+		fmt.Println("(Select2Categories) FromJsJSONValue:" + err.Error())
 	}
 
-	return categories
+	for _, category := range categoriesAjaxResponse.V1 {
+		select2Categories.Rows = append(select2Categories.Rows, &Category{
+			&models.Category{
+				MatchExactSearch: category.MatchExactSearch,
+				CategoryID:       sql.NullInt64{Int64: category.CategoryID, Valid: true},
+				CategoryLabel:    sql.NullString{String: category.CategoryLabel, Valid: true},
+			},
+		})
+	}
 
+	select2Categories.Total = categoriesAjaxResponse.V2
+
+	return select2Categories
 }
 
 func (c Category) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
@@ -83,7 +100,7 @@ func (c Category) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 
 }
 
-func (c Categories) GetRows() []select2.Select2ItemAble {
+func (c Select2Categories) GetRows() []select2.Select2ItemAble {
 
 	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(c.Rows))
 
@@ -95,7 +112,7 @@ func (c Categories) GetRows() []select2.Select2ItemAble {
 
 }
 
-func (c Categories) GetTotal() int {
+func (c Select2Categories) GetTotal() int {
 
 	return c.Total
 

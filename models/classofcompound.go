@@ -3,13 +3,13 @@ package models
 // ClassOfCompound is a product class of compound.
 type ClassOfCompound struct {
 	// nullable values to handle optional Product foreign key (gorilla shema nil values)
-	C                    int    `db:"c" json:"c"` // not stored in db but db:"c" set for sqlx
+	MatchExactSearch     bool   `db:"match_exact_search" json:"match_exact_search"` // not stored in db but db:"c" set for sqlx	CeNumberID    sql.NullInt64  `db:"cenumber_id" json:"cenumber_id" schema:"cenumber_id" `
 	ClassOfCompoundID    int    `db:"classofcompound_id" json:"classofcompound_id" schema:"classofcompound_id" `
 	ClassOfCompoundLabel string `db:"classofcompound_label" json:"classofcompound_label" schema:"classofcompound_label" `
 }
 
-func (coc ClassOfCompound) SetC(count int) Searchable {
-	coc.C = count
+func (coc ClassOfCompound) SetMatchExactSearch(MatchExactSearch bool) Searchable {
+	coc.MatchExactSearch = MatchExactSearch
 
 	return coc
 }

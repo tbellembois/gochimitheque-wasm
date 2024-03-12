@@ -1,15 +1,17 @@
 package types
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
+	"github.com/barweiss/go-tuple"
 	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
-type PhysicalStates struct {
+type Select2PhysicalStates struct {
 	Rows  []*PhysicalState `json:"rows"`
 	Total int              `json:"total"`
 }
@@ -18,16 +20,16 @@ type PhysicalState struct {
 	*models.PhysicalState
 }
 
-func (elems PhysicalStates) GetRowConcreteTypeName() string {
+func (elems Select2PhysicalStates) GetRowConcreteTypeName() string {
 
 	return "PhysicalState"
 
 }
 
-func (elems PhysicalStates) IsExactMatch() bool {
+func (elems Select2PhysicalStates) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {
-		if elem.C == 1 {
+		if elem.MatchExactSearch {
 			return true
 		}
 	}
@@ -50,20 +52,35 @@ func (p *PhysicalState) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (PhysicalStates) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
-
+func (Select2PhysicalStates) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 	var (
-		physicalStates PhysicalStates
-		err            error
+		physicalstatesAjaxResponse tuple.T2[[]struct {
+			MatchExactSearch   bool   `json:"match_exact_search"`
+			PhysicalStateID    int64  `json:"physicalstate_id"`
+			PhysicalStateLabel string `json:"physicalstate_label"`
+		}, int]
+		select2PhysicalStates Select2PhysicalStates
+		err                   error
 	)
 
 	jsPhysicalStatesString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
-	if err = json.Unmarshal([]byte(jsPhysicalStatesString), &physicalStates); err != nil {
-		fmt.Println(err)
+	if err = json.Unmarshal([]byte(jsPhysicalStatesString), &physicalstatesAjaxResponse); err != nil {
+		fmt.Println("(Select2PhysicalStates) FromJsJSONValue:" + err.Error())
 	}
 
-	return physicalStates
+	for _, physicalstate := range physicalstatesAjaxResponse.V1 {
+		select2PhysicalStates.Rows = append(select2PhysicalStates.Rows, &PhysicalState{
+			&models.PhysicalState{
+				MatchExactSearch:   physicalstate.MatchExactSearch,
+				PhysicalStateID:    sql.NullInt64{Int64: physicalstate.PhysicalStateID, Valid: true},
+				PhysicalStateLabel: sql.NullString{String: physicalstate.PhysicalStateLabel, Valid: true},
+			},
+		})
+	}
 
+	select2PhysicalStates.Total = physicalstatesAjaxResponse.V2
+
+	return select2PhysicalStates
 }
 
 func (p PhysicalState) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
@@ -82,7 +99,7 @@ func (p PhysicalState) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble
 
 }
 
-func (p PhysicalStates) GetRows() []select2.Select2ItemAble {
+func (p Select2PhysicalStates) GetRows() []select2.Select2ItemAble {
 
 	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(p.Rows))
 
@@ -94,7 +111,7 @@ func (p PhysicalStates) GetRows() []select2.Select2ItemAble {
 
 }
 
-func (p PhysicalStates) GetTotal() int {
+func (p Select2PhysicalStates) GetTotal() int {
 
 	return p.Total
 

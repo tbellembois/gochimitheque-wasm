@@ -1,15 +1,17 @@
 package types
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
+	"github.com/barweiss/go-tuple"
 	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
-type CeNumbers struct {
+type Select2CeNumbers struct {
 	Rows  []*CeNumber `json:"rows"`
 	Total int         `json:"total"`
 }
@@ -18,16 +20,16 @@ type CeNumber struct {
 	*models.CeNumber
 }
 
-func (elems CeNumbers) GetRowConcreteTypeName() string {
+func (elems Select2CeNumbers) GetRowConcreteTypeName() string {
 
 	return "CeNumber"
 
 }
 
-func (elems CeNumbers) IsExactMatch() bool {
+func (elems Select2CeNumbers) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {
-		if elem.C == 1 {
+		if elem.MatchExactSearch {
 			return true
 		}
 	}
@@ -51,20 +53,35 @@ func (c *CeNumber) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (CeNumbers) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
-
+func (Select2CeNumbers) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 	var (
-		ceNumbers CeNumbers
-		err       error
+		cesNumbersAjaxResponse tuple.T2[[]struct {
+			MatchExactSearch bool   `json:"match_exact_search"`
+			CeNumberID       int64  `json:"cenumber_id"`
+			CeNumberLabel    string `json:"cenumber_label"`
+		}, int]
+		select2CeNumbers Select2CeNumbers
+		err              error
 	)
 
-	jsCeNumbersString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
-	if err = json.Unmarshal([]byte(jsCeNumbersString), &ceNumbers); err != nil {
-		fmt.Println(err)
+	jsCasNumbersString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
+	if err = json.Unmarshal([]byte(jsCasNumbersString), &cesNumbersAjaxResponse); err != nil {
+		fmt.Println("(Select2CeNumbers) FromJsJSONValue:" + err.Error())
 	}
 
-	return ceNumbers
+	for _, cenumber := range cesNumbersAjaxResponse.V1 {
+		select2CeNumbers.Rows = append(select2CeNumbers.Rows, &CeNumber{
+			&models.CeNumber{
+				MatchExactSearch: cenumber.MatchExactSearch,
+				CeNumberID:       sql.NullInt64{Int64: cenumber.CeNumberID, Valid: true},
+				CeNumberLabel:    sql.NullString{String: cenumber.CeNumberLabel, Valid: true},
+			},
+		})
+	}
 
+	select2CeNumbers.Total = cesNumbersAjaxResponse.V2
+
+	return select2CeNumbers
 }
 
 func (c CeNumber) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
@@ -83,7 +100,7 @@ func (c CeNumber) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 
 }
 
-func (c CeNumbers) GetRows() []select2.Select2ItemAble {
+func (c Select2CeNumbers) GetRows() []select2.Select2ItemAble {
 
 	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(c.Rows))
 
@@ -95,7 +112,7 @@ func (c CeNumbers) GetRows() []select2.Select2ItemAble {
 
 }
 
-func (c CeNumbers) GetTotal() int {
+func (c Select2CeNumbers) GetTotal() int {
 
 	return c.Total
 

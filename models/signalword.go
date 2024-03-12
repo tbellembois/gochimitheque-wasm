@@ -9,7 +9,7 @@ type SignalWord struct {
 	SignalWordLabel sql.NullString `db:"signalword_label" json:"signalword_label" schema:"signalword_label" `
 }
 
-func (signalword SignalWord) SetC(count int) Searchable {
+func (signalword SignalWord) SetMatchExactSearch(MatchExactSearch bool) Searchable {
 	return signalword
 }
 

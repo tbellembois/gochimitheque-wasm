@@ -175,7 +175,7 @@ func SelectAllEntity(this js.Value, args []js.Value) interface{} {
 	done := func(data js.Value) {
 
 		var (
-			entities Entities
+			entities Select2Entities
 			err      error
 		)
 

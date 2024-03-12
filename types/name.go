@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"syscall/js"
 
+	"github.com/barweiss/go-tuple"
 	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 )
 
-type Names struct {
+type Select2Names struct {
 	Rows  []*Name `json:"rows"`
 	Total int     `json:"total"`
 }
@@ -18,13 +19,13 @@ type Name struct {
 	*models.Name
 }
 
-func (elems Names) GetRowConcreteTypeName() string {
+func (elems Select2Names) GetRowConcreteTypeName() string {
 
 	return "Name"
 
 }
 
-func (elems Names) IsExactMatch() bool {
+func (elems Select2Names) IsExactMatch() bool {
 
 	return false
 
@@ -44,23 +45,38 @@ func (n *Name) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (Names) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
-
+func (Select2Names) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 	var (
-		names Names
-		err   error
+		namesAjaxResponse tuple.T2[[]struct {
+			MatchExactSearch bool   `json:"match_exact_search"`
+			NameID           int64  `json:"name_id"`
+			NameLabel        string `json:"name_label"`
+		}, int]
+		select2Names Select2Names
+		err          error
 	)
 
 	jsNamesString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
-	if err = json.Unmarshal([]byte(jsNamesString), &names); err != nil {
-		fmt.Println(err)
+	if err = json.Unmarshal([]byte(jsNamesString), &namesAjaxResponse); err != nil {
+		fmt.Println("(Select2Names) FromJsJSONValue:" + err.Error())
 	}
 
-	return names
+	for _, name := range namesAjaxResponse.V1 {
+		select2Names.Rows = append(select2Names.Rows, &Name{
+			&models.Name{
+				MatchExactSearch: name.MatchExactSearch,
+				NameID:           int(name.NameID),
+				NameLabel:        name.NameLabel,
+			},
+		})
+	}
 
+	select2Names.Total = namesAjaxResponse.V2
+
+	return select2Names
 }
 
-func (n Names) GetRows() []select2.Select2ItemAble {
+func (n Select2Names) GetRows() []select2.Select2ItemAble {
 
 	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(n.Rows))
 
@@ -72,7 +88,7 @@ func (n Names) GetRows() []select2.Select2ItemAble {
 
 }
 
-func (n Names) GetTotal() int {
+func (n Select2Names) GetTotal() int {
 
 	return n.Total
 

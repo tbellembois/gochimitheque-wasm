@@ -7,7 +7,7 @@ type Symbol struct {
 	SymbolImage string `db:"symbol_image" json:"symbol_image" schema:"symbol_image"`
 }
 
-func (symbol Symbol) SetC(count int) Searchable {
+func (symbol Symbol) SetMatchExactSearch(MatchExactSearch bool) Searchable {
 	return symbol
 }
 
