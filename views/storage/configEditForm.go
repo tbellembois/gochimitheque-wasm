@@ -289,10 +289,10 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		globals.CurrentStorage.StorageEntryDate = sql.NullTime{
+		globals.CurrentStorage.StorageEntryDate = models.MyNullTime(sql.NullTime{
 			Valid: true,
 			Time:  storageEntryDate,
-		}
+		})
 	}
 	if jquery.Jq("input#storage_exitdate").GetVal().Truthy() {
 		var storageExitDate time.Time
@@ -300,10 +300,10 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		globals.CurrentStorage.StorageExitDate = sql.NullTime{
+		globals.CurrentStorage.StorageExitDate = models.MyNullTime(sql.NullTime{
 			Valid: true,
 			Time:  storageExitDate,
-		}
+		})
 	}
 	if jquery.Jq("input#storage_openingdate").GetVal().Truthy() {
 		var storageOpeningDate time.Time
@@ -311,10 +311,10 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		globals.CurrentStorage.StorageOpeningDate = sql.NullTime{
+		globals.CurrentStorage.StorageOpeningDate = models.MyNullTime(sql.NullTime{
 			Valid: true,
 			Time:  storageOpeningDate,
-		}
+		})
 	}
 	if jquery.Jq("input#storage_expirationdate").GetVal().Truthy() {
 		var storageExpirationDate time.Time
@@ -322,10 +322,10 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		globals.CurrentStorage.StorageExpirationDate = sql.NullTime{
+		globals.CurrentStorage.StorageExpirationDate = models.MyNullTime(sql.NullTime{
 			Valid: true,
 			Time:  storageExpirationDate,
-		}
+		})
 	}
 
 	if jquery.Jq("input#storage_reference").GetVal().Truthy() {
