@@ -7,10 +7,10 @@ import (
 	"honnef.co/go/js/dom/v2"
 
 	"github.com/tbellembois/gochimitheque-wasm/jsutils"
-	"github.com/tbellembois/gochimitheque-wasm/models"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 // TODO: move me
@@ -31,7 +31,7 @@ func Select2SymbolTemplateResults(this js.Value, args []js.Value) interface{} {
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
 		},
-		Src:   fmt.Sprintf("data:%s", symbol.SymbolImage),
+		Src:   fmt.Sprintf("data:%s", symbol.SymbolLabel),
 		Alt:   symbol.SymbolLabel,
 		Title: symbol.SymbolLabel,
 	})

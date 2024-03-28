@@ -12,11 +12,11 @@ import (
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
 	"github.com/tbellembois/gochimitheque-wasm/jquery"
 	"github.com/tbellembois/gochimitheque-wasm/jsutils"
-	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/validate"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 func FillInStoreLocationForm(s StoreLocation, id string) {
@@ -76,27 +76,27 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 			return nil
 		}
 
-		storelocation.StoreLocationID = sql.NullInt64{
+		storelocation.StoreLocationID = models.NullInt64{sql.NullInt64{
 			Int64: int64(storelocationId),
 			Valid: true,
-		}
+		}}
 	}
 
 	if jquery.Jq("input#storelocation_canstore:checked").Object.Length() > 0 {
-		storelocation.StoreLocationCanStore = sql.NullBool{
+		storelocation.StoreLocationCanStore = models.NullBool{sql.NullBool{
 			Bool:  true,
 			Valid: true,
-		}
+		}}
 	}
 
-	storelocation.StoreLocationName = sql.NullString{
+	storelocation.StoreLocationName = models.NullString{sql.NullString{
 		String: jquery.Jq("input#storelocation_name").GetVal().String(),
 		Valid:  true,
-	}
-	storelocation.StoreLocationColor = sql.NullString{
+	}}
+	storelocation.StoreLocationColor = models.NullString{sql.NullString{
 		String: jquery.Jq("input#storelocation_color").GetVal().String(),
 		Valid:  true,
-	}
+	}}
 
 	select2ItemEntity := select2.NewSelect2(jquery.Jq("select#entity"), nil)
 	storelocation.Entity = models.Entity{}
@@ -119,10 +119,10 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 				return nil
 			}
 
-			storelocation.StoreLocation.StoreLocation.StoreLocationID = sql.NullInt64{
+			storelocation.StoreLocation.StoreLocation.StoreLocationID = models.NullInt64{sql.NullInt64{
 				Int64: int64(storelocationId),
 				Valid: true,
-			}
+			}}
 		}
 	}
 

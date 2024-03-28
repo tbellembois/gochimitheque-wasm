@@ -31,7 +31,7 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/views/welcomeannounce"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 
-	"github.com/tbellembois/gochimitheque-wasm/models"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 var (

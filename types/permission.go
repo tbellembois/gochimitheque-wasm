@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"syscall/js"
 
-	"github.com/tbellembois/gochimitheque-wasm/models"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type Permission struct {

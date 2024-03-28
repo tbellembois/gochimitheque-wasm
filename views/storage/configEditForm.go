@@ -15,11 +15,11 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/jquery"
 	"github.com/tbellembois/gochimitheque-wasm/jsutils"
 	"github.com/tbellembois/gochimitheque-wasm/locales"
-	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/validate"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 func ScanQRdone(this js.Value, args []js.Value) interface{} {
@@ -188,14 +188,14 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		globals.CurrentStorage.StoreLocation.StoreLocationID = sql.NullInt64{
+		globals.CurrentStorage.StoreLocation.StoreLocationID = models.NullInt64{sql.NullInt64{
 			Int64: int64(storelocationId),
 			Valid: true,
-		}
-		globals.CurrentStorage.StoreLocation.StoreLocationName = sql.NullString{
+		}}
+		globals.CurrentStorage.StoreLocation.StoreLocationName = models.NullString{sql.NullString{
 			String: select2ItemStorelocation.Text,
 			Valid:  true,
-		}
+		}}
 	}
 
 	if jquery.Jq("input#storage_quantity").GetVal().Truthy() {

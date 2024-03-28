@@ -7,8 +7,8 @@ import (
 	"syscall/js"
 
 	"github.com/barweiss/go-tuple"
-	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 type Select2ProducerRefs struct {

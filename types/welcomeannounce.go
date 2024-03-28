@@ -1,6 +1,6 @@
 package types
 
-import "github.com/tbellembois/gochimitheque-wasm/models"
+import "github.com/tbellembois/gochimitheque/models"
 
 type WelcomeAnnounce struct {
 	*models.WelcomeAnnounce
