@@ -126,7 +126,7 @@ func (q QueryFilter) ToRawQuery() string {
 
 	values := url.Values{}
 	if q.Sort != "" {
-		values.Set("sort", q.Sort)
+		values.Set("order_by", q.Sort)
 	}
 	if q.Order != "" {
 		values.Set("order", q.Order)
