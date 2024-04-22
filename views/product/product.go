@@ -370,6 +370,21 @@ func product_common() {
 		return validate.NewValidate(jquery.Jq(this), nil).Valid()
 	}))
 
+	select2.NewSelect2(jquery.Jq("select#unit_molecularweight"), &select2.Select2Config{
+		Placeholder:    locales.Translate("product_unit_placeholder", HTTPHeaderAcceptLanguage),
+		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Unit{})),
+		AllowClear:     true,
+		Ajax: select2.Select2Ajax{
+			URL:            ApplicationProxyPath + "storages/units",
+			DataType:       "json",
+			Data:           js.FuncOf(Select2UnitTemperatureAjaxData),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Units{})),
+		},
+	}).Select2ify()
+	jquery.Jq("select#unit_molecularweight").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		return validate.NewValidate(jquery.Jq(this), nil).Valid()
+	}))
+
 	select2.NewSelect2(jquery.Jq("select#casnumber"), &select2.Select2Config{
 		Placeholder:    locales.Translate("product_cas_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(CasNumber{})),
@@ -592,6 +607,16 @@ func Product_listCallback(this js.Value, args []js.Value) interface{} {
 func Product_pubchemCallback(args ...interface{}) {
 	jquery.Jq("#searchbar").Hide()
 	jquery.Jq("#actions").Hide()
+
+	jquery.Jq("#search input").On("keyup", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		event := args[0]
+		if !event.Get("which").IsUndefined() && event.Get("which").Int() == 13 {
+
+			event.Call("preventDefault")
+		}
+
+		return nil
+	}))
 }
 
 func displaySection(section Section) {
@@ -652,7 +677,19 @@ func PubchemCreateProduct(this js.Value, args []js.Value) interface{} {
 		Method: "post",
 		Data:   jsonPubchemProduct,
 		Done: func(data js.Value) {
+			var (
+				err        error
+				product_id int
+			)
 
+			if err = json.Unmarshal([]byte(data.String()), &product_id); err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			href := fmt.Sprintf("%sv/products", ApplicationProxyPath)
+			jsutils.ClearSearch(js.Null(), nil)
+			jsutils.LoadContent("div#content", "product", href, Product_SaveCallback, product_id)
 		},
 		Fail: func(jqXHR js.Value) {
 
@@ -697,7 +734,7 @@ func PubchemGetProductByName(this js.Value, args []js.Value) interface{} {
 
 			// import button.
 			jquery.Jq("#pubchemcompound").Append(`<div id="import" class="row pb-3"></div>`)
-			jquery.Jq("#pubchemcompound #import").Append(`<a href="#" onclick="Product_pubchemCreateProduct('` + base64JsonPubchem + `')">import</a>`)
+			jquery.Jq("#pubchemcompound #import").Append(`<a href="#" onclick="Product_pubchemCreateProduct('` + base64JsonPubchem + `')">` + locales.Translate("import", HTTPHeaderAcceptLanguage) + `</a>`)
 
 			// 2dpicture.
 			jquery.Jq("#pubchemcompound").Append(`<div id="2dimage" class="row pb-3"></div>`)

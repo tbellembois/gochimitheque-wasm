@@ -126,6 +126,23 @@ func FillInProductForm(p Product, id string) {
 			}).HTMLElement.OuterHTML())
 	}
 
+	jquery.Jq("#product_molecularweight").SetVal("")
+	if p.ProductMolecularWeight.Valid {
+		jquery.Jq("#product_molecularweight").SetVal(p.ProductMolecularWeight.Float64)
+	}
+
+	select2UnitMolecularWeight := select2.NewSelect2(jquery.Jq("select#unit_molecularweight"), nil)
+	select2UnitMolecularWeight.Select2Clear()
+	if p.UnitMolecularWeight.UnitID.Valid {
+		select2UnitMolecularWeight.Select2AppendOption(
+			widgets.NewOption(widgets.OptionAttributes{
+				Text:            p.UnitMolecularWeight.UnitLabel.String,
+				Value:           strconv.Itoa(int(p.UnitMolecularWeight.UnitID.Int64)),
+				DefaultSelected: true,
+				Selected:        true,
+			}).HTMLElement.OuterHTML())
+	}
+
 	select2EmpiricalFormula := select2.NewSelect2(jquery.Jq("select#empiricalformula"), nil)
 	select2EmpiricalFormula.Select2Clear()
 	if p.EmpiricalFormula.EmpiricalFormulaID.Valid {
@@ -172,6 +189,19 @@ func FillInProductForm(p Product, id string) {
 				DefaultSelected: true,
 				Selected:        true,
 			}).HTMLElement.OuterHTML())
+	}
+
+	jquery.Jq("#product_inchi").SetVal("")
+	if p.ProductInchi.Valid {
+		jquery.Jq("#product_inchi").SetVal(p.ProductInchi.String)
+	}
+	jquery.Jq("#product_inchikey").SetVal("")
+	if p.ProductInchikey.Valid {
+		jquery.Jq("#product_inchikey").SetVal(p.ProductInchikey.String)
+	}
+	jquery.Jq("#product_canonicalsmiles").SetVal("")
+	if p.ProductCanonicalSmiles.Valid {
+		jquery.Jq("#product_canonicalsmiles").SetVal(p.ProductCanonicalSmiles.String)
 	}
 
 	jquery.Jq("#product_specificity").SetVal("")
@@ -367,6 +397,39 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		}
 	}
 
+	if jquery.Jq("input#product_inchi").GetVal().Truthy() {
+		globals.CurrentProduct.ProductInchi = sql.NullString{
+			String: jquery.Jq("input#product_inchi").GetVal().String(),
+			Valid:  true,
+		}
+	}
+
+	if jquery.Jq("input#product_inchikey").GetVal().Truthy() {
+		globals.CurrentProduct.ProductInchikey = sql.NullString{
+			String: jquery.Jq("input#product_inchikey").GetVal().String(),
+			Valid:  true,
+		}
+	}
+
+	if jquery.Jq("input#product_canonicalsmiles").GetVal().Truthy() {
+		globals.CurrentProduct.ProductCanonicalSmiles = sql.NullString{
+			String: jquery.Jq("input#product_canonicalsmiles").GetVal().String(),
+			Valid:  true,
+		}
+	}
+
+	if jquery.Jq("input#product_molecularweight").GetVal().Truthy() {
+		var productMolecularWeight float64
+		if productMolecularWeight, err = strconv.ParseFloat(jquery.Jq("input#product_molecularweight").GetVal().String(), 64); err != nil {
+			return nil
+		}
+
+		globals.CurrentProduct.ProductMolecularWeight = sql.NullFloat64{
+			Float64: productMolecularWeight,
+			Valid:   true,
+		}
+	}
+
 	if jquery.Jq("input#hidden_product_twodformula_content").Html() != "" {
 		globals.CurrentProduct.ProductTwoDFormula = sql.NullString{
 			String: jquery.Jq("input#hidden_product_twodformula_content").Html(),
@@ -445,6 +508,25 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		}
 		globals.CurrentProduct.UnitTemperature.UnitLabel = sql.NullString{
 			String: select2ItemUnitTemperature.Text,
+			Valid:  true,
+		}
+	}
+
+	select2UnitMolecularWeight := select2.NewSelect2(jquery.Jq("select#unit_molecularweight"), nil)
+	if len(select2UnitMolecularWeight.Select2Data()) > 0 {
+		select2ItemUnitMolecularWeight := select2UnitMolecularWeight.Select2Data()[0]
+		globals.CurrentProduct.UnitMolecularWeight = models.Unit{}
+		var unitMolecularWeightId int
+		if unitMolecularWeightId, err = strconv.Atoi(select2ItemUnitMolecularWeight.Id); err != nil {
+			fmt.Println(err)
+			return nil
+		}
+		globals.CurrentProduct.UnitMolecularWeight.UnitID = sql.NullInt64{
+			Int64: int64(unitMolecularWeightId),
+			Valid: true,
+		}
+		globals.CurrentProduct.UnitMolecularWeight.UnitLabel = sql.NullString{
+			String: select2ItemUnitMolecularWeight.Text,
 			Valid:  true,
 		}
 	}

@@ -606,7 +606,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				Visible: true,
 			},
 			Width: "200",
-			Src:   globals.CurrentProduct.ProductTwoDFormula.String,
+			Src:   "data:image/png;base64," + globals.CurrentProduct.ProductTwoDFormula.String,
 		}))
 	}
 	// Synonym.
@@ -734,7 +734,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: fmt.Sprintf("%s: %s", globals.CurrentProduct.Producer.ProducerLabel.String, globals.CurrentProduct.ProducerRef.ProducerRefLabel),
+			Text: fmt.Sprintf("%s: %s", globals.CurrentProduct.Producer.ProducerLabel.String, globals.CurrentProduct.ProducerRef.ProducerRefLabel.String),
 		}))
 	}
 	// Suppliers.
@@ -1095,7 +1095,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			},
 			Alt:   symbol.SymbolLabel,
 			Title: symbol.SymbolLabel,
-			Src:   fmt.Sprintf("data:%s", symbol.SymbolLabel),
+			Src:   fmt.Sprintf("data:%s", globals.SymbolImages[symbol.SymbolLabel]),
 		}))
 	}
 	// Signal word.
@@ -1389,6 +1389,78 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	if globals.CurrentProduct.ProductThreeDFormula.Valid && globals.CurrentProduct.ProductThreeDFormula.String != "" {
 		detailCardRow.AppendChild(colTreedFormula)
 	}
+	if globals.CurrentProduct.ProductInchi.Valid {
+		div := dom.GetWindow().Document().CreateElement("div")
+		inchi_div := div.(*dom.HTMLDivElement)
+		inchi_div.SetClass("col-sm-12 m-1")
+
+		span_title := dom.GetWindow().Document().CreateElement("span")
+		inchi_title_html := span_title.(*dom.HTMLSpanElement)
+		inchi_title_html.SetInnerHTML(locales.Translate("product_inchi_title", HTTPHeaderAcceptLanguage))
+		inchi_title_html.SetClass("iconlabel mr-sm-2")
+
+		span := dom.GetWindow().Document().CreateElement("span")
+		inchi_html := span.(*dom.HTMLSpanElement)
+		inchi_html.SetInnerHTML(globals.CurrentProduct.ProductInchi.String)
+
+		inchi_div.AppendChild(inchi_title_html)
+		inchi_div.AppendChild(inchi_html)
+		detailCardRow.AppendChild(inchi_div)
+	}
+	if globals.CurrentProduct.ProductInchikey.Valid {
+		div := dom.GetWindow().Document().CreateElement("div")
+		inchikey_div := div.(*dom.HTMLDivElement)
+		inchikey_div.SetClass("col-sm-12 m-1")
+
+		span_title := dom.GetWindow().Document().CreateElement("span")
+		inchikey_title_html := span_title.(*dom.HTMLSpanElement)
+		inchikey_title_html.SetInnerHTML(locales.Translate("product_inchi_key_title", HTTPHeaderAcceptLanguage))
+		inchikey_title_html.SetClass("iconlabel mr-sm-2")
+
+		span := dom.GetWindow().Document().CreateElement("span")
+		inchikey_html := span.(*dom.HTMLSpanElement)
+		inchikey_html.SetInnerHTML(globals.CurrentProduct.ProductInchikey.String)
+
+		inchikey_div.AppendChild(inchikey_title_html)
+		inchikey_div.AppendChild(inchikey_html)
+		detailCardRow.AppendChild(inchikey_div)
+	}
+	if globals.CurrentProduct.ProductCanonicalSmiles.Valid {
+		div := dom.GetWindow().Document().CreateElement("div")
+		smiles_div := div.(*dom.HTMLDivElement)
+		smiles_div.SetClass("col-sm-12 m-1")
+
+		span_title := dom.GetWindow().Document().CreateElement("span")
+		smiles_title_html := span_title.(*dom.HTMLSpanElement)
+		smiles_title_html.SetInnerHTML(locales.Translate("product_smiles_title", HTTPHeaderAcceptLanguage))
+		smiles_title_html.SetClass("iconlabel mr-sm-2")
+
+		span := dom.GetWindow().Document().CreateElement("span")
+		smiles_html := span.(*dom.HTMLSpanElement)
+		smiles_html.SetInnerHTML(globals.CurrentProduct.ProductCanonicalSmiles.String)
+
+		smiles_div.AppendChild(smiles_title_html)
+		smiles_div.AppendChild(smiles_html)
+		detailCardRow.AppendChild(smiles_div)
+	}
+	if globals.CurrentProduct.ProductMolecularWeight.Valid {
+		div := dom.GetWindow().Document().CreateElement("div")
+		molecularweight_div := div.(*dom.HTMLDivElement)
+		molecularweight_div.SetClass("col-sm-12 m-1")
+
+		span_title := dom.GetWindow().Document().CreateElement("span")
+		molecularweight_title_html := span_title.(*dom.HTMLSpanElement)
+		molecularweight_title_html.SetInnerHTML(locales.Translate("product_molecularweight_title", HTTPHeaderAcceptLanguage))
+		molecularweight_title_html.SetClass("iconlabel mr-sm-2")
+
+		span := dom.GetWindow().Document().CreateElement("span")
+		molecularweight_html := span.(*dom.HTMLSpanElement)
+		molecularweight_html.SetInnerHTML(fmt.Sprintf("%f %s", globals.CurrentProduct.ProductMolecularWeight.Float64, globals.CurrentProduct.UnitMolecularWeight.UnitLabel.String))
+
+		molecularweight_div.AppendChild(molecularweight_title_html)
+		molecularweight_div.AppendChild(molecularweight_html)
+		detailCardRow.AppendChild(molecularweight_div)
+	}
 	if globals.CurrentProduct.CasNumber.CasNumberID.Valid {
 		detailCardRow.AppendChild(colCas)
 	}
@@ -1502,7 +1574,7 @@ func TwodformulaFormatter(this js.Value, args []js.Value) interface{} {
 				Visible: true,
 			},
 			Height:          "70",
-			Src:             globals.CurrentProduct.ProductTwoDFormula.String,
+			Src:             "data:image/png;base64," + globals.CurrentProduct.ProductTwoDFormula.String,
 			BackgroundColor: "white",
 		}).OuterHTML()
 
