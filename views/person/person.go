@@ -47,7 +47,7 @@ func person_common() {
 			URL:            ApplicationProxyPath + "entities",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Entities{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Entities{})),
 		},
 	}).Select2ify()
 	jquery.Jq("select#entities").On("select2:unselecting", js.FuncOf(func(this js.Value, args []js.Value) interface{} {

@@ -25,13 +25,16 @@ import (
 	"github.com/tbellembois/gochimitheque/models"
 )
 
-var supplierrefToSupplier map[string]int64 // supplierref label -> supplier id
+var (
+	supplierrefToSupplier map[string]int64 // supplierref label -> supplier id
+)
 
 func init() {
 	supplierrefToSupplier = make(map[string]int64)
 }
 
 func LinearToEmpirical(this js.Value, args []js.Value) interface{} {
+
 	select2LinearFormula := select2.NewSelect2(jquery.Jq("select#linearformula"), nil).Select2Data()
 
 	if len(select2LinearFormula) == 0 {
@@ -66,29 +69,37 @@ func LinearToEmpirical(this js.Value, args []js.Value) interface{} {
 	}.Send()
 
 	return nil
+
 }
 
 func NoEmpiricalFormula(this js.Value, args []js.Value) interface{} {
+
 	validate.NewValidate(jquery.Jq("select#empiricalformula"), nil).ValidateRemoveRequired()
 	jquery.Jq("span#empiricalformula.badge").Hide()
 
 	return nil
+
 }
 
 func NoCas(this js.Value, args []js.Value) interface{} {
+
 	validate.NewValidate(jquery.Jq("select#casnumber"), nil).ValidateRemoveRequired()
 	jquery.Jq("span#casnumber.badge").Hide()
 
 	return nil
+
 }
 
 func HowToMagicalSelector(this js.Value, args []js.Value) interface{} {
+
 	js.Global().Get("window").Call("open", fmt.Sprintf("%simg/magicalselector.webm", ApplicationProxyPath), "_blank")
 
 	return nil
+
 }
 
 func Magic(this js.Value, args []js.Value) interface{} {
+
 	magic := jquery.Jq("textarea#magical").GetVal().String()
 
 	rhs := regexp.MustCompile("((?:EU){0,1}H[0-9]{3}[FfDdAi]{0,2})")
@@ -108,6 +119,7 @@ func Magic(this js.Value, args []js.Value) interface{} {
 	select2HS := select2.NewSelect2(jquery.Jq("select#hazardstatements"), nil)
 	select2HS.Select2Clear()
 	for _, h := range shs {
+
 		if _, ok = processedH[h[1]]; !ok {
 			processedH[h[1]] = ""
 
@@ -132,6 +144,7 @@ func Magic(this js.Value, args []js.Value) interface{} {
 	select2PS := select2.NewSelect2(jquery.Jq("select#precautionarystatements"), nil)
 	select2PS.Select2Clear()
 	for _, p := range sps {
+
 		if _, ok = processedP[p[1]]; !ok {
 			processedP[p[1]] = ""
 
@@ -152,13 +165,16 @@ func Magic(this js.Value, args []js.Value) interface{} {
 	}
 
 	return nil
+
 }
 
 func product_common() {
+
 	//
 	// Type chooser.
 	//
 	jquery.Jq("input[type=radio][name=typechooser]").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+
 		switch jquery.Jq("input[name=typechooser]:checked").GetVal().String() {
 		case "chem":
 			Chemify()
@@ -169,6 +185,7 @@ func product_common() {
 		}
 
 		return nil
+
 	}))
 
 	//
@@ -267,6 +284,7 @@ func product_common() {
 		return validate.NewValidate(jquery.Jq(this), nil).Valid()
 	}))
 	jquery.Jq("select#producerref").On("select2:select", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+
 		select2ProducerrefSelected := args[0].Get("params").Get("data")
 		producerrefSelected := ProducerRef{ProducerRef: &models.ProducerRef{}}.FromJsJSONValue(select2ProducerrefSelected)
 
@@ -287,6 +305,7 @@ func product_common() {
 			}).HTMLElement.OuterHTML())
 
 		return nil
+
 	}))
 	select2.NewSelect2(jquery.Jq("select#producer"), &select2.Select2Config{
 		Placeholder:    locales.Translate("product_producer_placeholder", HTTPHeaderAcceptLanguage),
@@ -337,7 +356,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "products/tags/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Tags{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Tags{})),
 		},
 	}).Select2ify()
 
@@ -351,7 +370,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "products/categories/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Categories{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Categories{})),
 		},
 	}).Select2ify()
 
@@ -363,7 +382,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "storages/units",
 			DataType:       "json",
 			Data:           js.FuncOf(Select2UnitTemperatureAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Units{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Units{})),
 		},
 	}).Select2ify()
 	jquery.Jq("select#unit_temperature").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -395,7 +414,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "products/casnumbers/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2CasNumbers{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(CasNumbers{})),
 		},
 	}).Select2ify()
 	jquery.Jq("select#casnumber").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -412,7 +431,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "products/cenumbers/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2CeNumbers{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(CeNumbers{})),
 		},
 	}).Select2ify()
 	jquery.Jq("select#cenumber").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -429,7 +448,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "products/physicalstates/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2PhysicalStates{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(PhysicalStates{})),
 		},
 	}).Select2ify()
 
@@ -441,7 +460,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "products/signalwords/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2SignalWords{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(SignalWords{})),
 		},
 	}).Select2ify()
 
@@ -455,7 +474,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "products/classofcompounds/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2ClassesOfCompound{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(ClassesOfCompound{})),
 		},
 	}).Select2ify()
 
@@ -469,7 +488,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "products/names/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Names{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Names{})),
 		},
 	}).Select2ify()
 	jquery.Jq("select#name").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -486,7 +505,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "products/empiricalformulas/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2EmpiricalFormulas{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(EmpiricalFormulas{})),
 		},
 	}).Select2ify()
 	jquery.Jq("select#empiricalformula").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -503,7 +522,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "products/linearformulas/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2LinearFormulas{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(LinearFormulas{})),
 		},
 	}).Select2ify()
 
@@ -517,7 +536,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "products/synonyms/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Names{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Names{})),
 		},
 	}).Select2ify()
 
@@ -529,7 +548,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "products/symbols/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Symbols{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Symbols{})),
 		},
 	}).Select2ify()
 
@@ -541,7 +560,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "products/hazardstatements/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2HazardStatements{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(HazardStatements{})),
 		},
 	}).Select2ify()
 
@@ -553,7 +572,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "products/precautionarystatements/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2PrecautionaryStatements{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(PrecautionaryStatements{})),
 		},
 	}).Select2ify()
 
@@ -561,9 +580,11 @@ func product_common() {
 		js.Global().Call("load2dimage")
 		return nil
 	}))
+
 }
 
 func Product_listBookmarkCallback(this js.Value, args []js.Value) interface{} {
+
 	BSTableQueryFilter.Clean()
 	BSTableQueryFilter.ProductBookmark = true
 
@@ -574,10 +595,12 @@ func Product_listBookmarkCallback(this js.Value, args []js.Value) interface{} {
 	jsutils.LoadContent("div#content", "product", fmt.Sprintf("%sv/products", ApplicationProxyPath), productCallbackWrapper, nil)
 
 	return nil
+
 }
 
 func Product_listCallback(this js.Value, args []js.Value) interface{} {
-	// product_common()
+
+	//product_common()
 
 	bstable.NewBootstraptable(jquery.Jq("#Product_table"), &bstable.BootstraptableParams{Ajax: "Product_getTableData"})
 	jquery.Jq("#Product_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
@@ -602,24 +625,18 @@ func Product_listCallback(this js.Value, args []js.Value) interface{} {
 	jquery.Jq("#switchview").Append(buttonTitle.OuterHTML())
 
 	return nil
+
 }
 
 func Product_pubchemCallback(args ...interface{}) {
+
 	jquery.Jq("#searchbar").Hide()
 	jquery.Jq("#actions").Hide()
 
-	jquery.Jq("#search input").On("keyup", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		event := args[0]
-		if !event.Get("which").IsUndefined() && event.Get("which").Int() == 13 {
-
-			event.Call("preventDefault")
-		}
-
-		return nil
-	}))
 }
 
 func displaySection(section Section) {
+
 	if section.Information != nil {
 		for _, information := range *section.Information {
 
@@ -658,6 +675,7 @@ func displaySection(section Section) {
 			displaySection(sectionChild)
 		}
 	}
+
 }
 
 func PubchemCreateProduct(this js.Value, args []js.Value) interface{} {
@@ -702,6 +720,7 @@ func PubchemCreateProduct(this js.Value, args []js.Value) interface{} {
 }
 
 func PubchemGetProductByName(this js.Value, args []js.Value) interface{} {
+
 	var (
 		pubchemProduct PubchemProduct
 		err            error
@@ -722,6 +741,7 @@ func PubchemGetProductByName(this js.Value, args []js.Value) interface{} {
 		URL:    ApplicationProxyPath + "products/pubchemgetproductbyname/" + name,
 		Method: "get",
 		Done: func(data js.Value) {
+
 			if err = json.Unmarshal([]byte(data.String()), &pubchemProduct); err != nil {
 				fmt.Println(err)
 			}
@@ -858,13 +878,16 @@ func PubchemGetProductByName(this js.Value, args []js.Value) interface{} {
 			// }
 		},
 		Fail: func(jqXHR js.Value) {
+
 			jsutils.DisplayGenericErrorMessage()
+
 		},
 	}.Send()
 	return nil
 }
 
 func PubchemGetCompoundByName(this js.Value, args []js.Value) interface{} {
+
 	var (
 		compounds Compounds
 		err       error
@@ -880,6 +903,7 @@ func PubchemGetCompoundByName(this js.Value, args []js.Value) interface{} {
 		URL:    ApplicationProxyPath + "products/pubchemgetcompoundbyname/" + name,
 		Method: "get",
 		Done: func(data js.Value) {
+
 			if err = json.Unmarshal([]byte(data.String()), &compounds); err != nil {
 				fmt.Println(err)
 			}
@@ -962,15 +986,19 @@ func PubchemGetCompoundByName(this js.Value, args []js.Value) interface{} {
 					}).OuterHTML())
 				}
 			}
+
 		},
 		Fail: func(jqXHR js.Value) {
+
 			jsutils.DisplayGenericErrorMessage()
+
 		},
 	}.Send()
 	return nil
 }
 
 func PubchemSearch(this js.Value, args []js.Value) interface{} {
+
 	var (
 		autocomplete Autocomplete
 		err          error
@@ -991,6 +1019,7 @@ func PubchemSearch(this js.Value, args []js.Value) interface{} {
 		URL:    ApplicationProxyPath + "products/pubchemautocomplete/" + search,
 		Method: "get",
 		Done: func(data js.Value) {
+
 			if err = json.Unmarshal([]byte(data.String()), &autocomplete); err != nil {
 				fmt.Println(err)
 			}
@@ -1001,9 +1030,12 @@ func PubchemSearch(this js.Value, args []js.Value) interface{} {
 			for _, compound := range autocomplete.DictionaryTerms.Compound {
 				jquery.Jq("#pubchemcompound").Append(`<div class="row"><div class="col-sm-auto mx-auto"><a href="#" onclick="Product_pubchemGetProductByName('` + compound + `')">` + compound + `</a></div></div>`)
 			}
+
 		},
 		Fail: func(jqXHR js.Value) {
+
 			jsutils.DisplayGenericErrorMessage()
+
 		},
 	}.Send()
 	return nil
@@ -1015,6 +1047,7 @@ var ProductCreateCallbackWrapper = func(this js.Value, args []js.Value) interfac
 }
 
 func Product_createCallback(args ...interface{}) {
+
 	product_common()
 
 	switch reflect.TypeOf(args[0]) {
@@ -1026,6 +1059,7 @@ func Product_createCallback(args ...interface{}) {
 
 		jquery.Jq("#searchbar").Hide()
 		jquery.Jq("#actions").Hide()
+
 	}
 
 	// Chemical product by default on creation.
@@ -1038,9 +1072,11 @@ func Product_createCallback(args ...interface{}) {
 
 	jquery.Jq("#searchbar").Hide()
 	jquery.Jq("#actions").Hide()
+
 }
 
 func Product_SaveCallback(args ...interface{}) {
+
 	BSTableQueryFilter.Lock()
 	BSTableQueryFilter.QueryFilter.Product = strconv.Itoa(args[0].(int))
 	BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", CurrentProduct.Name.NameLabel, CurrentProduct.ProductSpecificity.String)
@@ -1053,8 +1089,9 @@ func Product_SaveCallback(args ...interface{}) {
 	// })
 	jquery.Jq("#Product_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))
 
-	// product_common()
+	//product_common()
 
 	jquery.Jq("#searchbar").Show()
 	jquery.Jq("#actions").Show()
+
 }

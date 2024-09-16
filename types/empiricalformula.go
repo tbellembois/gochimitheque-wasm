@@ -1,17 +1,16 @@
 package types
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
-	"github.com/barweiss/go-tuple"
+	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 	"github.com/tbellembois/gochimitheque/models"
 )
 
-type Select2EmpiricalFormulas struct {
+type EmpiricalFormulas struct {
 	Rows  []*EmpiricalFormula `json:"rows"`
 	Total int                 `json:"total"`
 }
@@ -20,16 +19,16 @@ type EmpiricalFormula struct {
 	*models.EmpiricalFormula
 }
 
-func (elems Select2EmpiricalFormulas) GetRowConcreteTypeName() string {
+func (elems EmpiricalFormulas) GetRowConcreteTypeName() string {
 
 	return "EmpiricalFormula"
 
 }
 
-func (elems Select2EmpiricalFormulas) IsExactMatch() bool {
+func (elems EmpiricalFormulas) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {
-		if elem.MatchExactSearch {
+		if elem.C == 1 {
 			return true
 		}
 	}
@@ -52,35 +51,20 @@ func (e *EmpiricalFormula) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (Select2EmpiricalFormulas) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
+func (EmpiricalFormulas) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
+
 	var (
-		categoriesAjaxResponse tuple.T2[[]struct {
-			MatchExactSearch      bool   `json:"match_exact_search"`
-			EmpiricalFormulaID    int64  `json:"empiricalformula_id"`
-			EmpiricalFormulaLabel string `json:"empiricalformula_label"`
-		}, int]
-		select2EmpiricalFormulas Select2EmpiricalFormulas
-		err                      error
+		empiricalFormulas EmpiricalFormulas
+		err               error
 	)
 
-	jsCategoriesString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
-	if err = json.Unmarshal([]byte(jsCategoriesString), &categoriesAjaxResponse); err != nil {
-		fmt.Println("(Select2EmpiricalFormulas) FromJsJSONValue:" + err.Error())
+	jsEmpiricalFormulasString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
+	if err = json.Unmarshal([]byte(jsEmpiricalFormulasString), &empiricalFormulas); err != nil {
+		fmt.Println(err)
 	}
 
-	for _, empiricalformula := range categoriesAjaxResponse.V1 {
-		select2EmpiricalFormulas.Rows = append(select2EmpiricalFormulas.Rows, &EmpiricalFormula{
-			&models.EmpiricalFormula{
-				MatchExactSearch:      empiricalformula.MatchExactSearch,
-				EmpiricalFormulaID:    sql.NullInt64{Int64: empiricalformula.EmpiricalFormulaID, Valid: true},
-				EmpiricalFormulaLabel: sql.NullString{String: empiricalformula.EmpiricalFormulaLabel, Valid: true},
-			},
-		})
-	}
+	return empiricalFormulas
 
-	select2EmpiricalFormulas.Total = categoriesAjaxResponse.V2
-
-	return select2EmpiricalFormulas
 }
 
 func (e EmpiricalFormula) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
@@ -99,7 +83,7 @@ func (e EmpiricalFormula) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemA
 
 }
 
-func (e Select2EmpiricalFormulas) GetRows() []select2.Select2ItemAble {
+func (e EmpiricalFormulas) GetRows() []select2.Select2ItemAble {
 
 	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(e.Rows))
 
@@ -111,7 +95,7 @@ func (e Select2EmpiricalFormulas) GetRows() []select2.Select2ItemAble {
 
 }
 
-func (e Select2EmpiricalFormulas) GetTotal() int {
+func (e EmpiricalFormulas) GetTotal() int {
 
 	return e.Total
 

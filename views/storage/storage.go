@@ -104,7 +104,7 @@ func storage_common() {
 			URL:            ApplicationProxyPath + "storages/units",
 			DataType:       "json",
 			Data:           js.FuncOf(Select2UnitConcentrationAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Units{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Units{})),
 		},
 	}).Select2ify()
 
@@ -128,7 +128,7 @@ func storage_common() {
 			URL:            ApplicationProxyPath + "storages/units",
 			DataType:       "json",
 			Data:           js.FuncOf(Select2UnitQuantityAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Units{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Units{})),
 		},
 	}).Select2ify()
 

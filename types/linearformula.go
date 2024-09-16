@@ -1,17 +1,16 @@
 package types
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
-	"github.com/barweiss/go-tuple"
+	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 	"github.com/tbellembois/gochimitheque/models"
 )
 
-type Select2LinearFormulas struct {
+type LinearFormulas struct {
 	Rows  []*LinearFormula `json:"rows"`
 	Total int              `json:"total"`
 }
@@ -20,16 +19,16 @@ type LinearFormula struct {
 	*models.LinearFormula
 }
 
-func (elems Select2LinearFormulas) GetRowConcreteTypeName() string {
+func (elems LinearFormulas) GetRowConcreteTypeName() string {
 
 	return "LinearFormula"
 
 }
 
-func (elems Select2LinearFormulas) IsExactMatch() bool {
+func (elems LinearFormulas) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {
-		if elem.MatchExactSearch {
+		if elem.C == 1 {
 			return true
 		}
 	}
@@ -52,35 +51,20 @@ func (e *LinearFormula) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (Select2LinearFormulas) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
+func (LinearFormulas) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
+
 	var (
-		categoriesAjaxResponse tuple.T2[[]struct {
-			MatchExactSearch   bool   `json:"match_exact_search"`
-			LinearFormulaID    int64  `json:"linearformula_id"`
-			LinearFormulaLabel string `json:"linearformula_label"`
-		}, int]
-		select2LinearFormulas Select2LinearFormulas
-		err                   error
+		linearFormulas LinearFormulas
+		err            error
 	)
 
-	jsCategoriesString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
-	if err = json.Unmarshal([]byte(jsCategoriesString), &categoriesAjaxResponse); err != nil {
-		fmt.Println("(Select2LinearFormulas) FromJsJSONValue:" + err.Error())
+	jsLinearFormulasString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
+	if err = json.Unmarshal([]byte(jsLinearFormulasString), &linearFormulas); err != nil {
+		fmt.Println(err)
 	}
 
-	for _, linearformula := range categoriesAjaxResponse.V1 {
-		select2LinearFormulas.Rows = append(select2LinearFormulas.Rows, &LinearFormula{
-			&models.LinearFormula{
-				MatchExactSearch:   linearformula.MatchExactSearch,
-				LinearFormulaID:    sql.NullInt64{Int64: linearformula.LinearFormulaID, Valid: true},
-				LinearFormulaLabel: sql.NullString{String: linearformula.LinearFormulaLabel, Valid: true},
-			},
-		})
-	}
+	return linearFormulas
 
-	select2LinearFormulas.Total = categoriesAjaxResponse.V2
-
-	return select2LinearFormulas
 }
 
 func (e LinearFormula) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
@@ -99,7 +83,7 @@ func (e LinearFormula) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble
 
 }
 
-func (e Select2LinearFormulas) GetRows() []select2.Select2ItemAble {
+func (e LinearFormulas) GetRows() []select2.Select2ItemAble {
 
 	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(e.Rows))
 
@@ -111,7 +95,7 @@ func (e Select2LinearFormulas) GetRows() []select2.Select2ItemAble {
 
 }
 
-func (e Select2LinearFormulas) GetTotal() int {
+func (e LinearFormulas) GetTotal() int {
 
 	return e.Total
 

@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"syscall/js"
 
-	"github.com/barweiss/go-tuple"
+	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 	"github.com/tbellembois/gochimitheque/models"
 )
 
-type Select2Symbols struct {
+type Symbols struct {
 	Rows  []*Symbol `json:"rows"`
 	Total int       `json:"total"`
 }
@@ -19,13 +19,13 @@ type Symbol struct {
 	*models.Symbol
 }
 
-func (elems Select2Symbols) GetRowConcreteTypeName() string {
+func (elems Symbols) GetRowConcreteTypeName() string {
 
 	return "Symbol"
 
 }
 
-func (elems Select2Symbols) IsExactMatch() bool {
+func (elems Symbols) IsExactMatch() bool {
 
 	return false
 
@@ -45,38 +45,23 @@ func (s *Symbol) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (Select2Symbols) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
+func (Symbols) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
+
 	var (
-		symbolsAjaxResponse tuple.T2[[]struct {
-			MatchExactSearch bool   `json:"match_exact_search"`
-			SymbolID         int64  `json:"symbol_id"`
-			SymbolLabel      string `json:"symbol_label"`
-		}, int]
-		select2Symbols Select2Symbols
-		err            error
+		symbols Symbols
+		err     error
 	)
 
 	jsSymbolsString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
-	if err = json.Unmarshal([]byte(jsSymbolsString), &symbolsAjaxResponse); err != nil {
-		fmt.Println("(Select2Symbols) FromJsJSONValue:" + err.Error())
+	if err = json.Unmarshal([]byte(jsSymbolsString), &symbols); err != nil {
+		fmt.Println(err)
 	}
 
-	for _, symbol := range symbolsAjaxResponse.V1 {
-		select2Symbols.Rows = append(select2Symbols.Rows, &Symbol{
-			&models.Symbol{
-				// MatchExactSearch: symbol.MatchExactSearch,
-				SymbolID:    int(symbol.SymbolID),
-				SymbolLabel: symbol.SymbolLabel,
-			},
-		})
-	}
+	return symbols
 
-	select2Symbols.Total = symbolsAjaxResponse.V2
-
-	return select2Symbols
 }
 
-func (s Select2Symbols) GetRows() []select2.Select2ItemAble {
+func (s Symbols) GetRows() []select2.Select2ItemAble {
 
 	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(s.Rows))
 
@@ -88,7 +73,7 @@ func (s Select2Symbols) GetRows() []select2.Select2ItemAble {
 
 }
 
-func (s Select2Symbols) GetTotal() int {
+func (s Symbols) GetTotal() int {
 
 	return s.Total
 

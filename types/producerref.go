@@ -21,10 +21,13 @@ type ProducerRef struct {
 }
 
 func (elems Select2ProducerRefs) GetRowConcreteTypeName() string {
+
 	return "ProducerRef"
+
 }
 
 func (p ProducerRef) ToJsValue() js.Value {
+
 	var (
 		marshalJson []byte
 		err         error
@@ -36,9 +39,11 @@ func (p ProducerRef) ToJsValue() js.Value {
 	}
 
 	return js.Global().Get("JSON").Call("parse", string(marshalJson))
+
 }
 
 func (elems Select2ProducerRefs) IsExactMatch() bool {
+
 	for _, elem := range elems.Rows {
 		if elem.MatchExactSearch {
 			return true
@@ -46,9 +51,11 @@ func (elems Select2ProducerRefs) IsExactMatch() bool {
 	}
 
 	return false
+
 }
 
 func (r ProducerRef) MarshalJSON() ([]byte, error) {
+
 	type Copy ProducerRef
 	return json.Marshal(&struct {
 		Id   int    `json:"id"`
@@ -59,11 +66,13 @@ func (r ProducerRef) MarshalJSON() ([]byte, error) {
 		Text: r.GetSelect2Text(),
 		Copy: (Copy)(r),
 	})
+
 }
 
 func (Select2ProducerRefs) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
+
 	var (
-		producerRefsAjaxResponse tuple.T2[[]struct {
+		producersAjaxResponse tuple.T2[[]struct {
 			MatchExactSearch bool   `json:"match_exact_search"`
 			ProducerRefID    int64  `json:"producerref_id"`
 			ProducerRefLabel string `json:"producerref_label"`
@@ -73,11 +82,11 @@ func (Select2ProducerRefs) FromJsJSONValue(jsvalue js.Value) select2.Select2Resu
 	)
 
 	jsProducersString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
-	if err = json.Unmarshal([]byte(jsProducersString), &producerRefsAjaxResponse); err != nil {
+	if err = json.Unmarshal([]byte(jsProducersString), &producersAjaxResponse); err != nil {
 		fmt.Println("(Select2ProducerRefs) FromJsJSONValue:" + err.Error())
 	}
 
-	for _, producerref := range producerRefsAjaxResponse.V1 {
+	for _, producerref := range producersAjaxResponse.V1 {
 		select2ProducerRefs.Rows = append(select2ProducerRefs.Rows, &ProducerRef{
 			&models.ProducerRef{
 				MatchExactSearch: producerref.MatchExactSearch,
@@ -87,12 +96,14 @@ func (Select2ProducerRefs) FromJsJSONValue(jsvalue js.Value) select2.Select2Resu
 		})
 	}
 
-	select2ProducerRefs.Total = producerRefsAjaxResponse.V2
+	select2ProducerRefs.Total = producersAjaxResponse.V2
 
 	return select2ProducerRefs
+
 }
 
 func (r Select2ProducerRefs) GetRows() []select2.Select2ItemAble {
+
 	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(r.Rows))
 
 	for i, row := range r.Rows {
@@ -100,13 +111,17 @@ func (r Select2ProducerRefs) GetRows() []select2.Select2ItemAble {
 	}
 
 	return select2ItemAble
+
 }
 
 func (r Select2ProducerRefs) GetTotal() int {
+
 	return r.Total
+
 }
 
 func (r ProducerRef) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
+
 	var (
 		producerRef ProducerRef
 		err         error
@@ -118,16 +133,21 @@ func (r ProducerRef) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 	}
 
 	return producerRef
+
 }
 
 func (r ProducerRef) GetSelect2Id() int {
+
 	return int(r.ProducerRefID.Int64)
+
 }
 
 func (r ProducerRef) GetSelect2Text() string {
+
 	if r.ProducerRef != nil {
 		return r.ProducerRefLabel.String
 	}
 
 	return ""
+
 }
