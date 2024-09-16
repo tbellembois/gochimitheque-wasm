@@ -444,12 +444,12 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		}
 	}
 
-	// if jquery.Jq("#hidden_product_molformula_content").GetVal().Truthy() {
-	// 	globals.CurrentProduct.ProductMolFormula = sql.NullString{
-	// 		String: jquery.Jq("#hidden_product_molformula_content").GetVal().String(),
-	// 		Valid:  true,
-	// 	}
-	// }
+	if jquery.Jq("#hidden_product_molformula_content").GetVal().Truthy() {
+		globals.CurrentProduct.ProductMolFormula = sql.NullString{
+			String: jquery.Jq("#hidden_product_molformula_content").GetVal().String(),
+			Valid:  true,
+		}
+	}
 
 	if jquery.Jq("input#product_sheet").GetVal().Truthy() {
 		globals.CurrentProduct.ProductSheet = sql.NullString{

@@ -1,17 +1,16 @@
 package types
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
-	"github.com/barweiss/go-tuple"
+	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 	"github.com/tbellembois/gochimitheque/models"
 )
 
-type Select2ProducerRefs struct {
+type ProducerRefs struct {
 	Rows  []*ProducerRef `json:"rows"`
 	Total int            `json:"total"`
 }
@@ -20,7 +19,7 @@ type ProducerRef struct {
 	*models.ProducerRef
 }
 
-func (elems Select2ProducerRefs) GetRowConcreteTypeName() string {
+func (elems ProducerRefs) GetRowConcreteTypeName() string {
 
 	return "ProducerRef"
 
@@ -42,10 +41,10 @@ func (p ProducerRef) ToJsValue() js.Value {
 
 }
 
-func (elems Select2ProducerRefs) IsExactMatch() bool {
+func (elems ProducerRefs) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {
-		if elem.MatchExactSearch {
+		if elem.C == 1 {
 			return true
 		}
 	}
@@ -69,40 +68,23 @@ func (r ProducerRef) MarshalJSON() ([]byte, error) {
 
 }
 
-func (Select2ProducerRefs) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
+func (ProducerRefs) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 
 	var (
-		producersAjaxResponse tuple.T2[[]struct {
-			MatchExactSearch bool   `json:"match_exact_search"`
-			ProducerRefID    int64  `json:"producerref_id"`
-			ProducerRefLabel string `json:"producerref_label"`
-		}, int]
-		select2ProducerRefs Select2ProducerRefs
-		err                 error
+		producerRefs ProducerRefs
+		err          error
 	)
 
-	jsProducersString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
-	if err = json.Unmarshal([]byte(jsProducersString), &producersAjaxResponse); err != nil {
-		fmt.Println("(Select2ProducerRefs) FromJsJSONValue:" + err.Error())
+	jsProducerRefsString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
+	if err = json.Unmarshal([]byte(jsProducerRefsString), &producerRefs); err != nil {
+		fmt.Println(err)
 	}
 
-	for _, producerref := range producersAjaxResponse.V1 {
-		select2ProducerRefs.Rows = append(select2ProducerRefs.Rows, &ProducerRef{
-			&models.ProducerRef{
-				MatchExactSearch: producerref.MatchExactSearch,
-				ProducerRefID:    sql.NullInt64{Int64: producerref.ProducerRefID, Valid: true},
-				ProducerRefLabel: sql.NullString{String: producerref.ProducerRefLabel, Valid: true},
-			},
-		})
-	}
-
-	select2ProducerRefs.Total = producersAjaxResponse.V2
-
-	return select2ProducerRefs
+	return producerRefs
 
 }
 
-func (r Select2ProducerRefs) GetRows() []select2.Select2ItemAble {
+func (r ProducerRefs) GetRows() []select2.Select2ItemAble {
 
 	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(r.Rows))
 
@@ -114,7 +96,7 @@ func (r Select2ProducerRefs) GetRows() []select2.Select2ItemAble {
 
 }
 
-func (r Select2ProducerRefs) GetTotal() int {
+func (r ProducerRefs) GetTotal() int {
 
 	return r.Total
 
