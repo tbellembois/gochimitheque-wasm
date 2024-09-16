@@ -62,7 +62,7 @@ func (Select2Suppliers) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultA
 
 	jsSuppliersString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
 	if err = json.Unmarshal([]byte(jsSuppliersString), &suppliersAjaxResponse); err != nil {
-		fmt.Println("(Select2Suppliers) FromJsJSONValue:" + err.Error())
+		fmt.Println("(Suppliers) FromJsJSONValue:" + err.Error())
 	}
 
 	for _, supplier := range suppliersAjaxResponse.V1 {
@@ -76,6 +76,8 @@ func (Select2Suppliers) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultA
 	}
 
 	select2Suppliers.Total = suppliersAjaxResponse.V2
+
+	fmt.Println(select2Suppliers)
 
 	return select2Suppliers
 
