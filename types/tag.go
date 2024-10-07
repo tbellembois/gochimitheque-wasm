@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"syscall/js"
 
-	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 	"github.com/tbellembois/gochimitheque/models"
 )
@@ -28,7 +27,7 @@ func (elems Tags) GetRowConcreteTypeName() string {
 func (elems Tags) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {
-		if elem.C == 1 {
+		if elem.MatchExactSearch {
 			return true
 		}
 	}

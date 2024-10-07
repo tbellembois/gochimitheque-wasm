@@ -1,17 +1,15 @@
 package types
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"syscall/js"
 
-	"github.com/barweiss/go-tuple"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 	"github.com/tbellembois/gochimitheque/models"
 )
 
-type Select2Suppliers struct {
+type Suppliers struct {
 	Rows  []*Supplier `json:"rows"`
 	Total int         `json:"total"`
 }
@@ -20,13 +18,13 @@ type Supplier struct {
 	*models.Supplier
 }
 
-func (elems Select2Suppliers) GetRowConcreteTypeName() string {
+func (elems Suppliers) GetRowConcreteTypeName() string {
 
 	return "Supplier"
 
 }
 
-func (elems Select2Suppliers) IsExactMatch() bool {
+func (elems Suppliers) IsExactMatch() bool {
 
 	return false
 
@@ -48,42 +46,23 @@ func (s *Supplier) MarshalJSON() ([]byte, error) {
 
 }
 
-func (Select2Suppliers) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
+func (Suppliers) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 
 	var (
-		suppliersAjaxResponse tuple.T2[[]struct {
-			MatchExactSearch bool   `json:"match_exact_search"`
-			SupplierID       int64  `json:"supplier_id"`
-			SupplierLabel    string `json:"supplier_label"`
-		}, int]
-		select2Suppliers Select2Suppliers
-		err              error
+		suppliers Suppliers
+		err       error
 	)
 
 	jsSuppliersString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
-	if err = json.Unmarshal([]byte(jsSuppliersString), &suppliersAjaxResponse); err != nil {
-		fmt.Println("(Suppliers) FromJsJSONValue:" + err.Error())
+	if err = json.Unmarshal([]byte(jsSuppliersString), &suppliers); err != nil {
+		fmt.Println(err)
 	}
 
-	for _, supplier := range suppliersAjaxResponse.V1 {
-		select2Suppliers.Rows = append(select2Suppliers.Rows, &Supplier{
-			&models.Supplier{
-				MatchExactSearch: supplier.MatchExactSearch,
-				SupplierID:       sql.NullInt64{Int64: supplier.SupplierID, Valid: true},
-				SupplierLabel:    sql.NullString{String: supplier.SupplierLabel, Valid: true},
-			},
-		})
-	}
-
-	select2Suppliers.Total = suppliersAjaxResponse.V2
-
-	fmt.Println(select2Suppliers)
-
-	return select2Suppliers
+	return suppliers
 
 }
 
-func (s Select2Suppliers) GetRows() []select2.Select2ItemAble {
+func (s Suppliers) GetRows() []select2.Select2ItemAble {
 
 	var select2ItemAble []select2.Select2ItemAble = make([]select2.Select2ItemAble, len(s.Rows))
 
@@ -95,7 +74,7 @@ func (s Select2Suppliers) GetRows() []select2.Select2ItemAble {
 
 }
 
-func (r Select2Suppliers) GetTotal() int {
+func (r Suppliers) GetTotal() int {
 
 	return r.Total
 
@@ -119,14 +98,14 @@ func (s Supplier) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 
 func (s Supplier) GetSelect2Id() int {
 
-	return int(s.SupplierID.Int64)
+	return int(*s.SupplierID)
 
 }
 
 func (s Supplier) GetSelect2Text() string {
 
 	if s.Supplier != nil {
-		return s.SupplierLabel.String
+		return *s.SupplierLabel
 	}
 
 	return ""

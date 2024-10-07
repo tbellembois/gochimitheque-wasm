@@ -54,16 +54,16 @@ func (s *StoreLocation) MarshalJSON() ([]byte, error) {
 func (StoreLocations) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAble {
 
 	var (
-		storelocations StoreLocations
+		store_locations StoreLocations
 		err            error
 	)
 
 	jsStoreLocationsString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
-	if err = json.Unmarshal([]byte(jsStoreLocationsString), &storelocations); err != nil {
+	if err = json.Unmarshal([]byte(jsStoreLocationsString), &store_locations); err != nil {
 		fmt.Println(err)
 	}
 
-	return storelocations
+	return store_locations
 
 }
 
@@ -88,16 +88,16 @@ func (s StoreLocations) GetTotal() int {
 func (s StoreLocation) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 
 	var (
-		storelocation StoreLocation
+		store_location StoreLocation
 		err           error
 	)
 
 	jsStoreLocationString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
-	if err = json.Unmarshal([]byte(jsStoreLocationString), &storelocation); err != nil {
+	if err = json.Unmarshal([]byte(jsStoreLocationString), &store_location); err != nil {
 		fmt.Println(err)
 	}
 
-	return storelocation
+	return store_location
 
 }
 

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"syscall/js"
 
-	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 	"github.com/tbellembois/gochimitheque/models"
 )
@@ -28,7 +27,7 @@ func (elems PhysicalStates) GetRowConcreteTypeName() string {
 func (elems PhysicalStates) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {
-		if elem.C == 1 {
+		if elem.MatchExactSearch {
 			return true
 		}
 	}
@@ -103,14 +102,14 @@ func (p PhysicalStates) GetTotal() int {
 
 func (p PhysicalState) GetSelect2Id() int {
 
-	return int(p.PhysicalStateID.Int64)
+	return int(*p.PhysicalStateID)
 
 }
 
 func (p PhysicalState) GetSelect2Text() string {
 
 	if p.PhysicalState != nil {
-		return p.PhysicalStateLabel.String
+		return *p.PhysicalStateLabel
 	}
 
 	return ""

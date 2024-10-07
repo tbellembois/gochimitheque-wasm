@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"syscall/js"
 
-	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 	"github.com/tbellembois/gochimitheque/models"
 )
@@ -96,14 +95,14 @@ func (u Units) GetTotal() int {
 
 func (u Unit) GetSelect2Id() int {
 
-	return int(u.UnitID.Int64)
+	return int(*u.UnitID)
 
 }
 
 func (u Unit) GetSelect2Text() string {
 
 	if u.Unit != nil {
-		return u.UnitLabel.String
+		return *u.UnitLabel
 	}
 
 	return ""

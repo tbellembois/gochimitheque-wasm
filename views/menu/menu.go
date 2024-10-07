@@ -32,10 +32,10 @@ func LoadContentWrapper(this js.Value, args []js.Value) interface{} {
 	entityCreateCallbackWrapper := func(args ...interface{}) {
 		entity.Entity_createCallBack(js.Null(), nil)
 	}
-	storelocationCallbackWrapper := func(args ...interface{}) {
+	store_locationCallbackWrapper := func(args ...interface{}) {
 		storelocation.StoreLocation_listCallback(js.Null(), nil)
 	}
-	storelocationCreateCallbackWrapper := func(args ...interface{}) {
+	store_locationCreateCallbackWrapper := func(args ...interface{}) {
 		storelocation.StoreLocation_createCallBack(js.Null(), nil)
 	}
 	personCallbackWrapper := func(args ...interface{}) {
@@ -65,9 +65,9 @@ func LoadContentWrapper(this js.Value, args []js.Value) interface{} {
 	case "Entity_create":
 		callbackFunc = entityCreateCallbackWrapper
 	case "StoreLocation_list":
-		callbackFunc = storelocationCallbackWrapper
+		callbackFunc = store_locationCallbackWrapper
 	case "StoreLocation_create":
-		callbackFunc = storelocationCreateCallbackWrapper
+		callbackFunc = store_locationCreateCallbackWrapper
 	case "Person_list":
 		callbackFunc = personCallbackWrapper
 	case "Person_create":
@@ -119,13 +119,13 @@ func ShowIfAuthorizedMenuItems(args ...interface{}) {
 	})
 
 	jsutils.HasPermission("storages", "-2", "get", func() {
-		jquery.Jq("#menu_storelocations").FadeIn()
+		jquery.Jq("#menu_store_locations").FadeIn()
 		jquery.Jq("#menu_management").FadeIn()
 	}, func() {
 	})
 
 	jsutils.HasPermission("storelocations", "", "post", func() {
-		jquery.Jq("#menu_create_storelocation").FadeIn()
+		jquery.Jq("#menu_create_store_location").FadeIn()
 		jquery.Jq("#menu_management").FadeIn()
 	}, func() {
 	})

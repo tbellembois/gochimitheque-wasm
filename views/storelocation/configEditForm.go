@@ -21,10 +21,10 @@ import (
 
 func FillInStoreLocationForm(s StoreLocation, id string) {
 
-	jquery.Jq(fmt.Sprintf("#%s #storelocation_id", id)).SetVal(s.StoreLocationID.Int64)
-	jquery.Jq(fmt.Sprintf("#%s #storelocation_name", id)).SetVal(s.StoreLocationName.String)
-	jquery.Jq(fmt.Sprintf("#%s #storelocation_canstore", id)).SetProp("checked", s.StoreLocationCanStore.Bool)
-	jquery.Jq(fmt.Sprintf("#%s #storelocation_color", id)).SetVal(s.StoreLocationColor.String)
+	jquery.Jq(fmt.Sprintf("#%s #store_location_id", id)).SetVal(s.StoreLocationID.Int64)
+	jquery.Jq(fmt.Sprintf("#%s #store_location_name", id)).SetVal(s.StoreLocationName.String)
+	jquery.Jq(fmt.Sprintf("#%s #store_location_can_store", id)).SetProp("checked", s.StoreLocationCanStore.Bool)
+	jquery.Jq(fmt.Sprintf("#%s #store_location_color", id)).SetVal(s.StoreLocationColor.String)
 
 	select2Entity := select2.NewSelect2(jquery.Jq("select#entity"), nil)
 	select2Entity.Select2Clear()
@@ -36,7 +36,7 @@ func FillInStoreLocationForm(s StoreLocation, id string) {
 			Selected:        true,
 		}).HTMLElement.OuterHTML())
 
-	select2StoreLocation := select2.NewSelect2(jquery.Jq("select#storelocation"), nil)
+	select2StoreLocation := select2.NewSelect2(jquery.Jq("select#store_location"), nil)
 	select2StoreLocation.Select2Clear()
 
 	var parentId, parentName string
@@ -64,14 +64,14 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 		err                 error
 	)
 
-	if !validate.NewValidate(jquery.Jq("#storelocation"), nil).Valid() {
+	if !validate.NewValidate(jquery.Jq("#store_location"), nil).Valid() {
 		return nil
 	}
 
 	storelocation = &StoreLocation{StoreLocation: &models.StoreLocation{}}
 
-	if jquery.Jq("input#storelocation_id").GetVal().Truthy() {
-		if storelocationId, err = strconv.Atoi(jquery.Jq("input#storelocation_id").GetVal().String()); err != nil {
+	if jquery.Jq("input#store_location_id").GetVal().Truthy() {
+		if storelocationId, err = strconv.Atoi(jquery.Jq("input#store_location_id").GetVal().String()); err != nil {
 			fmt.Println(err)
 			return nil
 		}
@@ -82,7 +82,7 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 		}}
 	}
 
-	if jquery.Jq("input#storelocation_canstore:checked").Object.Length() > 0 {
+	if jquery.Jq("input#store_location_can_store:checked").Object.Length() > 0 {
 		storelocation.StoreLocationCanStore = models.NullBool{sql.NullBool{
 			Bool:  true,
 			Valid: true,
@@ -90,11 +90,11 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 	}
 
 	storelocation.StoreLocationName = models.NullString{sql.NullString{
-		String: jquery.Jq("input#storelocation_name").GetVal().String(),
+		String: jquery.Jq("input#store_location_name").GetVal().String(),
 		Valid:  true,
 	}}
 	storelocation.StoreLocationColor = models.NullString{sql.NullString{
-		String: jquery.Jq("input#storelocation_color").GetVal().String(),
+		String: jquery.Jq("input#store_location_color").GetVal().String(),
 		Valid:  true,
 	}}
 
@@ -108,7 +108,7 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 
 	storelocation.Entity.EntityName = select2ItemEntity.Select2Data()[0].Text
 
-	select2StoreLocation := select2.NewSelect2(jquery.Jq("select#storelocation"), nil)
+	select2StoreLocation := select2.NewSelect2(jquery.Jq("select#store_location"), nil)
 	if len(select2StoreLocation.Select2Data()) > 0 {
 		select2ItemStoreLocation := select2StoreLocation.Select2Data()[0]
 		if !select2ItemStoreLocation.IsEmpty() {
@@ -131,7 +131,7 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	if jquery.Jq("form#storelocation input#storelocation_id").Object.Length() > 0 {
+	if jquery.Jq("form#store_location input#store_location_id").Object.Length() > 0 {
 		ajaxURL = fmt.Sprintf("%sstorelocations/%d", ApplicationProxyPath, storelocation.StoreLocationID.Int64)
 		ajaxMethod = "put"
 	} else {
@@ -160,7 +160,7 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 			// TODO: use entityId for redirection
 			href := fmt.Sprintf("%sv/storelocations", ApplicationProxyPath)
 			jsutils.ClearSearch(js.Null(), nil)
-			jsutils.LoadContent("div#content", "storelocation", href, StoreLocation_SaveCallback, storelocation.StoreLocationName.String)
+			jsutils.LoadContent("div#content", "store_location", href, StoreLocation_SaveCallback, storelocation.StoreLocationName.String)
 
 		},
 		Fail: func(jqXHR js.Value) {

@@ -62,7 +62,7 @@ func FilterItem(title, value string) string {
 		},
 	})
 	// switch title {
-	// case "s_casnumber_cmr", "s_borrowing", "s_storage_to_destroy":
+	// case "s_cas_number_cmr", "s_borrowing", "s_storage_to_destroy":
 	// 	colValue.AppendChild(NewIcon(IconAttributes{
 	// 		BaseAttributes: BaseAttributes{
 	// 			Visible: true,

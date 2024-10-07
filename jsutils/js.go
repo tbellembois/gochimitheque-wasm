@@ -91,42 +91,42 @@ func clearSearchForm() {
 	if select2.NewSelect2(jquery.Jq("select#s_category"), nil).Select2IsInitialized() {
 		select2.NewSelect2(jquery.Jq("select#s_category"), nil).Select2Clear()
 	}
-	if select2.NewSelect2(jquery.Jq("select#s_storelocation"), nil).Select2IsInitialized() {
-		select2.NewSelect2(jquery.Jq("select#s_storelocation"), nil).Select2Clear()
+	if select2.NewSelect2(jquery.Jq("select#s_store_location"), nil).Select2IsInitialized() {
+		select2.NewSelect2(jquery.Jq("select#s_store_location"), nil).Select2Clear()
 	}
 	if select2.NewSelect2(jquery.Jq("select#s_name"), nil).Select2IsInitialized() {
 		select2.NewSelect2(jquery.Jq("select#s_name"), nil).Select2Clear()
 	}
-	if select2.NewSelect2(jquery.Jq("select#s_empiricalformula"), nil).Select2IsInitialized() {
-		select2.NewSelect2(jquery.Jq("select#s_empiricalformula"), nil).Select2Clear()
+	if select2.NewSelect2(jquery.Jq("select#s_empirical_formula"), nil).Select2IsInitialized() {
+		select2.NewSelect2(jquery.Jq("select#s_empirical_formula"), nil).Select2Clear()
 	}
-	if select2.NewSelect2(jquery.Jq("select#s_producerref"), nil).Select2IsInitialized() {
-		select2.NewSelect2(jquery.Jq("select#s_producerref"), nil).Select2Clear()
+	if select2.NewSelect2(jquery.Jq("select#s_producer_ref"), nil).Select2IsInitialized() {
+		select2.NewSelect2(jquery.Jq("select#s_producer_ref"), nil).Select2Clear()
 	}
-	if select2.NewSelect2(jquery.Jq("select#s_casnumber"), nil).Select2IsInitialized() {
-		select2.NewSelect2(jquery.Jq("select#s_casnumber"), nil).Select2Clear()
+	if select2.NewSelect2(jquery.Jq("select#s_cas_number"), nil).Select2IsInitialized() {
+		select2.NewSelect2(jquery.Jq("select#s_cas_number"), nil).Select2Clear()
 	}
-	if select2.NewSelect2(jquery.Jq("select#s_signalword"), nil).Select2IsInitialized() {
-		select2.NewSelect2(jquery.Jq("select#s_signalword"), nil).Select2Clear()
+	if select2.NewSelect2(jquery.Jq("select#s_signal_word"), nil).Select2IsInitialized() {
+		select2.NewSelect2(jquery.Jq("select#s_signal_word"), nil).Select2Clear()
 	}
 	if select2.NewSelect2(jquery.Jq("select#s_symbols"), nil).Select2IsInitialized() {
 		select2.NewSelect2(jquery.Jq("select#s_symbols"), nil).Select2Clear()
 	}
-	if select2.NewSelect2(jquery.Jq("select#s_hazardstatements"), nil).Select2IsInitialized() {
-		select2.NewSelect2(jquery.Jq("select#s_hazardstatements"), nil).Select2Clear()
+	if select2.NewSelect2(jquery.Jq("select#s_hazard_statements"), nil).Select2IsInitialized() {
+		select2.NewSelect2(jquery.Jq("select#s_hazard_statements"), nil).Select2Clear()
 	}
-	if select2.NewSelect2(jquery.Jq("select#s_precautionarystatements"), nil).Select2IsInitialized() {
-		select2.NewSelect2(jquery.Jq("select#s_precautionarystatements"), nil).Select2Clear()
+	if select2.NewSelect2(jquery.Jq("select#s_precautionary_statements"), nil).Select2IsInitialized() {
+		select2.NewSelect2(jquery.Jq("select#s_precautionary_statements"), nil).Select2Clear()
 	}
 
-	jquery.Jq("#s_casnumber_cmr:checked").SetProp("checked", false)
+	jquery.Jq("#s_cas_number_cmr:checked").SetProp("checked", false)
 	jquery.Jq("#s_borrowing:checked").SetProp("checked", false)
 	jquery.Jq("#s_storage_to_destroy:checked").SetProp("checked", false)
 	jquery.Jq("#searchshowchem").SetProp("checked", true)
 	jquery.Jq("#searchshowbio").SetProp("checked", true)
 	jquery.Jq("#searchshowconsu").SetProp("checked", true)
 
-	jquery.Jq("#s_storage_batchnumber").SetVal("")
+	jquery.Jq("#s_storage_batch_number").SetVal("")
 	jquery.Jq("#s_storage_barecode").SetVal("")
 	jquery.Jq("#s_custom_name_part_of").SetVal("")
 
@@ -363,13 +363,13 @@ func DisplayFilter(q ajax.QueryFilter) {
 	// }
 	// if q.CasNumber != "" {
 	// 	// isFilter = true
-	// 	jquery.Jq("#filter-item").Append(widgets.FilterItem("s_casnumber", q.CasNumberFilterLabel))
-	// 	jquery.Jq("#removefilters_casnumber").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	// 	jquery.Jq("#filter-item").Append(widgets.FilterItem("s_cas_number", q.CasNumberFilterLabel))
+	// 	jquery.Jq("#removefilters_cas_number").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 	// 		globals.BSTableQueryFilter.Lock()
 	// 		globals.BSTableQueryFilter.CasNumber = ""
 	// 		globals.BSTableQueryFilter.Unlock()
-	// 		if select2.NewSelect2(jquery.Jq("select#s_casnumber"), nil).Select2IsInitialized() {
-	// 			select2.NewSelect2(jquery.Jq("select#s_casnumber"), nil).Select2Clear()
+	// 		if select2.NewSelect2(jquery.Jq("select#s_cas_number"), nil).Select2IsInitialized() {
+	// 			select2.NewSelect2(jquery.Jq("select#s_cas_number"), nil).Select2Clear()
 	// 		}
 	// 		Search(js.Null(), nil)
 	// 		return nil
@@ -377,13 +377,13 @@ func DisplayFilter(q ajax.QueryFilter) {
 	// }
 	// if q.EmpiricalFormula != "" {
 	// 	// isFilter = true
-	// 	jquery.Jq("#filter-item").Append(widgets.FilterItem("s_empiricalformula", q.EmpiricalFormulaFilterLabel))
-	// 	jquery.Jq("#removefilters_empiricalformula").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	// 	jquery.Jq("#filter-item").Append(widgets.FilterItem("s_empirical_formula", q.EmpiricalFormulaFilterLabel))
+	// 	jquery.Jq("#removefilters_empirical_formula").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 	// 		globals.BSTableQueryFilter.Lock()
 	// 		globals.BSTableQueryFilter.EmpiricalFormula = ""
 	// 		globals.BSTableQueryFilter.Unlock()
-	// 		if select2.NewSelect2(jquery.Jq("select#s_empiricalformula"), nil).Select2IsInitialized() {
-	// 			select2.NewSelect2(jquery.Jq("select#s_empiricalformula"), nil).Select2Clear()
+	// 		if select2.NewSelect2(jquery.Jq("select#s_empirical_formula"), nil).Select2IsInitialized() {
+	// 			select2.NewSelect2(jquery.Jq("select#s_empirical_formula"), nil).Select2Clear()
 	// 		}
 	// 		Search(js.Null(), nil)
 	// 		return nil
@@ -403,25 +403,25 @@ func DisplayFilter(q ajax.QueryFilter) {
 	// }
 	// if q.StorageBatchNumber != "" {
 	// 	// isFilter = true
-	// 	jquery.Jq("#filter-item").Append(widgets.FilterItem("storage_batchnumber_title", q.StorageBatchNumberFilterLabel))
-	// 	jquery.Jq("#removefilterstorage_batchnumber_title").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	// 	jquery.Jq("#filter-item").Append(widgets.FilterItem("storage_batch_number_title", q.StorageBatchNumberFilterLabel))
+	// 	jquery.Jq("#removefilterstorage_batch_number_title").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 	// 		globals.BSTableQueryFilter.Lock()
 	// 		globals.BSTableQueryFilter.StorageBatchNumber = ""
 	// 		globals.BSTableQueryFilter.Unlock()
-	// 		jquery.Jq("#s_storage_batchnumber").SetVal("")
+	// 		jquery.Jq("#s_storage_batch_number").SetVal("")
 	// 		Search(js.Null(), nil)
 	// 		return nil
 	// 	}))
 	// }
 	// if q.StoreLocation != "" {
 	// 	// isFilter = true
-	// 	jquery.Jq("#filter-item").Append(widgets.FilterItem("s_storelocation", q.StoreLocationFilterLabel))
-	// 	jquery.Jq("#removefilters_storelocation").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	// 	jquery.Jq("#filter-item").Append(widgets.FilterItem("s_store_location", q.StoreLocationFilterLabel))
+	// 	jquery.Jq("#removefilters_store_location").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 	// 		globals.BSTableQueryFilter.Lock()
 	// 		globals.BSTableQueryFilter.StoreLocation = ""
 	// 		globals.BSTableQueryFilter.Unlock()
-	// 		if select2.NewSelect2(jquery.Jq("select#s_storelocation"), nil).Select2IsInitialized() {
-	// 			select2.NewSelect2(jquery.Jq("select#s_storelocation"), nil).Select2Clear()
+	// 		if select2.NewSelect2(jquery.Jq("select#s_store_location"), nil).Select2IsInitialized() {
+	// 			select2.NewSelect2(jquery.Jq("select#s_store_location"), nil).Select2Clear()
 	// 		}
 	// 		Search(js.Null(), nil)
 	// 		return nil
@@ -443,13 +443,13 @@ func DisplayFilter(q ajax.QueryFilter) {
 	// }
 	// if q.ProducerRef != "" {
 	// 	// isFilter = true
-	// 	jquery.Jq("#filter-item").Append(widgets.FilterItem("s_producerref", q.ProducerRefFilterLabel))
-	// 	jquery.Jq("#removefilters_producerref").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	// 	jquery.Jq("#filter-item").Append(widgets.FilterItem("s_producer_ref", q.ProducerRefFilterLabel))
+	// 	jquery.Jq("#removefilters_producer_ref").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 	// 		globals.BSTableQueryFilter.Lock()
 	// 		globals.BSTableQueryFilter.ProducerRef = ""
 	// 		globals.BSTableQueryFilter.Unlock()
-	// 		if select2.NewSelect2(jquery.Jq("select#s_producerref"), nil).Select2IsInitialized() {
-	// 			select2.NewSelect2(jquery.Jq("select#s_producerref"), nil).Select2Clear()
+	// 		if select2.NewSelect2(jquery.Jq("select#s_producer_ref"), nil).Select2IsInitialized() {
+	// 			select2.NewSelect2(jquery.Jq("select#s_producer_ref"), nil).Select2Clear()
 	// 		}
 	// 		Search(js.Null(), nil)
 	// 		return nil
@@ -483,12 +483,12 @@ func DisplayFilter(q ajax.QueryFilter) {
 
 	// if q.CasNumberCMR {
 	// 	// isFilter = true
-	// 	jquery.Jq("#filter-item").Append(widgets.FilterItem("s_casnumber_cmr", q.CasNumberCMRFilterLabel))
-	// 	jquery.Jq("#removefilters_casnumber_cmr").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	// 	jquery.Jq("#filter-item").Append(widgets.FilterItem("s_cas_number_cmr", q.CasNumberCMRFilterLabel))
+	// 	jquery.Jq("#removefilters_cas_number_cmr").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 	// 		globals.BSTableQueryFilter.Lock()
 	// 		globals.BSTableQueryFilter.CasNumberCMR = false
 	// 		globals.BSTableQueryFilter.Unlock()
-	// 		jquery.Jq("#s_casnumber_cmr").SetProp("checked", false)
+	// 		jquery.Jq("#s_cas_number_cmr").SetProp("checked", false)
 	// 		Search(js.Null(), nil)
 	// 		return nil
 	// 	}))
@@ -530,12 +530,12 @@ func DisplayFilter(q ajax.QueryFilter) {
 
 }
 
-func ShowStockRecursive(storelocation *models.StoreLocation, depth int, jqSelector string) {
+func ShowStockRecursive(store_location *models.StoreLocation, depth int, jqSelector string) {
 
 	// Checking if there is a stock or not for the store location.
 	hasStock := false
 
-	for _, stock := range storelocation.Stocks {
+	for _, stock := range store_location.Stocks {
 		if stock.Total != 0 || stock.Current != 0 {
 			hasStock = true
 			continue
@@ -560,10 +560,10 @@ func ShowStockRecursive(storelocation *models.StoreLocation, depth int, jqSelect
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: fmt.Sprintf("%s %s", depthSep, storelocation.StoreLocationName.String),
+			Text: fmt.Sprintf("%s %s", depthSep, store_location.StoreLocationName.String),
 		}))
 
-		for _, stock := range storelocation.Stocks {
+		for _, stock := range store_location.Stocks {
 
 			if !(stock.Total == 0 && stock.Current == 0) {
 
@@ -573,14 +573,14 @@ func ShowStockRecursive(storelocation *models.StoreLocation, depth int, jqSelect
 						Classes: []string{"ml-sm-2"},
 					},
 					Icon:  themes.NewMdiIcon(themes.MDI_ARROW_RIGHT, ""),
-					Title: locales.Translate("stock_storelocation_title", globals.HTTPHeaderAcceptLanguage),
+					Title: locales.Translate("stock_store_location_title", globals.HTTPHeaderAcceptLanguage),
 				}))
 				rowStorelocation.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 					BaseAttributes: widgets.BaseAttributes{
 						Visible: true,
 						Classes: []string{""},
 					},
-					Text: fmt.Sprintf("%g %s", stock.Current, stock.Unit.UnitLabel.String),
+					Text: fmt.Sprintf("%g %s", stock.Current, *stock.Unit.UnitLabel),
 				}))
 				rowStorelocation.AppendChild(widgets.NewIcon(widgets.IconAttributes{
 					BaseAttributes: widgets.BaseAttributes{
@@ -588,14 +588,14 @@ func ShowStockRecursive(storelocation *models.StoreLocation, depth int, jqSelect
 						Classes: []string{"ml-sm-2"},
 					},
 					Icon:  themes.NewMdiIcon(themes.MDI_SUBSTORELOCATION, ""),
-					Title: locales.Translate("stock_storelocation_sub_title", globals.HTTPHeaderAcceptLanguage),
+					Title: locales.Translate("stock_store_location_sub_title", globals.HTTPHeaderAcceptLanguage),
 				}))
 				rowStorelocation.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 					BaseAttributes: widgets.BaseAttributes{
 						Visible: true,
 						Classes: []string{""},
 					},
-					Text: fmt.Sprintf("%g %s", stock.Total, stock.Unit.UnitLabel.String),
+					Text: fmt.Sprintf("%g %s", stock.Total, *stock.Unit.UnitLabel),
 				}))
 
 			}
@@ -606,9 +606,9 @@ func ShowStockRecursive(storelocation *models.StoreLocation, depth int, jqSelect
 
 	}
 
-	if len(storelocation.Children) > 0 {
+	if len(store_location.Children) > 0 {
 		depth++
-		for _, child := range storelocation.Children {
+		for _, child := range store_location.Children {
 
 			ShowStockRecursive(child, depth, jqSelector)
 

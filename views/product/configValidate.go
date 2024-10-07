@@ -28,7 +28,7 @@ func ValidateProductCeNumberBeforeSend(this js.Value, args []js.Value) interface
 
 func ValidateProductCeNumberData(this js.Value, args []js.Value) interface{} {
 
-	return select2.NewSelect2(jquery.Jq("select#cenumber"), nil).Select2Data()[0].Text
+	return select2.NewSelect2(jquery.Jq("select#ce_number"), nil).Select2Data()[0].Text
 
 }
 
@@ -68,7 +68,7 @@ func ValidateProductEmpiricalFormulaBeforeSend(this js.Value, args []js.Value) i
 
 func ValidateProductCasNumberData1(this js.Value, args []js.Value) interface{} {
 
-	return select2.NewSelect2(jquery.Jq("select#casnumber"), nil).Select2Data()[0].Text
+	return select2.NewSelect2(jquery.Jq("select#cas_number"), nil).Select2Data()[0].Text
 
 }
 
@@ -80,6 +80,6 @@ func ValidateProductCasNumberData2(this js.Value, args []js.Value) interface{} {
 
 func ValidateProductEmpiricalFormulaData(this js.Value, args []js.Value) interface{} {
 
-	return select2.NewSelect2(jquery.Jq("select#empiricalformula"), nil).Select2Data()[0].Text
+	return select2.NewSelect2(jquery.Jq("select#empirical_formula"), nil).Select2Data()[0].Text
 
 }

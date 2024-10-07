@@ -35,14 +35,14 @@ func init() {
 
 func LinearToEmpirical(this js.Value, args []js.Value) interface{} {
 
-	select2LinearFormula := select2.NewSelect2(jquery.Jq("select#linearformula"), nil).Select2Data()
+	select2LinearFormula := select2.NewSelect2(jquery.Jq("select#linear_formula"), nil).Select2Data()
 
 	if len(select2LinearFormula) == 0 {
 		return ""
 	}
 
 	ajaxData := struct {
-		EmpiricalFormula string `json:"empiricalformula"`
+		EmpiricalFormula string `json:"empirical_formula"`
 	}{
 		EmpiricalFormula: select2LinearFormula[0].Text,
 	}
@@ -74,8 +74,8 @@ func LinearToEmpirical(this js.Value, args []js.Value) interface{} {
 
 func NoEmpiricalFormula(this js.Value, args []js.Value) interface{} {
 
-	validate.NewValidate(jquery.Jq("select#empiricalformula"), nil).ValidateRemoveRequired()
-	jquery.Jq("span#empiricalformula.badge").Hide()
+	validate.NewValidate(jquery.Jq("select#empirical_formula"), nil).ValidateRemoveRequired()
+	jquery.Jq("span#empirical_formula.badge").Hide()
 
 	return nil
 
@@ -83,8 +83,8 @@ func NoEmpiricalFormula(this js.Value, args []js.Value) interface{} {
 
 func NoCas(this js.Value, args []js.Value) interface{} {
 
-	validate.NewValidate(jquery.Jq("select#casnumber"), nil).ValidateRemoveRequired()
-	jquery.Jq("span#casnumber.badge").Hide()
+	validate.NewValidate(jquery.Jq("select#cas_number"), nil).ValidateRemoveRequired()
+	jquery.Jq("span#cas_number.badge").Hide()
 
 	return nil
 
@@ -116,7 +116,7 @@ func Magic(this js.Value, args []js.Value) interface{} {
 
 	processedH = make(map[string]string)
 
-	select2HS := select2.NewSelect2(jquery.Jq("select#hazardstatements"), nil)
+	select2HS := select2.NewSelect2(jquery.Jq("select#hazard_statements"), nil)
 	select2HS.Select2Clear()
 	for _, h := range shs {
 
@@ -141,7 +141,7 @@ func Magic(this js.Value, args []js.Value) interface{} {
 
 	processedP = make(map[string]string)
 
-	select2PS := select2.NewSelect2(jquery.Jq("select#precautionarystatements"), nil)
+	select2PS := select2.NewSelect2(jquery.Jq("select#precautionary_statements"), nil)
 	select2PS.Select2Clear()
 	for _, p := range sps {
 
@@ -201,7 +201,7 @@ func product_common() {
 					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
 				},
 			},
-			"producerref": {
+			"producer_ref": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
 				Remote: validate.ValidateRemote{
 					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
@@ -215,36 +215,36 @@ func product_common() {
 					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
 				},
 			},
-			"empiricalformula": {
+			"empirical_formula": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
 				Remote: validate.ValidateRemote{
 					URL:        "",
 					Type:       "post",
 					BeforeSend: js.FuncOf(ValidateProductEmpiricalFormulaBeforeSend),
 					Data: map[string]interface{}{
-						"empiricalformula": js.FuncOf(ValidateProductEmpiricalFormulaData),
+						"empirical_formula": js.FuncOf(ValidateProductEmpiricalFormulaData),
 					},
 				},
 			},
-			"casnumber": {
+			"cas_number": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
 				Remote: validate.ValidateRemote{
 					URL:        "",
 					Type:       "post",
 					BeforeSend: js.FuncOf(ValidateProductCasNumberBeforeSend),
 					Data: map[string]interface{}{
-						"casnumber":           js.FuncOf(ValidateProductCasNumberData1),
+						"cas_number":          js.FuncOf(ValidateProductCasNumberData1),
 						"product_specificity": js.FuncOf(ValidateProductCasNumberData2),
 					},
 				},
 			},
-			"cenumber": {
+			"ce_number": {
 				Remote: validate.ValidateRemote{
 					URL:        "",
 					Type:       "post",
 					BeforeSend: js.FuncOf(ValidateProductCeNumberBeforeSend),
 					Data: map[string]interface{}{
-						"cenumber": js.FuncOf(ValidateProductCeNumberData),
+						"ce_number": js.FuncOf(ValidateProductCeNumberData),
 					},
 				},
 			},
@@ -253,21 +253,21 @@ func product_common() {
 			"name": {
 				Required: locales.Translate("required_input", HTTPHeaderAcceptLanguage),
 			},
-			"empiricalformula": {
+			"empirical_formula": {
 				Required: locales.Translate("required_input", HTTPHeaderAcceptLanguage),
 			},
-			"casnumber": {
+			"cas_number": {
 				Required: locales.Translate("required_input", HTTPHeaderAcceptLanguage),
 			},
-			"producerref": {
+			"producer_ref": {
 				Required: locales.Translate("required_input", HTTPHeaderAcceptLanguage),
 			},
 		},
 	}).Validate()
 
 	// select2
-	select2.NewSelect2(jquery.Jq("select#producerref"), &select2.Select2Config{
-		Placeholder:       locales.Translate("product_producerref_placeholder", HTTPHeaderAcceptLanguage),
+	select2.NewSelect2(jquery.Jq("select#producer_ref"), &select2.Select2Config{
+		Placeholder:       locales.Translate("product_producer_ref_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult:    js.FuncOf(select2.Select2GenericTemplateResults(ProducerRef{})),
 		TemplateSelection: js.FuncOf(Select2ProducerRefTemplateSelection),
 		Tags:              true,
@@ -280,10 +280,10 @@ func product_common() {
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(ProducerRefs{})),
 		},
 	}).Select2ify()
-	jquery.Jq("select#producerref").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq("select#producer_ref").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		return validate.NewValidate(jquery.Jq(this), nil).Valid()
 	}))
-	jquery.Jq("select#producerref").On("select2:select", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq("select#producer_ref").On("select2:select", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
 		select2ProducerrefSelected := args[0].Get("params").Get("data")
 		producerrefSelected := ProducerRef{ProducerRef: &models.ProducerRef{}}.FromJsJSONValue(select2ProducerrefSelected)
@@ -298,8 +298,8 @@ func product_common() {
 		select2Producer := select2.NewSelect2(jquery.Jq("select#producer"), nil)
 		select2Producer.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
-				Text:            producerref.Producer.ProducerLabel.String,
-				Value:           strconv.Itoa(int(producerref.Producer.ProducerID.Int64)),
+				Text:            *producerref.Producer.ProducerLabel,
+				Value:           strconv.Itoa(int(*producerref.Producer.ProducerID)),
 				DefaultSelected: true,
 				Selected:        true,
 			}).HTMLElement.OuterHTML())
@@ -319,8 +319,8 @@ func product_common() {
 		},
 	}).Select2ify()
 
-	select2.NewSelect2(jquery.Jq("select#supplierrefs"), &select2.Select2Config{
-		Placeholder:       locales.Translate("product_supplierref_placeholder", HTTPHeaderAcceptLanguage),
+	select2.NewSelect2(jquery.Jq("select#supplier_refs"), &select2.Select2Config{
+		Placeholder:       locales.Translate("product_supplier_ref_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult:    js.FuncOf(select2.Select2GenericTemplateResults(SupplierRef{})),
 		TemplateSelection: js.FuncOf(Select2SupplierRefTemplateSelection),
 		Tags:              true,
@@ -342,7 +342,7 @@ func product_common() {
 			URL:            ApplicationProxyPath + "products/suppliers/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Suppliers{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Suppliers{})),
 		},
 	}).Select2ify()
 
@@ -397,14 +397,14 @@ func product_common() {
 			URL:            ApplicationProxyPath + "storages/units",
 			DataType:       "json",
 			Data:           js.FuncOf(Select2UnitTemperatureAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Units{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Units{})),
 		},
 	}).Select2ify()
 	jquery.Jq("select#unit_molecularweight").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		return validate.NewValidate(jquery.Jq(this), nil).Valid()
 	}))
 
-	select2.NewSelect2(jquery.Jq("select#casnumber"), &select2.Select2Config{
+	select2.NewSelect2(jquery.Jq("select#cas_number"), &select2.Select2Config{
 		Placeholder:    locales.Translate("product_cas_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(CasNumber{})),
 		AllowClear:     true,
@@ -417,11 +417,11 @@ func product_common() {
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(CasNumbers{})),
 		},
 	}).Select2ify()
-	jquery.Jq("select#casnumber").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq("select#cas_number").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		return validate.NewValidate(jquery.Jq(this), nil).Valid()
 	}))
 
-	select2.NewSelect2(jquery.Jq("select#cenumber"), &select2.Select2Config{
+	select2.NewSelect2(jquery.Jq("select#ce_number"), &select2.Select2Config{
 		Placeholder:    locales.Translate("product_ce_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(CeNumber{})),
 		AllowClear:     true,
@@ -434,12 +434,12 @@ func product_common() {
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(CeNumbers{})),
 		},
 	}).Select2ify()
-	jquery.Jq("select#cenumber").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq("select#ce_number").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		return validate.NewValidate(jquery.Jq(this), nil).Valid()
 	}))
 
-	select2.NewSelect2(jquery.Jq("select#physicalstate"), &select2.Select2Config{
-		Placeholder:    locales.Translate("product_physicalstate_placeholder", HTTPHeaderAcceptLanguage),
+	select2.NewSelect2(jquery.Jq("select#physical_state"), &select2.Select2Config{
+		Placeholder:    locales.Translate("product_physical_state_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(PhysicalState{})),
 		AllowClear:     true,
 		Tags:           true,
@@ -452,8 +452,8 @@ func product_common() {
 		},
 	}).Select2ify()
 
-	select2.NewSelect2(jquery.Jq("select#signalword"), &select2.Select2Config{
-		Placeholder:    locales.Translate("product_signalword_placeholder", HTTPHeaderAcceptLanguage),
+	select2.NewSelect2(jquery.Jq("select#signal_word"), &select2.Select2Config{
+		Placeholder:    locales.Translate("product_signal_word_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(SignalWord{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
@@ -464,8 +464,8 @@ func product_common() {
 		},
 	}).Select2ify()
 
-	select2.NewSelect2(jquery.Jq("select#classofcompound"), &select2.Select2Config{
-		Placeholder:    locales.Translate("product_classofcompound_placeholder", HTTPHeaderAcceptLanguage),
+	select2.NewSelect2(jquery.Jq("select#class_of_compound"), &select2.Select2Config{
+		Placeholder:    locales.Translate("product_class_of_compound_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(ClassOfCompound{})),
 		AllowClear:     true,
 		Tags:           true,
@@ -495,8 +495,8 @@ func product_common() {
 		return validate.NewValidate(jquery.Jq(this), nil).Valid()
 	}))
 
-	select2.NewSelect2(jquery.Jq("select#empiricalformula"), &select2.Select2Config{
-		Placeholder:    locales.Translate("product_empiricalformula_placeholder", HTTPHeaderAcceptLanguage),
+	select2.NewSelect2(jquery.Jq("select#empirical_formula"), &select2.Select2Config{
+		Placeholder:    locales.Translate("product_empirical_formula_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(EmpiricalFormula{})),
 		AllowClear:     true,
 		Tags:           true,
@@ -508,12 +508,12 @@ func product_common() {
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(EmpiricalFormulas{})),
 		},
 	}).Select2ify()
-	jquery.Jq("select#empiricalformula").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq("select#empirical_formula").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		return validate.NewValidate(jquery.Jq(this), nil).Valid()
 	}))
 
-	select2.NewSelect2(jquery.Jq("select#linearformula"), &select2.Select2Config{
-		Placeholder:    locales.Translate("product_linearformula_placeholder", HTTPHeaderAcceptLanguage),
+	select2.NewSelect2(jquery.Jq("select#linear_formula"), &select2.Select2Config{
+		Placeholder:    locales.Translate("product_linear_formula_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(LinearFormula{})),
 		AllowClear:     true,
 		Tags:           true,
@@ -552,8 +552,8 @@ func product_common() {
 		},
 	}).Select2ify()
 
-	select2.NewSelect2(jquery.Jq("select#hazardstatements"), &select2.Select2Config{
-		Placeholder:    locales.Translate("product_hazardstatements_placeholder", HTTPHeaderAcceptLanguage),
+	select2.NewSelect2(jquery.Jq("select#hazard_statements"), &select2.Select2Config{
+		Placeholder:    locales.Translate("product_hazard_statements_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(Select2HazardStatementTemplateResults),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
@@ -564,8 +564,8 @@ func product_common() {
 		},
 	}).Select2ify()
 
-	select2.NewSelect2(jquery.Jq("select#precautionarystatements"), &select2.Select2Config{
-		Placeholder:    locales.Translate("product_precautionarystatements_placeholder", HTTPHeaderAcceptLanguage),
+	select2.NewSelect2(jquery.Jq("select#precautionary_statements"), &select2.Select2Config{
+		Placeholder:    locales.Translate("product_precautionary_statements_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(Select2PrecautionaryStatementTemplateResults),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
@@ -1079,7 +1079,13 @@ func Product_SaveCallback(args ...interface{}) {
 
 	BSTableQueryFilter.Lock()
 	BSTableQueryFilter.QueryFilter.Product = strconv.Itoa(args[0].(int))
-	BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", CurrentProduct.Name.NameLabel, CurrentProduct.ProductSpecificity.String)
+
+	if CurrentProduct.ProductSpecificity != nil {
+		BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", CurrentProduct.Name.NameLabel, *CurrentProduct.ProductSpecificity)
+	} else {
+		BSTableQueryFilter.QueryFilter.ProductFilterLabel = CurrentProduct.Name.NameLabel
+	}
+
 	bstable.NewBootstraptable(jquery.Jq("#Product_table"), nil).Refresh(nil)
 
 	// jquery.Jq("#Product_table").Bootstraptable(nil).Refresh(&BootstraptableRefreshQuery{

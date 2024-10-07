@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"syscall/js"
 
-	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 	"github.com/tbellembois/gochimitheque/models"
 )
@@ -44,7 +43,7 @@ func (p ProducerRef) ToJsValue() js.Value {
 func (elems ProducerRefs) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {
-		if elem.C == 1 {
+		if elem.MatchExactSearch {
 			return true
 		}
 	}
@@ -120,14 +119,14 @@ func (r ProducerRef) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 
 func (r ProducerRef) GetSelect2Id() int {
 
-	return int(r.ProducerRefID.Int64)
+	return int(*r.ProducerRefID)
 
 }
 
 func (r ProducerRef) GetSelect2Text() string {
 
 	if r.ProducerRef != nil {
-		return r.ProducerRefLabel.String
+		return *r.ProducerRefLabel
 	}
 
 	return ""

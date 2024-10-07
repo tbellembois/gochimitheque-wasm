@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"syscall/js"
 
-	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 	"github.com/tbellembois/gochimitheque/models"
 )
@@ -97,14 +96,14 @@ func (s SignalWord) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 
 func (s SignalWord) GetSelect2Id() int {
 
-	return int(s.SignalWordID.Int64)
+	return int(*s.SignalWordID)
 
 }
 
 func (s SignalWord) GetSelect2Text() string {
 
 	if s.SignalWord != nil {
-		return s.SignalWordLabel.String
+		return *s.SignalWordLabel
 	}
 
 	return ""

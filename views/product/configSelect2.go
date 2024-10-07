@@ -27,9 +27,9 @@ func Select2StoreLocationTemplateResults(this js.Value, args []js.Value) interfa
 
 	data := args[0]
 
-	storelocation := StoreLocation{StoreLocation: &models.StoreLocation{}}.FromJsJSONValue(data).(StoreLocation)
+	store_location := StoreLocation{StoreLocation: &models.StoreLocation{}}.FromJsJSONValue(data).(StoreLocation)
 
-	if storelocation.StoreLocation == nil {
+	if store_location.StoreLocation == nil {
 		return jsutils.CreateJsHTMLElementFromString(widgets.NewDiv(widgets.DivAttributes{}).OuterHTML())
 	}
 
@@ -37,7 +37,7 @@ func Select2StoreLocationTemplateResults(this js.Value, args []js.Value) interfa
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
 			Attributes: map[string]string{
-				"style": fmt.Sprintf("color: %s", storelocation.StoreLocationColor.String),
+				"style": fmt.Sprintf("color: %s", store_location.StoreLocationColor.String),
 			},
 		},
 		Icon: themes.NewMdiIcon(themes.MDI_COLOR, themes.MDI_24PX),
@@ -47,10 +47,10 @@ func Select2StoreLocationTemplateResults(this js.Value, args []js.Value) interfa
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
 		},
-		Text: storelocation.StoreLocationFullPath,
+		Text: store_location.StoreLocationFullPath,
 	})
 
-	if storelocation.StoreLocationCanStore.Valid && storelocation.StoreLocationCanStore.Bool {
+	if store_location.StoreLocationCanStore.Valid && store_location.StoreLocationCanStore.Bool {
 		iconCanStore = widgets.NewIcon(widgets.IconAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -247,14 +247,14 @@ func Select2ProducerRefTemplateSelection(this js.Value, args []js.Value) interfa
 		// return jsutils.CreateJsHTMLElementFromString(widgets.NewDiv(widgets.DivAttributes{}).OuterHTML())
 	}
 
-	if !producerRef.ProducerRefID.Valid {
+	if producerRef.ProducerRefID == nil {
 		return data.Get("text")
 	}
 
 	if producerRef.Producer != nil {
-		text = fmt.Sprintf("%s (%s)", producerRef.ProducerRefLabel.String, producerRef.Producer.ProducerLabel.String)
+		text = fmt.Sprintf("%s (%s)", *producerRef.ProducerRefLabel, *producerRef.Producer.ProducerLabel)
 	} else {
-		text = producerRef.ProducerRefLabel.String
+		text = *producerRef.ProducerRefLabel
 	}
 
 	spanLabel := widgets.NewSpan(widgets.SpanAttributes{
@@ -334,8 +334,8 @@ func Select2SupplierRefTemplateSelection(this js.Value, args []js.Value) interfa
 
 	if supplierRef.Supplier != nil {
 		// Selection.
-		text = fmt.Sprintf("%s@%s", supplierRef.SupplierRefLabel, supplierRef.Supplier.SupplierLabel.String)
-		supplierrefToSupplier[supplierRef.SupplierRefLabel] = supplierRef.Supplier.SupplierID.Int64
+		text = fmt.Sprintf("%s@%s", supplierRef.SupplierRefLabel, *supplierRef.Supplier.SupplierLabel)
+		supplierrefToSupplier[supplierRef.SupplierRefLabel] = *supplierRef.Supplier.SupplierID
 	} else {
 		text = supplierRef.SupplierRefLabel
 	}

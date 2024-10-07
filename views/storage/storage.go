@@ -50,7 +50,7 @@ func storage_common() {
 			// 		BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
 			// 	},
 			// },
-			"storage_batchnumber": {
+			"storage_batch_number": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 					return true
 				}),
@@ -58,7 +58,7 @@ func storage_common() {
 					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
 				},
 			},
-			"storelocation": {
+			"store_location": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
 				Remote: validate.ValidateRemote{
 					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
@@ -74,7 +74,7 @@ func storage_common() {
 			},
 		},
 		Messages: map[string]validate.ValidateMessage{
-			"storelocation": {
+			"store_location": {
 				Required: locales.Translate("required_input", HTTPHeaderAcceptLanguage),
 			},
 			"unit_concentration": {
@@ -89,7 +89,7 @@ func storage_common() {
 			"storage_number_of_carton": {
 				Required: locales.Translate("storage_one_number_required", HTTPHeaderAcceptLanguage),
 			},
-			"storage_batchnumber": {
+			"storage_batch_number": {
 				Required: locales.Translate("required_input", HTTPHeaderAcceptLanguage),
 			},
 		},
@@ -108,8 +108,8 @@ func storage_common() {
 		},
 	}).Select2ify()
 
-	select2.NewSelect2(jquery.Jq("select#storelocation"), &select2.Select2Config{
-		Placeholder:    locales.Translate("storage_storelocation_placeholder", HTTPHeaderAcceptLanguage),
+	select2.NewSelect2(jquery.Jq("select#store_location"), &select2.Select2Config{
+		Placeholder:    locales.Translate("storage_store_location_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(Select2StoreLocationTemplateResults),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
@@ -142,7 +142,7 @@ func storage_common() {
 			URL:            ApplicationProxyPath + "products/suppliers/",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Select2Suppliers{})),
+			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Suppliers{})),
 		},
 	}).Select2ify()
 
@@ -197,7 +197,12 @@ func Storage_createCallback(args ...interface{}) {
 
 		product := args[0].(Product)
 		productId = product.ProductID
-		productName = fmt.Sprintf("%s %s", product.Name.NameLabel, product.ProductSpecificity.String)
+
+		if product.ProductSpecificity == nil {
+			productName = product.Name.NameLabel
+		} else {
+			productName = fmt.Sprintf("%s %s", product.Name.NameLabel, *product.ProductSpecificity)
+		}
 
 		// Chem/Bio/Consu detection.
 		switch product.ProductType {
@@ -215,7 +220,11 @@ func Storage_createCallback(args ...interface{}) {
 
 		storage := args[0].(Storage)
 		productId = storage.Product.ProductID
-		productName = fmt.Sprintf("%s %s", storage.Product.Name.NameLabel, storage.Product.ProductSpecificity.String)
+		if storage.Product.ProductSpecificity == nil {
+			productName = storage.Product.Name.NameLabel
+		} else {
+			productName = fmt.Sprintf("%s %s", storage.Product.Name.NameLabel, *storage.Product.ProductSpecificity)
+		}
 
 		FillInStorageForm(storage, "storage")
 
@@ -256,10 +265,10 @@ func Storage_createCallback(args ...interface{}) {
 	jquery.Jq("input#product_id").SetVal(productId)
 	jquery.Jq("#filter-product").SetHtml(title.OuterHTML())
 
-	if !globals.CurrentProduct.ProductNumberPerBag.Valid || !(globals.CurrentProduct.ProductNumberPerBag.Int64 > 0) {
+	if globals.CurrentProduct.ProductNumberPerBag == nil || !(*globals.CurrentProduct.ProductNumberPerBag > 0) {
 		jquery.Jq("input#storage_number_of_bag").SetProp("disabled", true)
 	}
-	if !globals.CurrentProduct.ProductNumberPerCarton.Valid || !(globals.CurrentProduct.ProductNumberPerCarton.Int64 > 0) {
+	if globals.CurrentProduct.ProductNumberPerCarton == nil || !(*globals.CurrentProduct.ProductNumberPerCarton > 0) {
 		jquery.Jq("input#storage_number_of_carton").SetProp("disabled", true)
 	}
 	jquery.Jq("#searchbar").Hide()
@@ -320,7 +329,13 @@ func Storage_SaveCallback(args ...interface{}) {
 	BSTableQueryFilter.Lock()
 	BSTableQueryFilter.QueryFilter.Storages = currentStorageIds
 	BSTableQueryFilter.QueryFilter.StoragesFilterLabel = filterLabel
-	BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", globals.CurrentProduct.Name.NameLabel, globals.CurrentProduct.ProductSpecificity.String)
+
+	if globals.CurrentProduct.ProductSpecificity != nil {
+		BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", globals.CurrentProduct.Name.NameLabel, *globals.CurrentProduct.ProductSpecificity)
+	} else {
+		BSTableQueryFilter.QueryFilter.ProductFilterLabel = globals.CurrentProduct.Name.NameLabel
+	}
+
 	bstable.NewBootstraptable(jquery.Jq("#Storage_table"), nil).Refresh(nil)
 
 	// jquery.bstable.NewBootstraptable(jquery.Jq("#Storage_table"),nil).Refresh(&BootstraptableRefreshQuery{

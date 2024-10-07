@@ -33,7 +33,7 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 
 		done := func(data js.Value) {
 
-			jsutils.DisplaySuccessMessage(locales.Translate("storelocation_deleted_message", HTTPHeaderAcceptLanguage))
+			jsutils.DisplaySuccessMessage(locales.Translate("store_location_deleted_message", HTTPHeaderAcceptLanguage))
 			bstable.NewBootstraptable(jquery.Jq("#StoreLocation_table"), nil).ResetSearch("")
 			bstable.NewBootstraptable(jquery.Jq("#StoreLocation_table"), nil).Refresh(nil)
 

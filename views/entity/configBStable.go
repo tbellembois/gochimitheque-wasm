@@ -25,7 +25,7 @@ import (
 
 func OperateEventsStorelocations(this js.Value, args []js.Value) interface{} {
 
-	storelocationCallbackWrapper := func(args ...interface{}) {
+	store_locationCallbackWrapper := func(args ...interface{}) {
 		storelocation.StoreLocation_listCallback(js.Null(), nil)
 	}
 
@@ -35,8 +35,8 @@ func OperateEventsStorelocations(this js.Value, args []js.Value) interface{} {
 	BSTableQueryFilter.Lock()
 	BSTableQueryFilter.QueryFilter.Entity = strconv.Itoa(entity.EntityID)
 
-	href := fmt.Sprintf("%sv/storelocations", ApplicationProxyPath)
-	jsutils.LoadContent("div#content", "storelocation", href, storelocationCallbackWrapper)
+	href := fmt.Sprintf("%sv/store_locations", ApplicationProxyPath)
+	jsutils.LoadContent("div#content", "store_location", href, store_locationCallbackWrapper)
 
 	return nil
 
@@ -161,12 +161,12 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	buttonStorelocations := widgets.NewBSButtonWithIcon(
 		widgets.ButtonAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:         "storelocations" + strconv.Itoa(entity.EntityID),
-				Classes:    []string{"storelocations"},
+				Id:         "store_locations" + strconv.Itoa(entity.EntityID),
+				Classes:    []string{"store_locations"},
 				Visible:    false,
 				Attributes: map[string]string{"eid": strconv.Itoa(entity.EntityID)},
 			},
-			Title: locales.Translate("storelocations", HTTPHeaderAcceptLanguage),
+			Title: locales.Translate("store_locations", HTTPHeaderAcceptLanguage),
 		},
 		widgets.IconAttributes{
 			BaseAttributes: widgets.BaseAttributes{
@@ -307,16 +307,16 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 
 func ShowIfAuthorizedActionButtons(this js.Value, args []js.Value) interface{} {
 
-	// Iterating other the button with the class "storelocation"
+	// Iterating other the button with the class "store_location"
 	// (we could choose "members" or "delete")
 	// to retrieve once the entity id.
 	buttons := dom.GetWindow().Document().GetElementsByTagName("button")
 	for _, button := range buttons {
-		if button.Class().Contains("storelocations") {
+		if button.Class().Contains("store_locations") {
 			entityId := button.GetAttribute("eid")
 
-			jsutils.HasPermission("storelocations", entityId, "get", func() {
-				jquery.Jq("#storelocations" + entityId).FadeIn()
+			jsutils.HasPermission("store_locations", entityId, "get", func() {
+				jquery.Jq("#store_locations" + entityId).FadeIn()
 			}, func() {
 			})
 			jsutils.HasPermission("people", entityId, "get", func() {

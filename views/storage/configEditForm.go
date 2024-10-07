@@ -179,7 +179,7 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 		}
 	}
 
-	select2StoreLocation := select2.NewSelect2(jquery.Jq("select#storelocation"), nil)
+	select2StoreLocation := select2.NewSelect2(jquery.Jq("select#store_location"), nil)
 	if len(select2StoreLocation.Select2Data()) > 0 {
 		select2ItemStorelocation := select2StoreLocation.Select2Data()[0]
 		globals.CurrentStorage.StoreLocation = models.StoreLocation{}
@@ -219,14 +219,8 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		globals.CurrentStorage.UnitQuantity.UnitID = sql.NullInt64{
-			Int64: int64(unitId),
-			Valid: true,
-		}
-		globals.CurrentStorage.UnitQuantity.UnitLabel = sql.NullString{
-			String: select2ItemUnitQuantity.Text,
-			Valid:  true,
-		}
+		*globals.CurrentStorage.UnitQuantity.UnitID = int64(unitId)
+		*globals.CurrentStorage.UnitQuantity.UnitLabel = select2ItemUnitQuantity.Text
 	}
 
 	if jquery.Jq("input#storage_concentration").GetVal().Truthy() {
@@ -250,14 +244,8 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		globals.CurrentStorage.UnitConcentration.UnitID = sql.NullInt64{
-			Int64: int64(unitId),
-			Valid: true,
-		}
-		globals.CurrentStorage.UnitConcentration.UnitLabel = sql.NullString{
-			String: select2ItemUnitConcentration.Text,
-			Valid:  true,
-		}
+		*globals.CurrentStorage.UnitConcentration.UnitID = int64(unitId)
+		*globals.CurrentStorage.UnitConcentration.UnitLabel = select2ItemUnitConcentration.Text
 	}
 
 	select2Supplier := select2.NewSelect2(jquery.Jq("select#supplier"), nil)
@@ -273,19 +261,14 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			}
 		}
 
-		globals.CurrentStorage.Supplier.SupplierID = sql.NullInt64{
-			Int64: int64(supplierId),
-			Valid: true,
-		}
-		globals.CurrentStorage.Supplier.SupplierLabel = sql.NullString{
-			String: select2ItemSupplier.Text,
-			Valid:  true,
-		}
+		supplierIdInt64 := int64(supplierId)
+		globals.CurrentStorage.Supplier.SupplierID = &supplierIdInt64
+		globals.CurrentStorage.Supplier.SupplierLabel = &select2ItemSupplier.Text
 	}
 
-	if jquery.Jq("input#storage_entrydate").GetVal().Truthy() {
+	if jquery.Jq("input#storage_entry_date").GetVal().Truthy() {
 		var storageEntryDate time.Time
-		if storageEntryDate, err = time.Parse("2006-01-02", jquery.Jq("#storage_entrydate").GetVal().String()); err != nil {
+		if storageEntryDate, err = time.Parse("2006-01-02", jquery.Jq("#storage_entry_date").GetVal().String()); err != nil {
 			fmt.Println(err)
 			return nil
 		}
@@ -294,9 +277,9 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			Time:  storageEntryDate,
 		})
 	}
-	if jquery.Jq("input#storage_exitdate").GetVal().Truthy() {
+	if jquery.Jq("input#storage_exit_date").GetVal().Truthy() {
 		var storageExitDate time.Time
-		if storageExitDate, err = time.Parse("2006-01-02", jquery.Jq("#storage_exitdate").GetVal().String()); err != nil {
+		if storageExitDate, err = time.Parse("2006-01-02", jquery.Jq("#storage_exit_date").GetVal().String()); err != nil {
 			fmt.Println(err)
 			return nil
 		}
@@ -305,9 +288,9 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			Time:  storageExitDate,
 		})
 	}
-	if jquery.Jq("input#storage_openingdate").GetVal().Truthy() {
+	if jquery.Jq("input#storage_opening_date").GetVal().Truthy() {
 		var storageOpeningDate time.Time
-		if storageOpeningDate, err = time.Parse("2006-01-02", jquery.Jq("#storage_openingdate").GetVal().String()); err != nil {
+		if storageOpeningDate, err = time.Parse("2006-01-02", jquery.Jq("#storage_opening_date").GetVal().String()); err != nil {
 			fmt.Println(err)
 			return nil
 		}
@@ -316,9 +299,9 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			Time:  storageOpeningDate,
 		})
 	}
-	if jquery.Jq("input#storage_expirationdate").GetVal().Truthy() {
+	if jquery.Jq("input#storage_expiration_date").GetVal().Truthy() {
 		var storageExpirationDate time.Time
-		if storageExpirationDate, err = time.Parse("2006-01-02", jquery.Jq("#storage_expirationdate").GetVal().String()); err != nil {
+		if storageExpirationDate, err = time.Parse("2006-01-02", jquery.Jq("#storage_expiration_date").GetVal().String()); err != nil {
 			fmt.Println(err)
 			return nil
 		}
@@ -334,10 +317,10 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			String: jquery.Jq("input#storage_reference").GetVal().String(),
 		}
 	}
-	if jquery.Jq("input#storage_batchnumber").GetVal().Truthy() {
+	if jquery.Jq("input#storage_batch_number").GetVal().Truthy() {
 		globals.CurrentStorage.StorageBatchNumber = sql.NullString{
 			Valid:  true,
-			String: jquery.Jq("input#storage_batchnumber").GetVal().String(),
+			String: jquery.Jq("input#storage_batch_number").GetVal().String(),
 		}
 	}
 	if jquery.Jq("input#storage_barecode").GetVal().Truthy() {
@@ -387,7 +370,7 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 		}
 	}
 
-	if jquery.Jq("input#storage_todestroy:checked").Object.Length() > 0 {
+	if jquery.Jq("input#storage_to_destroy:checked").Object.Length() > 0 {
 		globals.CurrentStorage.StorageToDestroy = sql.NullBool{
 			Bool:  true,
 			Valid: true,
@@ -444,7 +427,7 @@ func FillInStorageForm(s Storage, id string) {
 		jquery.Jq(fmt.Sprintf("#%s #storage_id", id)).SetVal(s.StorageID.Int64)
 	}
 
-	select2StoreLocation := select2.NewSelect2(jquery.Jq("select#storelocation"), nil)
+	select2StoreLocation := select2.NewSelect2(jquery.Jq("select#store_location"), nil)
 	select2StoreLocation.Select2Clear()
 	if s.StoreLocation.StoreLocationID.Valid {
 		select2StoreLocation.Select2AppendOption(
@@ -463,11 +446,11 @@ func FillInStorageForm(s Storage, id string) {
 
 	select2UnitQuantity := select2.NewSelect2(jquery.Jq("select#unit_quantity"), nil)
 	select2UnitQuantity.Select2Clear()
-	if s.UnitQuantity.UnitID.Valid {
+	if s.UnitQuantity.UnitID != nil {
 		select2UnitQuantity.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
-				Text:            s.UnitQuantity.UnitLabel.String,
-				Value:           strconv.Itoa(int(s.UnitQuantity.UnitID.Int64)),
+				Text:            *s.UnitQuantity.UnitLabel,
+				Value:           strconv.Itoa(int(*s.UnitQuantity.UnitID)),
 				DefaultSelected: true,
 				Selected:        true,
 			}).HTMLElement.OuterHTML())
@@ -480,11 +463,11 @@ func FillInStorageForm(s Storage, id string) {
 
 	select2UnitConcentration := select2.NewSelect2(jquery.Jq("select#unit_concentration"), nil)
 	select2UnitConcentration.Select2Clear()
-	if s.UnitConcentration.UnitID.Valid {
+	if s.UnitConcentration.UnitID != nil {
 		select2UnitConcentration.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
-				Text:            s.UnitConcentration.UnitLabel.String,
-				Value:           strconv.Itoa(int(s.UnitConcentration.UnitID.Int64)),
+				Text:            *s.UnitConcentration.UnitLabel,
+				Value:           strconv.Itoa(int(*s.UnitConcentration.UnitID)),
 				DefaultSelected: true,
 				Selected:        true,
 			}).HTMLElement.OuterHTML())
@@ -492,11 +475,11 @@ func FillInStorageForm(s Storage, id string) {
 
 	select2Supplier := select2.NewSelect2(jquery.Jq("select#supplier"), nil)
 	select2Supplier.Select2Clear()
-	if s.Supplier.SupplierID.Valid {
+	if s.Supplier.SupplierID != nil {
 		select2Supplier.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
-				Text:            s.Supplier.SupplierLabel.String,
-				Value:           strconv.Itoa(int(s.Supplier.SupplierID.Int64)),
+				Text:            *s.Supplier.SupplierLabel,
+				Value:           strconv.Itoa(int(*s.Supplier.SupplierID)),
 				DefaultSelected: true,
 				Selected:        true,
 			}).HTMLElement.OuterHTML())
@@ -515,30 +498,30 @@ func FillInStorageForm(s Storage, id string) {
 		jquery.Jq("input#storage_number_of_carton").SetVal(s.StorageNumberOfCarton.Int64)
 	}
 
-	jquery.Jq("input#storage_entrydate").SetVal("")
+	jquery.Jq("input#storage_entry_date").SetVal("")
 	if s.StorageEntryDate.Valid {
-		jquery.Jq("input#storage_entrydate").SetVal(s.StorageEntryDate.Time.Format("2006-01-02"))
+		jquery.Jq("input#storage_entry_date").SetVal(s.StorageEntryDate.Time.Format("2006-01-02"))
 	}
-	jquery.Jq("input#storage_exitdate").SetVal("")
+	jquery.Jq("input#storage_exit_date").SetVal("")
 	if s.StorageExitDate.Valid {
-		jquery.Jq("input#storage_exitdate").SetVal(s.StorageExitDate.Time.Format("2006-01-02"))
+		jquery.Jq("input#storage_exit_date").SetVal(s.StorageExitDate.Time.Format("2006-01-02"))
 	}
-	jquery.Jq("#storage_openingdate").SetVal("")
+	jquery.Jq("#storage_opening_date").SetVal("")
 	if s.StorageOpeningDate.Valid {
-		jquery.Jq("#storage_openingdate").SetVal(s.StorageOpeningDate.Time.Format("2006-01-02"))
+		jquery.Jq("#storage_opening_date").SetVal(s.StorageOpeningDate.Time.Format("2006-01-02"))
 	}
-	jquery.Jq("input#storage_expirationdate").SetVal("")
+	jquery.Jq("input#storage_expiration_date").SetVal("")
 	if s.StorageExpirationDate.Valid {
-		jquery.Jq("input#storage_expirationdate").SetVal(s.StorageExpirationDate.Time.Format("2006-01-02"))
+		jquery.Jq("input#storage_expiration_date").SetVal(s.StorageExpirationDate.Time.Format("2006-01-02"))
 	}
 
 	jquery.Jq("input#storage_reference").SetVal("")
 	if s.StorageReference.Valid {
 		jquery.Jq("input#storage_reference").SetVal(s.StorageReference.String)
 	}
-	jquery.Jq("input#storage_batchnumber").SetVal("")
+	jquery.Jq("input#storage_batch_number").SetVal("")
 	if s.StorageBatchNumber.Valid {
-		jquery.Jq("input#storage_batchnumber").SetVal(s.StorageBatchNumber.String)
+		jquery.Jq("input#storage_batch_number").SetVal(s.StorageBatchNumber.String)
 	}
 	jquery.Jq("input#storage_barecode").SetVal("")
 	if s.StorageBarecode.Valid {

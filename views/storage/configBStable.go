@@ -470,19 +470,19 @@ func Storage_productFormatter(this js.Value, args []js.Value) interface{} {
 		)
 	}
 
-	if CurrentStorage.Product.ProductSpecificity.Valid {
+	if CurrentStorage.Product.ProductSpecificity != nil {
 		d.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
 					Classes: []string{"font-italic"},
 				},
-				Text: CurrentStorage.Product.ProductSpecificity.String,
+				Text: *CurrentStorage.Product.ProductSpecificity,
 			}),
 		)
 	}
 
-	if CurrentStorage.Product.ProducerRef.ProducerRefID.Valid {
+	if CurrentStorage.Product.ProducerRef.ProducerRefID != nil {
 		d.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -499,7 +499,7 @@ func Storage_productFormatter(this js.Value, args []js.Value) interface{} {
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
 				},
-				Text: CurrentStorage.Product.ProducerRef.ProducerRefLabel.String,
+				Text: *CurrentStorage.Product.ProducerRef.ProducerRefLabel,
 			}),
 		)
 	}
@@ -582,7 +582,7 @@ func Storage_quantityFormatter(this js.Value, args []js.Value) interface{} {
 
 	if CurrentStorage.StorageQuantity.Float64 != 0 {
 
-		ret = fmt.Sprintf("%v %s", CurrentStorage.StorageQuantity.Float64, CurrentStorage.UnitQuantity.UnitLabel.String)
+		ret = fmt.Sprintf("%v %s", CurrentStorage.StorageQuantity.Float64, *CurrentStorage.UnitQuantity.UnitLabel)
 
 	} else {
 
@@ -590,20 +590,20 @@ func Storage_quantityFormatter(this js.Value, args []js.Value) interface{} {
 			totalUnits int64
 		)
 
-		if CurrentStorage.Product.ProductNumberPerCarton.Valid &&
-			CurrentStorage.Product.ProductNumberPerCarton.Int64 != 0 &&
+		if CurrentStorage.Product.ProductNumberPerCarton != nil &&
+			*CurrentStorage.Product.ProductNumberPerCarton != 0 &&
 			CurrentStorage.StorageNumberOfCarton.Valid &&
 			CurrentStorage.StorageNumberOfCarton.Int64 != 0 {
 
-			totalUnits += CurrentStorage.Product.ProductNumberPerCarton.Int64 * CurrentStorage.StorageNumberOfCarton.Int64
+			totalUnits += *CurrentStorage.Product.ProductNumberPerCarton * CurrentStorage.StorageNumberOfCarton.Int64
 
 		}
-		if CurrentStorage.Product.ProductNumberPerBag.Valid &&
-			CurrentStorage.Product.ProductNumberPerBag.Int64 != 0 &&
+		if CurrentStorage.Product.ProductNumberPerBag != nil &&
+			*CurrentStorage.Product.ProductNumberPerBag != 0 &&
 			CurrentStorage.StorageNumberOfBag.Valid &&
 			CurrentStorage.StorageNumberOfBag.Int64 != 0 {
 
-			totalUnits += CurrentStorage.Product.ProductNumberPerBag.Int64 * CurrentStorage.StorageNumberOfBag.Int64
+			totalUnits += *CurrentStorage.Product.ProductNumberPerBag * CurrentStorage.StorageNumberOfBag.Int64
 
 		}
 		if CurrentStorage.StorageNumberOfUnit.Valid &&
@@ -996,7 +996,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Visible: true,
 			Classes: []string{"iconlabel"},
 		},
-		Text: fmt.Sprintf("%s %s", CurrentStorage.Product.Name.NameLabel, CurrentStorage.Product.ProductSpecificity.String),
+		Text: fmt.Sprintf("%s %s", CurrentStorage.Product.Name.NameLabel, *CurrentStorage.Product.ProductSpecificity),
 	})
 	qrcodeImgCol.AppendChild(qrcodeImg)
 	qrcodeProductNameCol.AppendChild(qrcodeProductNameSpan)
@@ -1118,7 +1118,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: fmt.Sprintf("%s %s", CurrentStorage.Product.Name.NameLabel, CurrentStorage.Product.ProductSpecificity.String),
+			Text: fmt.Sprintf("%s %s", CurrentStorage.Product.Name.NameLabel, *CurrentStorage.Product.ProductSpecificity),
 		}))
 	// Store location.
 	colStorelocation := widgets.NewDiv(widgets.DivAttributes{
@@ -1257,7 +1257,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
 				},
-				Text: fmt.Sprintf("%v %s", CurrentStorage.StorageQuantity.Float64, CurrentStorage.UnitQuantity.UnitLabel.String),
+				Text: fmt.Sprintf("%v %s", CurrentStorage.StorageQuantity.Float64, *CurrentStorage.UnitQuantity.UnitLabel),
 			}))
 	}
 	// Barecode.
@@ -1314,7 +1314,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
 				},
-				Text: fmt.Sprintf("%d %s", CurrentStorage.StorageConcentration.Int64, CurrentStorage.UnitConcentration.UnitLabel.String),
+				Text: fmt.Sprintf("%d %s", CurrentStorage.StorageConcentration.Int64, *CurrentStorage.UnitConcentration.UnitLabel),
 			}))
 	}
 	// Batch number.
@@ -1360,7 +1360,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-6"},
 		},
 	})
-	if CurrentStorage.Supplier.SupplierID.Valid {
+	if CurrentStorage.Supplier.SupplierID != nil {
 		colSupplier.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -1373,7 +1373,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
 				},
-				Text: CurrentStorage.Supplier.SupplierLabel.String,
+				Text: *CurrentStorage.Supplier.SupplierLabel,
 			}))
 	}
 	// Reference.
@@ -1425,7 +1425,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				Visible: true,
 				Classes: []string{"iconlabel", "mr-sm-2"},
 			},
-			Text: locales.Translate("storage_entrydate_title", HTTPHeaderAcceptLanguage),
+			Text: locales.Translate("storage_entry_date_title", HTTPHeaderAcceptLanguage),
 		}))
 		colEntryDate.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
@@ -1448,7 +1448,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				Visible: true,
 				Classes: []string{"iconlabel", "mr-sm-2"},
 			},
-			Text: locales.Translate("storage_exitdate_title", HTTPHeaderAcceptLanguage),
+			Text: locales.Translate("storage_exit_date_title", HTTPHeaderAcceptLanguage),
 		}))
 		colExitDate.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
@@ -1471,7 +1471,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				Visible: true,
 				Classes: []string{"iconlabel", "mr-sm-2"},
 			},
-			Text: locales.Translate("storage_openingdate_title", HTTPHeaderAcceptLanguage),
+			Text: locales.Translate("storage_opening_date_title", HTTPHeaderAcceptLanguage),
 		}))
 		colOpeningDate.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
@@ -1494,7 +1494,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				Visible: true,
 				Classes: []string{"iconlabel", "mr-sm-2"},
 			},
-			Text: locales.Translate("storage_expirationdate_title", HTTPHeaderAcceptLanguage),
+			Text: locales.Translate("storage_expiration_date_title", HTTPHeaderAcceptLanguage),
 		}))
 		colExpirationDate.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
@@ -1646,7 +1646,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 	BSTableQueryFilter.Export = false
 	BSTableQueryFilter.Unlock()
 
-	select2SProducerRef := select2.NewSelect2(jquery.Jq("select#s_producerref"), nil)
+	select2SProducerRef := select2.NewSelect2(jquery.Jq("select#s_producer_ref"), nil)
 	if select2SProducerRef.Select2IsInitialized() {
 		i := select2SProducerRef.Select2Data()
 		if len(i) > 0 {
@@ -1655,7 +1655,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 		}
 	}
 
-	select2SStoreLocation := select2.NewSelect2(jquery.Jq("select#s_storelocation"), nil)
+	select2SStoreLocation := select2.NewSelect2(jquery.Jq("select#s_store_location"), nil)
 	if select2SStoreLocation.Select2IsInitialized() {
 		i := select2SStoreLocation.Select2Data()
 		if len(i) > 0 {
@@ -1681,7 +1681,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 			queryFilter.NameFilterLabel = i[0].Text
 		}
 	}
-	select2SCasNumber := select2.NewSelect2(jquery.Jq("select#s_casnumber"), nil)
+	select2SCasNumber := select2.NewSelect2(jquery.Jq("select#s_cas_number"), nil)
 	if select2SCasNumber.Select2IsInitialized() {
 		i := select2SCasNumber.Select2Data()
 		if len(i) > 0 {
@@ -1689,7 +1689,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 			queryFilter.CasNumberFilterLabel = i[0].Text
 		}
 	}
-	select2SEmpiricalFormula := select2.NewSelect2(jquery.Jq("select#s_empiricalformula"), nil)
+	select2SEmpiricalFormula := select2.NewSelect2(jquery.Jq("select#s_empirical_formula"), nil)
 	if select2SEmpiricalFormula.Select2IsInitialized() {
 		i := select2SEmpiricalFormula.Select2Data()
 		if len(i) > 0 {
@@ -1705,7 +1705,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 			queryFilter.CategoryFilterLabel = i[0].Text
 		}
 	}
-	select2SSignalWord := select2.NewSelect2(jquery.Jq("select#s_signalword"), nil)
+	select2SSignalWord := select2.NewSelect2(jquery.Jq("select#s_signal_word"), nil)
 	if select2SSignalWord.Select2IsInitialized() {
 		i := select2SSignalWord.Select2Data()
 		if len(i) > 0 {
@@ -1723,7 +1723,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 			}
 		}
 	}
-	select2SHS := select2.NewSelect2(jquery.Jq("select#s_hazardstatements"), nil)
+	select2SHS := select2.NewSelect2(jquery.Jq("select#s_hazard_statements"), nil)
 	if select2SHS.Select2IsInitialized() {
 		i := select2SHS.Select2Data()
 		if len(i) > 0 {
@@ -1733,7 +1733,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 			}
 		}
 	}
-	select2SPS := select2.NewSelect2(jquery.Jq("select#s_precautionarystatements"), nil)
+	select2SPS := select2.NewSelect2(jquery.Jq("select#s_precautionary_statements"), nil)
 	if select2SPS.Select2IsInitialized() {
 		i := select2SPS.Select2Data()
 		if len(i) > 0 {
@@ -1754,9 +1754,9 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 		}
 	}
 
-	if jquery.Jq("#s_storage_batchnumber").GetVal().Truthy() {
-		queryFilter.StorageBatchNumber = jquery.Jq("#s_storage_batchnumber").GetVal().String()
-		queryFilter.StorageBatchNumberFilterLabel = jquery.Jq("#s_storage_batchnumber").GetVal().String()
+	if jquery.Jq("#s_storage_batch_number").GetVal().Truthy() {
+		queryFilter.StorageBatchNumber = jquery.Jq("#s_storage_batch_number").GetVal().String()
+		queryFilter.StorageBatchNumberFilterLabel = jquery.Jq("#s_storage_batch_number").GetVal().String()
 	}
 	if jquery.Jq("#s_storage_barecode").GetVal().Truthy() {
 		queryFilter.StorageBarecode = jquery.Jq("#s_storage_barecode").GetVal().String()
@@ -1767,7 +1767,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 		queryFilter.CustomNamePartOfFilterLabel = jquery.Jq("#s_custom_name_part_of").GetVal().String()
 	}
 	if jquery.Jq("#s_casnumber_cmr:checked").Object.Length() > 0 {
-		queryFilter.CasNumberCMR = true
+		queryFilter.IsCMR = true
 		queryFilter.CasNumberCMRFilterLabel = locales.Translate("s_casnumber_cmr", globals.HTTPHeaderAcceptLanguage)
 	}
 	if jquery.Jq("#s_borrowing:checked").Object.Length() > 0 {

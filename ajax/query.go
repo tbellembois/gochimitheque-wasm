@@ -64,7 +64,7 @@ type QueryFilter struct {
 	StorageBarecodeFilterLabel         string
 	CustomNamePartOf                   string `json:"custom_name_part_of,omitempty"`
 	CustomNamePartOfFilterLabel        string
-	CasNumberCMR                       bool `json:"cas_number_cmr,omitempty"`
+	IsCMR                              bool `json:"is_cmr,omitempty"`
 	CasNumberCMRFilterLabel            string
 	Borrowing                          bool `json:"borrowing,omitempty"`
 	BorrowingFilterLabel               string
@@ -221,8 +221,8 @@ func (q QueryFilter) ToRawQuery() string {
 	if q.CustomNamePartOf != "" {
 		values.Set("custom_name_part_of", q.CustomNamePartOf)
 	}
-	if q.CasNumberCMR {
-		values.Set("cas_number_cmr", strconv.FormatBool(true))
+	if q.IsCMR {
+		values.Set("is_cmr", strconv.FormatBool(true))
 	}
 	if q.Borrowing {
 		values.Set("borrowing", strconv.FormatBool(true))

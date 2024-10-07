@@ -58,8 +58,8 @@ func Search_listCallback(args ...interface{}) {
 		},
 	}).Select2ify()
 
-	select2.NewSelect2(jquery.Jq("select#s_storelocation"), &select2.Select2Config{
-		Placeholder:    locales.Translate("s_storelocation", HTTPHeaderAcceptLanguage),
+	select2.NewSelect2(jquery.Jq("select#s_store_location"), &select2.Select2Config{
+		Placeholder:    locales.Translate("s_store_location", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(Select2StoreLocationTemplateResults),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
@@ -70,8 +70,8 @@ func Search_listCallback(args ...interface{}) {
 		},
 	}).Select2ify()
 
-	select2.NewSelect2(jquery.Jq("select#s_casnumber"), &select2.Select2Config{
-		Placeholder:    locales.Translate("s_casnumber", HTTPHeaderAcceptLanguage),
+	select2.NewSelect2(jquery.Jq("select#s_cas_number"), &select2.Select2Config{
+		Placeholder:    locales.Translate("s_cas_number", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(CasNumber{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
@@ -94,8 +94,8 @@ func Search_listCallback(args ...interface{}) {
 		},
 	}).Select2ify()
 
-	select2.NewSelect2(jquery.Jq("select#s_empiricalformula"), &select2.Select2Config{
-		Placeholder:    locales.Translate("s_empiricalformula", HTTPHeaderAcceptLanguage),
+	select2.NewSelect2(jquery.Jq("select#s_empirical_formula"), &select2.Select2Config{
+		Placeholder:    locales.Translate("s_empirical_formula", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(EmpiricalFormula{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
@@ -106,8 +106,8 @@ func Search_listCallback(args ...interface{}) {
 		},
 	}).Select2ify()
 
-	select2.NewSelect2(jquery.Jq("select#s_producerref"), &select2.Select2Config{
-		Placeholder:    locales.Translate("s_producerref", HTTPHeaderAcceptLanguage),
+	select2.NewSelect2(jquery.Jq("select#s_producer_ref"), &select2.Select2Config{
+		Placeholder:    locales.Translate("s_producer_ref", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(ProducerRef{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
@@ -118,8 +118,8 @@ func Search_listCallback(args ...interface{}) {
 		},
 	}).Select2ify()
 
-	select2.NewSelect2(jquery.Jq("select#s_signalword"), &select2.Select2Config{
-		Placeholder:    locales.Translate("s_signalword", HTTPHeaderAcceptLanguage),
+	select2.NewSelect2(jquery.Jq("select#s_signal_word"), &select2.Select2Config{
+		Placeholder:    locales.Translate("s_signal_word", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(SignalWord{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
@@ -142,8 +142,8 @@ func Search_listCallback(args ...interface{}) {
 		},
 	}).Select2ify()
 
-	select2.NewSelect2(jquery.Jq("select#s_hazardstatements"), &select2.Select2Config{
-		Placeholder:    locales.Translate("s_hazardstatements", HTTPHeaderAcceptLanguage),
+	select2.NewSelect2(jquery.Jq("select#s_hazard_statements"), &select2.Select2Config{
+		Placeholder:    locales.Translate("s_hazard_statements", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(HazardStatement{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
@@ -154,8 +154,8 @@ func Search_listCallback(args ...interface{}) {
 		},
 	}).Select2ify()
 
-	select2.NewSelect2(jquery.Jq("select#s_precautionarystatements"), &select2.Select2Config{
-		Placeholder:    locales.Translate("s_precautionarystatements", HTTPHeaderAcceptLanguage),
+	select2.NewSelect2(jquery.Jq("select#s_precautionary_statements"), &select2.Select2Config{
+		Placeholder:    locales.Translate("s_precautionary_statements", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(PrecautionaryStatement{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{

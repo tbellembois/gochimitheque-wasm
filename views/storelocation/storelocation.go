@@ -15,11 +15,11 @@ import (
 func storelocation_common() {
 
 	// validate
-	validate.NewValidate(jquery.Jq("#storelocation"), &validate.ValidateConfig{
+	validate.NewValidate(jquery.Jq("#store_location"), &validate.ValidateConfig{
 		Ignore:     "", // required to validate select2
 		ErrorClass: "alert alert-danger",
 		Rules: map[string]validate.ValidateRule{
-			"storelocation_name": {
+			"store_location_name": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
 				Remote: validate.ValidateRemote{
 					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return false }),
@@ -33,7 +33,7 @@ func storelocation_common() {
 			},
 		},
 		Messages: map[string]validate.ValidateMessage{
-			"storelocation_name": {
+			"store_location_name": {
 				Required: locales.Translate("required_input", HTTPHeaderAcceptLanguage),
 			},
 			"entity": {
@@ -44,7 +44,7 @@ func storelocation_common() {
 
 	// select2
 	select2.NewSelect2(jquery.Jq("select#entity"), &select2.Select2Config{
-		Placeholder:    locales.Translate("storelocation_entity_placeholder", HTTPHeaderAcceptLanguage),
+		Placeholder:    locales.Translate("store_location_entity_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Entity{})),
 		Ajax: select2.Select2Ajax{
 			URL:            ApplicationProxyPath + "entities",
@@ -54,13 +54,13 @@ func storelocation_common() {
 		},
 	}).Select2ify()
 	jquery.Jq("select#entity").On("select2:select", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		select2StoreLocation := select2.NewSelect2(jquery.Jq("select#storelocation"), nil)
+		select2StoreLocation := select2.NewSelect2(jquery.Jq("select#store_location"), nil)
 		select2StoreLocation.Select2Clear()
 		return nil
 	}))
 
-	select2.NewSelect2(jquery.Jq("select#storelocation"), &select2.Select2Config{
-		Placeholder:    locales.Translate("storelocation_storelocation_placeholder", HTTPHeaderAcceptLanguage),
+	select2.NewSelect2(jquery.Jq("select#store_location"), &select2.Select2Config{
+		Placeholder:    locales.Translate("store_location_store_location_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(StoreLocation{})),
 		Ajax: select2.Select2Ajax{
 			URL:            ApplicationProxyPath + "storelocations",
@@ -70,7 +70,7 @@ func storelocation_common() {
 		},
 	}).Select2ify()
 
-	jquery.Jq("#storelocation_color").Object.Call("colorpicker")
+	jquery.Jq("#store_location_color").Object.Call("colorpicker")
 
 	jquery.Jq("#searchbar").Hide()
 	jquery.Jq("#actions").Hide()

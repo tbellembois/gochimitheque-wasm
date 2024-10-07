@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"syscall/js"
 
-	"github.com/tbellembois/gochimitheque-wasm/models"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 	"github.com/tbellembois/gochimitheque/models"
 )
@@ -28,7 +27,7 @@ func (elems EmpiricalFormulas) GetRowConcreteTypeName() string {
 func (elems EmpiricalFormulas) IsExactMatch() bool {
 
 	for _, elem := range elems.Rows {
-		if elem.C == 1 {
+		if elem.MatchExactSearch {
 			return true
 		}
 	}
@@ -103,14 +102,14 @@ func (e EmpiricalFormulas) GetTotal() int {
 
 func (e EmpiricalFormula) GetSelect2Id() int {
 
-	return int(e.EmpiricalFormulaID.Int64)
+	return int(*e.EmpiricalFormulaID)
 
 }
 
 func (e EmpiricalFormula) GetSelect2Text() string {
 
 	if e.EmpiricalFormula != nil {
-		return e.EmpiricalFormulaLabel.String
+		return *e.EmpiricalFormulaLabel
 	}
 
 	return ""
