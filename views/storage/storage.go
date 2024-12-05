@@ -206,9 +206,9 @@ func Storage_createCallback(args ...interface{}) {
 
 		// Chem/Bio/Consu detection.
 		switch product.ProductType {
-		case "CONS":
+		case "cons":
 			Consufy()
-		case "BIO":
+		case "bio":
 			Biofy()
 		default:
 			Chemify()
@@ -230,9 +230,9 @@ func Storage_createCallback(args ...interface{}) {
 
 		// Chem/Bio/Consu detection.
 		switch storage.Product.ProductType {
-		case "CONS":
+		case "cons":
 			Consufy()
-		case "BIO":
+		case "bio":
 			Biofy()
 		default:
 			Chemify()

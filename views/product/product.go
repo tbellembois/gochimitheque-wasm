@@ -633,6 +633,21 @@ func Product_pubchemCallback(args ...interface{}) {
 	jquery.Jq("#searchbar").Hide()
 	jquery.Jq("#actions").Hide()
 
+	// Works only with no select2.
+	jquery.Jq("input[name='searchpubchem']").On("keyup", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+
+		event := args[0]
+		if !event.Get("which").IsUndefined() && event.Get("which").Int() == 13 {
+
+			event.Call("preventDefault")
+			PubchemSearch(js.Null(), nil)
+
+		}
+
+		return nil
+
+	}))
+
 }
 
 func displaySection(section Section) {

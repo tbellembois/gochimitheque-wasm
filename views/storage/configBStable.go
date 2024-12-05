@@ -69,9 +69,9 @@ func Consufy() {
 			return jquery.Jq("#storage_number_of_bag").GetVal().String() == "" && jquery.Jq("#storage_number_of_unit").GetVal().String() == ""
 		}),
 	})
-	validate.NewValidate(jquery.Jq("input#storage_batchnumber"), nil).ValidateAddRequired()
+	validate.NewValidate(jquery.Jq("input#storage_batch_number"), nil).ValidateAddRequired()
 
-	jquery.Jq("span#storage_batchnumber.badge").Show()
+	jquery.Jq("span#storage_batch_number.badge").Show()
 
 }
 
@@ -84,9 +84,9 @@ func Chemify() {
 	validate.NewValidate(jquery.Jq("input#storage_number_of_unit"), nil).ValidateRemoveRequired()
 	validate.NewValidate(jquery.Jq("input#storage_number_of_bag"), nil).ValidateRemoveRequired()
 	validate.NewValidate(jquery.Jq("input#storage_number_of_carton"), nil).ValidateRemoveRequired()
-	validate.NewValidate(jquery.Jq("input#storage_batchnumber"), nil).ValidateRemoveRequired()
+	validate.NewValidate(jquery.Jq("input#storage_batch_number"), nil).ValidateRemoveRequired()
 
-	jquery.Jq("span#storage_batchnumber.badge").Hide()
+	jquery.Jq("span#storage_batch_number.badge").Hide()
 
 }
 
@@ -99,9 +99,9 @@ func Biofy() {
 	validate.NewValidate(jquery.Jq("input#storage_number_of_unit"), nil).ValidateRemoveRequired()
 	validate.NewValidate(jquery.Jq("input#storage_number_of_bag"), nil).ValidateRemoveRequired()
 	validate.NewValidate(jquery.Jq("input#storage_number_of_carton"), nil).ValidateRemoveRequired()
-	validate.NewValidate(jquery.Jq("input#storage_batchnumber"), nil).ValidateAddRequired()
+	validate.NewValidate(jquery.Jq("input#storage_batch_number"), nil).ValidateAddRequired()
 
-	jquery.Jq("span#storage_batchnumber.badge").Show()
+	jquery.Jq("span#storage_batch_number.badge").Show()
 
 }
 
@@ -491,7 +491,7 @@ func Storage_productFormatter(this js.Value, args []js.Value) interface{} {
 						"style": "font-size: 0.8em; font-style: italic; margin-right: 1em;",
 					},
 				},
-				Text: locales.Translate("producerref_label_title", globals.HTTPHeaderAcceptLanguage),
+				Text: locales.Translate("producer_ref_label_title", globals.HTTPHeaderAcceptLanguage),
 			}),
 		)
 		d.AppendChild(
@@ -520,7 +520,7 @@ func Storage_productFormatter(this js.Value, args []js.Value) interface{} {
 	// 					"style": "font-size: 0.8em; font-style: italic; margin-right: 1em;",
 	// 				},
 	// 			},
-	// 			Text: locales.Translate("storage_batchnumber_title", globals.HTTPHeaderAcceptLanguage),
+	// 			Text: locales.Translate("storage_batch_number_title", globals.HTTPHeaderAcceptLanguage),
 	// 		}),
 	// 	)
 	// 	d.AppendChild(
@@ -580,9 +580,13 @@ func Storage_quantityFormatter(this js.Value, args []js.Value) interface{} {
 	row := args[1]
 	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
-	if CurrentStorage.StorageQuantity.Float64 != 0 {
+	if CurrentStorage.StorageQuantity.Valid && CurrentStorage.StorageQuantity.Float64 != 0 {
 
-		ret = fmt.Sprintf("%v %s", CurrentStorage.StorageQuantity.Float64, *CurrentStorage.UnitQuantity.UnitLabel)
+		if CurrentStorage.UnitQuantity.UnitLabel != nil {
+			ret = fmt.Sprintf("%v %s", CurrentStorage.StorageQuantity.Float64, *CurrentStorage.UnitQuantity.UnitLabel)
+		} else {
+			ret = fmt.Sprintf("%v", CurrentStorage.StorageQuantity.Float64)
+		}
 
 	} else {
 
@@ -991,12 +995,17 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col", "p-sm-0"},
 		},
 	})
+
+	specificity := ""
+	if CurrentStorage.Product.ProductSpecificity != nil {
+		specificity = fmt.Sprintf("%s %s", CurrentStorage.Product.Name.NameLabel, *CurrentStorage.Product.ProductSpecificity)
+	}
 	qrcodeProductNameSpan := widgets.NewSpan(widgets.SpanAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
 			Classes: []string{"iconlabel"},
 		},
-		Text: fmt.Sprintf("%s %s", CurrentStorage.Product.Name.NameLabel, *CurrentStorage.Product.ProductSpecificity),
+		Text: specificity,
 	})
 	qrcodeImgCol.AppendChild(qrcodeImg)
 	qrcodeProductNameCol.AppendChild(qrcodeProductNameSpan)
@@ -1113,12 +1122,16 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		},
 		Text: locales.Translate("storage_product_table_header", HTTPHeaderAcceptLanguage),
 	}))
+	specificity = ""
+	if CurrentStorage.Product.ProductSpecificity != nil {
+		specificity = fmt.Sprintf("%s %s", CurrentStorage.Product.Name.NameLabel, *CurrentStorage.Product.ProductSpecificity)
+	}
 	colProduct.AppendChild(
 		widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: fmt.Sprintf("%s %s", CurrentStorage.Product.Name.NameLabel, *CurrentStorage.Product.ProductSpecificity),
+			Text: specificity,
 		}))
 	// Store location.
 	colStorelocation := widgets.NewDiv(widgets.DivAttributes{
@@ -1132,7 +1145,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Visible: true,
 			Classes: []string{"iconlabel", "mr-sm-2"},
 		},
-		Text: locales.Translate("storage_storelocation_table_header", HTTPHeaderAcceptLanguage),
+		Text: locales.Translate("storage_store_location_table_header", HTTPHeaderAcceptLanguage),
 	}))
 	colStorelocation.AppendChild(
 		widgets.NewSpan(widgets.SpanAttributes{
@@ -1252,12 +1265,16 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			},
 			Text: locales.Translate("storage_quantity_title", HTTPHeaderAcceptLanguage),
 		}))
+		unit_label := ""
+		if CurrentStorage.UnitQuantity.UnitLabel != nil {
+			unit_label = fmt.Sprintf("%v %s", CurrentStorage.StorageQuantity.Float64, *CurrentStorage.UnitQuantity.UnitLabel)
+		}
 		colQuantity.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
 				},
-				Text: fmt.Sprintf("%v %s", CurrentStorage.StorageQuantity.Float64, *CurrentStorage.UnitQuantity.UnitLabel),
+				Text: unit_label,
 			}))
 	}
 	// Barecode.
@@ -1330,7 +1347,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				Visible: true,
 				Classes: []string{"iconlabel", "mr-sm-2"},
 			},
-			Text: locales.Translate("storage_batchnumber_title", HTTPHeaderAcceptLanguage),
+			Text: locales.Translate("storage_batch_number_title", HTTPHeaderAcceptLanguage),
 		}))
 		colBatchnumber.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{

@@ -227,12 +227,12 @@ func OperateEventsTotalStock(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	product := Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
-	jquery.Jq(fmt.Sprintf("#totalstock-collapse-%d", product.ProductID)).Append(widgets.NewSpan(widgets.SpanAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"mdi", "mdi-loading", "mdi-spin", "mdi-36px"},
-		},
-	}).OuterHTML())
+	// jquery.Jq(fmt.Sprintf("#totalstock-collapse-%d", product.ProductID)).Append(widgets.NewSpan(widgets.SpanAttributes{
+	// 	BaseAttributes: widgets.BaseAttributes{
+	// 		Visible: true,
+	// 		Classes: []string{"mdi", "mdi-loading", "mdi-spin", "mdi-36px"},
+	// 	},
+	// }).OuterHTML())
 
 	jquery.Jq(fmt.Sprintf("#totalstock-collapse-%d", product.ProductID)).Show()
 
@@ -242,18 +242,25 @@ func OperateEventsTotalStock(this js.Value, args []js.Value) interface{} {
 	done := func(data js.Value) {
 
 		var (
-			store_locations []models.StoreLocation
-			err             error
+			stocks []models.Stock
+			err    error
 		)
 
-		if err = json.Unmarshal([]byte(data.String()), &store_locations); err != nil {
+		if err = json.Unmarshal([]byte(data.String()), &stocks); err != nil {
+			jsutils.DisplayGenericErrorMessage()
 			fmt.Println(err)
 		}
 
-		jquery.Jq(fmt.Sprintf("#totalstock-collapse-%d", product.ProductID)).SetHtml("")
+		jquery.Jq("div#stock").SetHtml("")
 
-		for _, store_location := range store_locations {
-			jsutils.ShowStockRecursive(&store_location, 0, fmt.Sprintf("#totalstock-collapse-%d", product.ProductID))
+		for _, stock := range stocks {
+			jquery.Jq("div#stock").Append(fmt.Sprintf("<div class='col-sm-8'><span>%s</span></div>", stock.StoreLocation.StoreLocationFullPath))
+
+			unit := ""
+			if stock.Unit != nil {
+				unit = *stock.Unit.UnitLabel
+			}
+			jquery.Jq("div#stock").Append(fmt.Sprintf("<div class='col-sm-4'><span>%.2f %s</span></div>", stock.Quantity, unit))
 		}
 
 	}
@@ -338,6 +345,17 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 
 	row := args[0]
 	params := bstable.QueryParamsFromJsJSONValue(row)
+
+	if params.Data.Sort == "name.name_label" {
+		params.Data.Sort = "name"
+	}
+	if params.Data.Sort == "empirical_formula.empirical_formula_label" {
+		params.Data.Sort = "empirical_formula"
+	}
+	if params.Data.Sort == "cas_number.cas_number_label" {
+		params.Data.Sort = "cas_number"
+	}
+	// jsutils.ConsoleLog(fmt.Sprintf("%#v", params))
 
 	go func() {
 
@@ -655,7 +673,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
-				Classes: []string{"iconlabel", "mr-sm-2"},
+				Classes: []string{"iconlabel"},
 			},
 			Text: "#",
 		}))
@@ -664,7 +682,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: strconv.Itoa(globals.CurrentProduct.ProductID),
+			Text: strconv.Itoa(globals.CurrentProduct.ProductID) + globals.CurrentProduct.ProductType,
 		}))
 	// Person.
 	colPerson := widgets.NewDiv(widgets.DivAttributes{
@@ -2005,10 +2023,10 @@ func Consufy() {
 	jquery.Jq(".consu").Show()
 
 	validate.NewValidate(jquery.Jq("select#producer_ref"), nil).ValidateAddRequired()
-	validate.NewValidate(jquery.Jq("input#product_batchnumber"), nil).ValidateRemoveRequired()
+	validate.NewValidate(jquery.Jq("input#storage_batch_number"), nil).ValidateRemoveRequired()
 
 	jquery.Jq("span#producerref.badge").Show()
-	jquery.Jq("span#product_batchnumber.badge").Hide()
+	jquery.Jq("span#storage_batch_number.badge").Hide()
 
 	validate.NewValidate(jquery.Jq("select#empirical_formula"), nil).ValidateRemoveRequired()
 	validate.NewValidate(jquery.Jq("select#cas_number"), nil).ValidateRemoveRequired()
@@ -2027,10 +2045,10 @@ func Chemify() {
 	jquery.Jq(".chem").Show()
 
 	validate.NewValidate(jquery.Jq("select#producer_ref"), nil).ValidateRemoveRequired()
-	validate.NewValidate(jquery.Jq("input#product_batchnumber"), nil).ValidateRemoveRequired()
+	validate.NewValidate(jquery.Jq("input#storage_batch_number"), nil).ValidateRemoveRequired()
 
 	jquery.Jq("span#producerref.badge").Hide()
-	jquery.Jq("span#product_batchnumber.badge").Hide()
+	jquery.Jq("span#storage_batch_number.badge").Hide()
 
 	validate.NewValidate(jquery.Jq("select#empirical_formula"), nil).ValidateAddRequired()
 	validate.NewValidate(jquery.Jq("select#cas_number"), nil).ValidateAddRequired()
@@ -2049,10 +2067,10 @@ func Biofy() {
 	jquery.Jq(".bio").Show()
 
 	validate.NewValidate(jquery.Jq("select#producer_ref"), nil).ValidateAddRequired()
-	validate.NewValidate(jquery.Jq("input#product_batchnumber"), nil).ValidateAddRequired()
+	validate.NewValidate(jquery.Jq("input#storage_batch_number"), nil).ValidateAddRequired()
 
 	jquery.Jq("span#producerref.badge").Show()
-	jquery.Jq("span#product_batchnumber.badge").Show()
+	jquery.Jq("span#storage_batch_number.badge").Show()
 
 	validate.NewValidate(jquery.Jq("select#empirical_formula"), nil).ValidateRemoveRequired()
 	validate.NewValidate(jquery.Jq("select#cas_number"), nil).ValidateRemoveRequired()

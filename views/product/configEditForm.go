@@ -353,6 +353,16 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		}
 	}
 
+	if jquery.Jq("input#showchem:checked").Object.Length() > 0 {
+		globals.CurrentProduct.ProductType = "chem"
+	}
+	if jquery.Jq("input#showbio:checked").Object.Length() > 0 {
+		globals.CurrentProduct.ProductType = "bio"
+	}
+	if jquery.Jq("input#showconsu:checked").Object.Length() > 0 {
+		globals.CurrentProduct.ProductType = "cons"
+	}
+
 	if jquery.Jq("input#product_temperature").GetVal().Truthy() {
 		var productTemperature int
 		if productTemperature, err = strconv.Atoi(jquery.Jq("input#product_temperature").GetVal().String()); err != nil {
@@ -368,10 +378,10 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		if productNumberPerCarton, err = strconv.Atoi(jquery.Jq("input#product_number_per_carton").GetVal().String()); err != nil {
 			return nil
 		}
-		var ProductNumberPerCartonPointer *int64 = new(int64)
-		*ProductNumberPerCartonPointer = int64(productNumberPerCarton)
-		globals.CurrentProduct.ProductNumberPerCarton = ProductNumberPerCartonPointer
+		globals.CurrentProduct.ProductNumberPerCarton = new(int64)
+		*globals.CurrentProduct.ProductNumberPerCarton = int64(productNumberPerCarton)
 	} else if jquery.Jq("input#showconsu:checked").Object.Length() > 0 {
+		globals.CurrentProduct.ProductNumberPerCarton = new(int64)
 		*globals.CurrentProduct.ProductNumberPerCarton = -1
 	}
 
@@ -380,9 +390,9 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		if productNumberPerBag, err = strconv.Atoi(jquery.Jq("input#product_number_per_bag").GetVal().String()); err != nil {
 			return nil
 		}
-		var ProductNumberPerBagPointer *int64 = new(int64)
-		*ProductNumberPerBagPointer = int64(productNumberPerBag)
-		globals.CurrentProduct.ProductNumberPerBag = ProductNumberPerBagPointer
+
+		globals.CurrentProduct.ProductNumberPerBag = new(int64)
+		*globals.CurrentProduct.ProductNumberPerBag = int64(productNumberPerBag)
 	}
 
 	if jquery.Jq("input#product_specificity").GetVal().Truthy() {

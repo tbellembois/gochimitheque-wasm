@@ -182,14 +182,14 @@ func (q QueryFilter) ToRawQuery() string {
 	if len(q.HazardStatements) > 0 {
 		hs_ids := ""
 		for _, hs := range q.HazardStatements {
-			hs_ids = "," + hs
+			hs_ids = hs + ","
 		}
 		values.Set("hazard_statements", hs_ids)
 	}
 	if len(q.PrecautionaryStatements) > 0 {
 		ps_ids := ""
 		for _, ps := range q.PrecautionaryStatements {
-			ps_ids = "," + ps
+			ps_ids = ps + ","
 		}
 		values.Set("precautionary_statements", ps_ids)
 
@@ -197,14 +197,14 @@ func (q QueryFilter) ToRawQuery() string {
 	if len(q.Symbols) > 0 {
 		symbol_ids := ""
 		for _, s := range q.Symbols {
-			symbol_ids = "," + s
+			symbol_ids = s + ","
 		}
 		values.Set("symbols", symbol_ids)
 	}
 	if len(q.Tags) > 0 {
 		tag_ids := ""
 		for _, tag := range q.Tags {
-			tag_ids = "," + tag
+			tag_ids = tag + ","
 		}
 		values.Set("tags", tag_ids)
 	}

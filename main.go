@@ -260,6 +260,7 @@ func main() {
 	js.Global().Set("StoreLocation_colorFormatter", js.FuncOf(storelocation.ColorFormatter))
 	js.Global().Set("StoreLocation_canStoreFormatter", js.FuncOf(storelocation.CanStoreFormatter))
 	js.Global().Set("StoreLocation_storeLocationFormatter", js.FuncOf(storelocation.StoreLocationFormatter))
+	js.Global().Set("StoreLocation_fullPathFormatter", js.FuncOf(storelocation.StoreLocationFullPathFormatter))
 	js.Global().Set("StoreLocation_saveStoreLocation", js.FuncOf(storelocation.SaveStoreLocation))
 	js.Global().Set("StoreLocation_dataQueryParams", js.FuncOf(storelocation.DataQueryParams))
 

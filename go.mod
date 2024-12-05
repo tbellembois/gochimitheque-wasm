@@ -1,6 +1,8 @@
 module github.com/tbellembois/gochimitheque-wasm
 
-go 1.21.4
+go 1.22.0
+
+toolchain go1.23.3
 
 replace github.com/tbellembois/gochimitheque v0.0.0 => /home/thbellem/workspace/workspace_go/src/github.com/tbellembois/gochimitheque
 

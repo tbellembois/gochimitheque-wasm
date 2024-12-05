@@ -27,7 +27,7 @@ func person_common() {
 				Email:    true,
 				Remote: validate.ValidateRemote{
 					URL:        "",
-					Type:       "post",
+					Type:       "get",
 					BeforeSend: js.FuncOf(ValidatePersonEmailBeforeSend),
 				},
 			},

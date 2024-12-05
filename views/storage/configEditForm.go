@@ -213,12 +213,19 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 	select2UnitQuantity := select2.NewSelect2(jquery.Jq("select#unit_quantity"), nil)
 	if len(select2UnitQuantity.Select2Data()) > 0 {
 		select2ItemUnitQuantity := select2UnitQuantity.Select2Data()[0]
-		globals.CurrentStorage.UnitQuantity = models.Unit{}
+		label := ""
+		id := int64(0)
+		globals.CurrentStorage.UnitQuantity = models.Unit{
+			UnitID:    &id,
+			UnitLabel: &label,
+		}
+
 		var unitId int
 		if unitId, err = strconv.Atoi(select2ItemUnitQuantity.Id); err != nil {
 			fmt.Println(err)
 			return nil
 		}
+
 		*globals.CurrentStorage.UnitQuantity.UnitID = int64(unitId)
 		*globals.CurrentStorage.UnitQuantity.UnitLabel = select2ItemUnitQuantity.Text
 	}

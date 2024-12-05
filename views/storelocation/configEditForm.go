@@ -87,6 +87,11 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 			Bool:  true,
 			Valid: true,
 		}}
+	} else {
+		storelocation.StoreLocationCanStore = models.NullBool{sql.NullBool{
+			Bool:  false,
+			Valid: true,
+		}}
 	}
 
 	storelocation.StoreLocationName = models.NullString{sql.NullString{
@@ -123,6 +128,15 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 				Int64: int64(storelocationId),
 				Valid: true,
 			}}
+			storelocation.StoreLocation.StoreLocation.StoreLocationName = models.NullString{sql.NullString{
+				String: "FIELD_REQUIRED_BY_RUST_MODEL_BUT_NOT_USED_IN_CREATE_OR_UPDATE",
+				Valid:  true,
+			}}
+			// FIELD_REQUIRED_BY_RUST_MODEL_BUT_NOT_USED_IN_CREATE_OR_UPDATE
+			storelocation.StoreLocation.StoreLocation.StoreLocationCanStore = models.NullBool{sql.NullBool{
+				Bool:  false,
+				Valid: true,
+			}}
 		}
 	}
 
@@ -147,15 +161,15 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 
 			globals.LocalStorage.Clear()
 
-			var (
-				storelocation StoreLocation
-				err           error
-			)
-
-			if err = json.Unmarshal([]byte(data.String()), &storelocation); err != nil {
-				fmt.Println(err)
-				return
-			}
+			// var (
+			// 	storelocation StoreLocation
+			// 	err           error
+			// )
+			//
+			// if err = json.Unmarshal([]byte(data.String()), &storelocation); err != nil {
+			// 	fmt.Println(err)
+			// 	return
+			// }
 
 			// TODO: use entityId for redirection
 			href := fmt.Sprintf("%sv/storelocations", ApplicationProxyPath)

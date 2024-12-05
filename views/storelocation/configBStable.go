@@ -76,7 +76,7 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 	index := args[3].Int()
 	storeLocation := StoreLocation{StoreLocation: &models.StoreLocation{}}.FromJsJSONValue(row).(StoreLocation)
 
-	url := fmt.Sprintf("%sstorelocations/%d", ApplicationProxyPath, storeLocation.StoreLocationID.Int64)
+	url := fmt.Sprintf("%sstorelocations?store_location=%d", ApplicationProxyPath, storeLocation.StoreLocationID.Int64)
 	method := "get"
 
 	done := func(data js.Value) {
@@ -210,6 +210,32 @@ func CanStoreFormatter(this js.Value, args []js.Value) interface{} {
 	})
 
 	return i.OuterHTML()
+
+}
+
+func StoreLocationFullPathFormatter(this js.Value, args []js.Value) interface{} {
+
+	row := args[1]
+	storelocation := StoreLocation{StoreLocation: &models.StoreLocation{}}.FromJsJSONValue(row).(StoreLocation)
+
+	label := storelocation.StoreLocationFullPath + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<i>"
+
+	if storelocation.StoreLocationNbStorage != nil {
+		label += " st:" + strconv.Itoa(int(*storelocation.StoreLocationNbStorage))
+	}
+	if storelocation.StoreLocationNbStorage != nil {
+		label += " chil.: " + strconv.Itoa(int(*storelocation.StoreLocationNbChildren))
+	}
+	label += " </i>]"
+
+	span := widgets.NewSpan(widgets.SpanAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+		},
+		Text: label,
+	})
+
+	return span.OuterHTML()
 
 }
 

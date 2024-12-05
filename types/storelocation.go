@@ -24,12 +24,6 @@ func (elems StoreLocations) GetRowConcreteTypeName() string {
 
 }
 
-type Stock struct {
-	Total   float64 `json:"total"`
-	Current float64 `json:"current"`
-	Unit    Unit    `json:"unit"`
-}
-
 func (elems StoreLocations) IsExactMatch() bool {
 
 	return false
@@ -55,7 +49,7 @@ func (StoreLocations) FromJsJSONValue(jsvalue js.Value) select2.Select2ResultAbl
 
 	var (
 		store_locations StoreLocations
-		err            error
+		err             error
 	)
 
 	jsStoreLocationsString := js.Global().Get("JSON").Call("stringify", jsvalue).String()
@@ -89,7 +83,7 @@ func (s StoreLocation) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble
 
 	var (
 		store_location StoreLocation
-		err           error
+		err            error
 	)
 
 	jsStoreLocationString := js.Global().Get("JSON").Call("stringify", jsvalue).String()

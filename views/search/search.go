@@ -1,13 +1,9 @@
 package search
 
 import (
-	"encoding/json"
-	"fmt"
 	"syscall/js"
 
-	"github.com/tbellembois/gochimitheque-wasm/ajax"
 	"github.com/tbellembois/gochimitheque-wasm/bstable"
-	"github.com/tbellembois/gochimitheque-wasm/globals"
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
 	"github.com/tbellembois/gochimitheque-wasm/jquery"
 	"github.com/tbellembois/gochimitheque-wasm/jsutils"
@@ -17,7 +13,6 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/views/storage"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
-	"github.com/tbellembois/gochimitheque/models"
 )
 
 func Search_listCallback(args ...interface{}) {
@@ -176,99 +171,6 @@ func Search_listCallback(args ...interface{}) {
 			jsutils.Search(js.Null(), nil)
 
 		}
-
-		return nil
-
-	}))
-
-	// Stock.
-	jquery.Jq("#s_storage_stock_button").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-
-		jquery.Jq("#stock").Append(widgets.NewSpan(widgets.SpanAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Visible: true,
-				Classes: []string{"mdi", "mdi-loading", "mdi-spin", "mdi-36px"},
-			},
-		}).OuterHTML())
-
-		url := fmt.Sprintf("%sentities/stocks/%d", ApplicationProxyPath, globals.CurrentProduct.ProductID)
-		method := "get"
-
-		done := func(data js.Value) {
-
-			var (
-				storelocations []models.StoreLocation
-				err            error
-			)
-
-			if err = json.Unmarshal([]byte(data.String()), &storelocations); err != nil {
-				fmt.Println(err)
-			}
-
-			jquery.Jq("#stock").SetHtml("")
-
-			// rowButtonClose := widgets.NewDiv(widgets.DivAttributes{
-			// 	BaseAttributes: widgets.BaseAttributes{
-			// 		Visible: true,
-			// 		Classes: []string{"row"},
-			// 	},
-			// })
-			// buttonClose := widgets.NewBSButtonWithIcon(
-			// 	widgets.ButtonAttributes{
-			// 		BaseAttributes: widgets.BaseAttributes{
-			// 			Visible: true,
-			// 			Attributes: map[string]string{
-			// 				"onclick": "$('#stock').html('')",
-			// 			},
-			// 		},
-			// 		Title: locales.Translate("close", HTTPHeaderAcceptLanguage),
-			// 	},
-			// 	widgets.IconAttributes{
-			// 		BaseAttributes: widgets.BaseAttributes{
-			// 			Visible: true,
-			// 			Classes: []string{"iconlabel"},
-			// 		},
-			// 		Text: locales.Translate("close", HTTPHeaderAcceptLanguage),
-			// 		Icon: themes.NewMdiIcon(themes.MDI_CLOSE, ""),
-			// 	},
-			// 	[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
-			// )
-			// rowButtonClose.AppendChild(buttonClose)
-
-			// rowProduct := widgets.NewDiv(widgets.DivAttributes{
-			// 	BaseAttributes: widgets.BaseAttributes{
-			// 		Visible: true,
-			// 		Classes: []string{"row", "iconlabel"},
-			// 	},
-			// })
-			// rowProduct.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
-			// 	BaseAttributes: widgets.BaseAttributes{
-			// 		Visible: true,
-			// 		Classes: []string{"col", "iconlabel"},
-			// 	},
-			// 	Text: CurrentProduct.Name.NameLabel,
-			// }))
-
-			//jquery.Jq("#stock").Append(rowButtonClose.OuterHTML())
-			// jquery.Jq("#stock").Append(rowProduct.OuterHTML())
-
-			for _, storelocation := range storelocations {
-				jsutils.ShowStockRecursive(&storelocation, 0, "#stock")
-			}
-
-		}
-		fail := func(data js.Value) {
-
-			jsutils.DisplayGenericErrorMessage()
-
-		}
-
-		ajax.Ajax{
-			Method: method,
-			URL:    url,
-			Done:   done,
-			Fail:   fail,
-		}.Send()
 
 		return nil
 

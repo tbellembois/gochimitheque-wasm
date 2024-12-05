@@ -10,11 +10,9 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/bstable"
 	"github.com/tbellembois/gochimitheque-wasm/globals"
 	"github.com/tbellembois/gochimitheque-wasm/jquery"
-	"github.com/tbellembois/gochimitheque-wasm/locales"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 	"github.com/tbellembois/gochimitheque-wasm/widgets/themes"
-	"github.com/tbellembois/gochimitheque/models"
 )
 
 func ConsoleLog(s string) {
@@ -527,92 +525,5 @@ func DisplayFilter(q ajax.QueryFilter) {
 	// 		Text: locales.Translate("no_filter", globals.HTTPHeaderAcceptLanguage),
 	// 	}).OuterHTML())
 	// }
-
-}
-
-func ShowStockRecursive(store_location *models.StoreLocation, depth int, jqSelector string) {
-
-	// Checking if there is a stock or not for the store location.
-	hasStock := false
-
-	for _, stock := range store_location.Stocks {
-		if stock.Total != 0 || stock.Current != 0 {
-			hasStock = true
-			continue
-		}
-	}
-
-	if hasStock {
-
-		// Depth.
-		depthSep := ""
-		for i := 0; i <= depth; i++ {
-			depthSep += "<span class='mdi mdi-blank'></span>"
-		}
-
-		rowStorelocation := widgets.NewDiv(widgets.DivAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Visible: true,
-				Classes: []string{"row", "iconlabel"},
-			},
-		})
-		rowStorelocation.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Visible: true,
-			},
-			Text: fmt.Sprintf("%s %s", depthSep, store_location.StoreLocationName.String),
-		}))
-
-		for _, stock := range store_location.Stocks {
-
-			if !(stock.Total == 0 && stock.Current == 0) {
-
-				rowStorelocation.AppendChild(widgets.NewIcon(widgets.IconAttributes{
-					BaseAttributes: widgets.BaseAttributes{
-						Visible: true,
-						Classes: []string{"ml-sm-2"},
-					},
-					Icon:  themes.NewMdiIcon(themes.MDI_ARROW_RIGHT, ""),
-					Title: locales.Translate("stock_store_location_title", globals.HTTPHeaderAcceptLanguage),
-				}))
-				rowStorelocation.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
-					BaseAttributes: widgets.BaseAttributes{
-						Visible: true,
-						Classes: []string{""},
-					},
-					Text: fmt.Sprintf("%g %s", stock.Current, *stock.Unit.UnitLabel),
-				}))
-				rowStorelocation.AppendChild(widgets.NewIcon(widgets.IconAttributes{
-					BaseAttributes: widgets.BaseAttributes{
-						Visible: true,
-						Classes: []string{"ml-sm-2"},
-					},
-					Icon:  themes.NewMdiIcon(themes.MDI_SUBSTORELOCATION, ""),
-					Title: locales.Translate("stock_store_location_sub_title", globals.HTTPHeaderAcceptLanguage),
-				}))
-				rowStorelocation.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
-					BaseAttributes: widgets.BaseAttributes{
-						Visible: true,
-						Classes: []string{""},
-					},
-					Text: fmt.Sprintf("%g %s", stock.Total, *stock.Unit.UnitLabel),
-				}))
-
-			}
-
-		}
-
-		jquery.Jq(jqSelector).Append(rowStorelocation.OuterHTML())
-
-	}
-
-	if len(store_location.Children) > 0 {
-		depth++
-		for _, child := range store_location.Children {
-
-			ShowStockRecursive(child, depth, jqSelector)
-
-		}
-	}
 
 }
