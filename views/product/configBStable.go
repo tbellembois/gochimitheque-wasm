@@ -280,6 +280,19 @@ func OperateEventsTotalStock(this js.Value, args []js.Value) interface{} {
 	return nil
 }
 
+func OperateEventsSelect(this js.Value, args []js.Value) interface{} {
+
+	row := args[2]
+	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
+
+	jquery.Jq("input[name=selected_product_id]").SetVal(globals.CurrentProduct.ProductID)
+	jquery.Jq("input[name=selected_product_name]").SetVal(globals.CurrentProduct.Name.NameLabel)
+
+	jsutils.DisplaySuccessMessage(locales.Translate("selected", HTTPHeaderAcceptLanguage) + ": #" + strconv.Itoa(globals.CurrentProduct.ProductID) + " " + globals.CurrentProduct.Name.NameLabel)
+
+	return nil
+}
+
 func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 
 	row := args[2]
@@ -1867,6 +1880,27 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 		},
 	).OuterHTML()
 
+	buttonSelect := widgets.NewLink(
+		widgets.LinkAttributes{
+			BaseAttributes: widgets.BaseAttributes{
+				Id:         "select" + strconv.Itoa(globals.CurrentProduct.ProductID),
+				Classes:    []string{"select", "dropdown-item", "text-primary", "iconlabel"},
+				Visible:    true,
+				Attributes: map[string]string{"pid": strconv.Itoa(globals.CurrentProduct.ProductID)},
+			},
+			Href: "#",
+			Label: widgets.NewSpan(
+				widgets.SpanAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Classes: []string{"mdi", themes.MDI_PUBCHEM.ToString()},
+						Visible: true,
+					},
+					Text: locales.Translate("select", HTTPHeaderAcceptLanguage),
+				},
+			),
+		},
+	).OuterHTML()
+
 	if globals.CurrentProduct.ProductSC != 0 {
 
 		buttonTotalStock = widgets.NewLink(
@@ -1913,7 +1947,7 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
     <span class="mdi mdi-menu">&nbsp;</span>
   </button>
   <div class="dropdown-menu" aria-labelledby="productActions` + strconv.Itoa(globals.CurrentProduct.ProductID) + `">
-  ` + buttonStorages + buttonOStorages + buttonStore + buttonEdit + buttonDelete + buttonBookmark + buttonTotalStock +
+  ` + buttonStorages + buttonOStorages + buttonStore + buttonEdit + buttonDelete + buttonBookmark + buttonTotalStock + buttonSelect +
 		`
   </div>
 </div>

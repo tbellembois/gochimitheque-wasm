@@ -54,19 +54,19 @@ func Consufy() {
 	jquery.Jq(".chem").Not(".consu").Hide()
 	jquery.Jq(".consu").Show()
 
-	validate.NewValidate(jquery.Jq("input#storage_number_of_unit"), nil).ValidateAdd(validate.ValidateRule{
+	validate.NewValidate(jquery.Jq("input#storage_quantity"), nil).ValidateAdd(validate.ValidateRule{
 		Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			return jquery.Jq("#storage_number_of_bag").GetVal().String() == "" && jquery.Jq("#storage_number_of_carton").GetVal().String() == ""
 		}),
 	})
 	validate.NewValidate(jquery.Jq("input#storage_number_of_bag"), nil).ValidateAdd(validate.ValidateRule{
 		Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			return jquery.Jq("#storage_number_of_unit").GetVal().String() == "" && jquery.Jq("#storage_number_of_carton").GetVal().String() == ""
+			return jquery.Jq("#storage_quantity").GetVal().String() == "" && jquery.Jq("#storage_number_of_carton").GetVal().String() == ""
 		}),
 	})
 	validate.NewValidate(jquery.Jq("input#storage_number_of_carton"), nil).ValidateAdd(validate.ValidateRule{
 		Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			return jquery.Jq("#storage_number_of_bag").GetVal().String() == "" && jquery.Jq("#storage_number_of_unit").GetVal().String() == ""
+			return jquery.Jq("#storage_number_of_bag").GetVal().String() == "" && jquery.Jq("#storage_quantity").GetVal().String() == ""
 		}),
 	})
 	validate.NewValidate(jquery.Jq("input#storage_batch_number"), nil).ValidateAddRequired()
@@ -81,7 +81,6 @@ func Chemify() {
 	jquery.Jq(".consu").Not(".chem").Hide()
 	jquery.Jq(".chem").Show()
 
-	validate.NewValidate(jquery.Jq("input#storage_number_of_unit"), nil).ValidateRemoveRequired()
 	validate.NewValidate(jquery.Jq("input#storage_number_of_bag"), nil).ValidateRemoveRequired()
 	validate.NewValidate(jquery.Jq("input#storage_number_of_carton"), nil).ValidateRemoveRequired()
 	validate.NewValidate(jquery.Jq("input#storage_batch_number"), nil).ValidateRemoveRequired()
@@ -96,7 +95,6 @@ func Biofy() {
 	jquery.Jq(".chem").Not(".bio").Hide()
 	jquery.Jq(".bio").Show()
 
-	validate.NewValidate(jquery.Jq("input#storage_number_of_unit"), nil).ValidateRemoveRequired()
 	validate.NewValidate(jquery.Jq("input#storage_number_of_bag"), nil).ValidateRemoveRequired()
 	validate.NewValidate(jquery.Jq("input#storage_number_of_carton"), nil).ValidateRemoveRequired()
 	validate.NewValidate(jquery.Jq("input#storage_batch_number"), nil).ValidateAddRequired()
@@ -610,10 +608,10 @@ func Storage_quantityFormatter(this js.Value, args []js.Value) interface{} {
 			totalUnits += *CurrentStorage.Product.ProductNumberPerBag * CurrentStorage.StorageNumberOfBag.Int64
 
 		}
-		if CurrentStorage.StorageNumberOfUnit.Valid &&
-			CurrentStorage.StorageNumberOfUnit.Int64 != 0 {
-			totalUnits += int64(CurrentStorage.StorageNumberOfUnit.Int64)
-		}
+		// if CurrentStorage.StorageNumberOfUnit.Valid &&
+		// 	CurrentStorage.StorageNumberOfUnit.Int64 != 0 {
+		// 	totalUnits += int64(CurrentStorage.StorageNumberOfUnit.Int64)
+		// }
 
 		ret = fmt.Sprintf("%d", totalUnits)
 
@@ -1214,32 +1212,32 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			}))
 	}
 	// Units.
-	colNumberOfUnit := widgets.NewDiv(widgets.DivAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Classes: []string{"col-sm-4"},
-		},
-	})
-	if CurrentStorage.StorageNumberOfUnit.Int64 != 0 {
-		colNumberOfUnit.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Visible: true,
-				Classes: []string{"iconlabel", "mr-sm-2"},
-			},
-			Text: locales.Translate("storage_number_of_unit", HTTPHeaderAcceptLanguage),
-		}))
-		colNumberOfUnit.AppendChild(
-			widgets.NewSpan(widgets.SpanAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-				},
-				Text: fmt.Sprintf("%d", CurrentStorage.StorageNumberOfUnit.Int64),
-			}))
-	}
+	// colNumberOfUnit := widgets.NewDiv(widgets.DivAttributes{
+	// 	BaseAttributes: widgets.BaseAttributes{
+	// 		Visible: true,
+	// 		Classes: []string{"col-sm-4"},
+	// 	},
+	// })
+	// if CurrentStorage.StorageNumberOfUnit.Int64 != 0 {
+	// 	colNumberOfUnit.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
+	// 		BaseAttributes: widgets.BaseAttributes{
+	// 			Visible: true,
+	// 			Classes: []string{"iconlabel", "mr-sm-2"},
+	// 		},
+	// 		Text: locales.Translate("storage_number_of_unit", HTTPHeaderAcceptLanguage),
+	// 	}))
+	// 	colNumberOfUnit.AppendChild(
+	// 		widgets.NewSpan(widgets.SpanAttributes{
+	// 			BaseAttributes: widgets.BaseAttributes{
+	// 				Visible: true,
+	// 			},
+	// 			Text: fmt.Sprintf("%d", CurrentStorage.StorageNumberOfUnit.Int64),
+	// 		}))
+	// }
 
 	rowNumberOfCartonBagUnit.AppendChild(colNumberOfCarton)
 	rowNumberOfCartonBagUnit.AppendChild(colNumberOfBag)
-	rowNumberOfCartonBagUnit.AppendChild(colNumberOfUnit)
+	// rowNumberOfCartonBagUnit.AppendChild(colNumberOfUnit)
 
 	//
 	// Quantity and barecode.

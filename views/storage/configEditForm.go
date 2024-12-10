@@ -343,17 +343,6 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 		}
 	}
 
-	if jquery.Jq("input#storage_number_of_unit").GetVal().Truthy() {
-		var storageNumberOfUnit int
-		if storageNumberOfUnit, err = strconv.Atoi(jquery.Jq("input#storage_number_of_unit").GetVal().String()); err != nil {
-			fmt.Println(err)
-			return nil
-		}
-		globals.CurrentStorage.StorageNumberOfUnit = sql.NullInt64{
-			Valid: true,
-			Int64: int64(storageNumberOfUnit),
-		}
-	}
 	if jquery.Jq("input#storage_number_of_bag").GetVal().Truthy() {
 		var StorageNumberOfBag int
 		if StorageNumberOfBag, err = strconv.Atoi(jquery.Jq("input#storage_number_of_bag").GetVal().String()); err != nil {
@@ -492,10 +481,6 @@ func FillInStorageForm(s Storage, id string) {
 			}).HTMLElement.OuterHTML())
 	}
 
-	jquery.Jq("input#storage_number_of_unit").SetVal("")
-	if s.StorageNumberOfUnit.Valid {
-		jquery.Jq("input#storage_number_of_unit").SetVal(s.StorageNumberOfUnit.Int64)
-	}
 	jquery.Jq("input#storage_number_of_bag").SetVal("")
 	if s.StorageNumberOfBag.Valid {
 		jquery.Jq("input#storage_number_of_bag").SetVal(s.StorageNumberOfBag.Int64)

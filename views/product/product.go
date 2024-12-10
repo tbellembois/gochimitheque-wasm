@@ -637,7 +637,8 @@ func Product_pubchemCallback(args ...interface{}) {
 	jquery.Jq("input[name='searchpubchem']").On("keyup", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
 		event := args[0]
-		if !event.Get("which").IsUndefined() && event.Get("which").Int() == 13 {
+
+		if !event.Get("keyCode").IsUndefined() && event.Get("keyCode").Int() == 13 {
 
 			event.Call("preventDefault")
 			PubchemSearch(js.Null(), nil)
@@ -691,6 +692,48 @@ func displaySection(section Section) {
 		}
 	}
 
+}
+
+func PubchemUpdateProduct(this js.Value, args []js.Value) interface{} {
+
+	base64JsonPubchemProduct := args[0].String()
+	product_id := args[1].String()
+
+	var (
+		jsonPubchemProduct []byte
+		err                error
+	)
+	if jsonPubchemProduct, err = base64.StdEncoding.DecodeString(base64JsonPubchemProduct); err != nil {
+		jsutils.DisplayGenericErrorMessage()
+	}
+
+	ajax.Ajax{
+		URL:    ApplicationProxyPath + "products/pubchemcreateproduct/" + product_id,
+		Method: "post",
+		Data:   jsonPubchemProduct,
+		Done: func(data js.Value) {
+			var (
+				err        error
+				product_id int
+			)
+
+			if err = json.Unmarshal([]byte(data.String()), &product_id); err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			href := fmt.Sprintf("%sv/products", ApplicationProxyPath)
+			jsutils.ClearSearch(js.Null(), nil)
+			jsutils.LoadContent("div#content", "product", href, Product_SaveCallback, product_id)
+		},
+		Fail: func(jqXHR js.Value) {
+
+			jsutils.DisplayGenericErrorMessage()
+
+		},
+	}.Send()
+
+	return nil
 }
 
 func PubchemCreateProduct(this js.Value, args []js.Value) interface{} {
@@ -769,7 +812,13 @@ func PubchemGetProductByName(this js.Value, args []js.Value) interface{} {
 
 			// import button.
 			jquery.Jq("#pubchemcompound").Append(`<div id="import" class="row pb-3"></div>`)
-			jquery.Jq("#pubchemcompound #import").Append(`<a href="#" onclick="Product_pubchemCreateProduct('` + base64JsonPubchem + `')">` + locales.Translate("import", HTTPHeaderAcceptLanguage) + `</a>`)
+			jquery.Jq("#pubchemcompound #import").Append(`<button type="buton" class="btn btn-primary" href="#" onclick="Product_pubchemCreateProduct('` + base64JsonPubchem + `')">` + locales.Translate("import", HTTPHeaderAcceptLanguage) + `</button>`)
+
+			if jquery.Jq("input[name='selected_product_id']").GetVal().String() != "" {
+				// replace button.
+				jquery.Jq("#pubchemcompound").Append(`<div id="replace" class="row pb-3"></div>`)
+				jquery.Jq("#pubchemcompound #replace").Append(`<button type="buton" class="btn btn-primary" href="#" onclick="Product_pubchemUpdateProduct('` + base64JsonPubchem + `', '` + jquery.Jq("input[name='selected_product_id']").GetVal().String() + `')">` + locales.Translate("replace", HTTPHeaderAcceptLanguage) + " " + jquery.Jq("input[name='selected_product_name']").GetVal().String() + `</button>`)
+			}
 
 			// 2dpicture.
 			jquery.Jq("#pubchemcompound").Append(`<div id="2dimage" class="row pb-3"></div>`)

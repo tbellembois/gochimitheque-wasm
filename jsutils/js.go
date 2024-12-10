@@ -120,9 +120,7 @@ func clearSearchForm() {
 	jquery.Jq("#s_cas_number_cmr:checked").SetProp("checked", false)
 	jquery.Jq("#s_borrowing:checked").SetProp("checked", false)
 	jquery.Jq("#s_storage_to_destroy:checked").SetProp("checked", false)
-	jquery.Jq("#searchshowchem").SetProp("checked", true)
-	jquery.Jq("#searchshowbio").SetProp("checked", true)
-	jquery.Jq("#searchshowconsu").SetProp("checked", true)
+	jquery.Jq("#searchshowall").SetProp("checked", true)
 
 	jquery.Jq("#s_storage_batch_number").SetVal("")
 	jquery.Jq("#s_storage_barecode").SetVal("")

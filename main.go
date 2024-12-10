@@ -176,6 +176,7 @@ func main() {
 	js.Global().Set("Product_operateEventsOStorages", js.FuncOf(product.OperateEventsOStorages))
 	js.Global().Set("Product_operateEventsEdit", js.FuncOf(product.OperateEventsEdit))
 	js.Global().Set("Product_operateEventsDelete", js.FuncOf(product.OperateEventsDelete))
+	js.Global().Set("Product_operateEventsSelect", js.FuncOf(product.OperateEventsSelect))
 	js.Global().Set("Product_operateEventsTotalStock", js.FuncOf(product.OperateEventsTotalStock))
 	js.Global().Set("Product_getTableData", js.FuncOf(product.GetTableData))
 	js.Global().Set("Product_dataQueryParams", js.FuncOf(product.DataQueryParams))
@@ -200,6 +201,7 @@ func main() {
 	js.Global().Set("Product_pubchemGetCompoundByName", js.FuncOf(product.PubchemGetCompoundByName))
 	js.Global().Set("Product_pubchemGetProductByName", js.FuncOf(product.PubchemGetProductByName))
 	js.Global().Set("Product_pubchemCreateProduct", js.FuncOf(product.PubchemCreateProduct))
+	js.Global().Set("Product_pubchemUpdateProduct", js.FuncOf(product.PubchemUpdateProduct))
 
 	js.Global().Set("Common_search", js.FuncOf(jsutils.Search))
 	js.Global().Set("Common_clearSearch", js.FuncOf(jsutils.ClearSearch))
