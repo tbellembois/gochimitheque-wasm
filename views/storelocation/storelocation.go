@@ -62,6 +62,8 @@ func storelocation_common() {
 	select2.NewSelect2(jquery.Jq("select#store_location"), &select2.Select2Config{
 		Placeholder:    locales.Translate("store_location_store_location_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(StoreLocation{})),
+		AllowClear:     true,
+		Tags:           true,
 		Ajax: select2.Select2Ajax{
 			URL:            ApplicationProxyPath + "storelocations",
 			DataType:       "json",

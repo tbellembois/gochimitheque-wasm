@@ -354,6 +354,8 @@ func Select2GenericAjaxProcessResults(select2ResultAble Select2ResultAble) func(
 			Pagination: pagination,
 		}
 
+		// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", pagination))
+
 		return select2Data.ToJsValue()
 
 	}

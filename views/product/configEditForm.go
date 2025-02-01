@@ -303,9 +303,9 @@ func FillInProductForm(p Product, id string) {
 		jquery.Jq("#product_radioactive").SetProp("checked", "checked")
 	}
 
-	jquery.Jq("#product_disposalcomment").SetVal("")
+	jquery.Jq("#product_disposal_comment").SetVal("")
 	if p.ProductDisposalComment != nil {
-		jquery.Jq("#product_disposalcomment").SetVal(*p.ProductDisposalComment)
+		jquery.Jq("#product_disposal_comment").SetVal(*p.ProductDisposalComment)
 	}
 	jquery.Jq("#product_remark").SetVal("")
 	if p.ProductRemark != nil {
@@ -323,9 +323,9 @@ func FillInProductForm(p Product, id string) {
 
 	// Chem/Bio/Consu detection.
 	switch p.ProductType {
-	case "CONS":
+	case "cons":
 		Consufy()
-	case "BIO":
+	case "bio":
 		Biofy()
 	default:
 		Chemify()
@@ -452,9 +452,9 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		*globals.CurrentProduct.ProductMSDS = jquery.Jq("input#product_msds").GetVal().String()
 	}
 
-	if jquery.Jq("textarea#product_disposalcomment").GetVal().Truthy() {
+	if jquery.Jq("textarea#product_disposal_comment").GetVal().Truthy() {
 		globals.CurrentProduct.ProductDisposalComment = new(string)
-		*globals.CurrentProduct.ProductDisposalComment = jquery.Jq("textarea#product_disposalcomment").GetVal().String()
+		*globals.CurrentProduct.ProductDisposalComment = jquery.Jq("textarea#product_disposal_comment").GetVal().String()
 	}
 
 	if jquery.Jq("textarea#product_remark").GetVal().Truthy() {

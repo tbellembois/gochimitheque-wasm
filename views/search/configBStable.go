@@ -6,6 +6,7 @@ import (
 
 	"honnef.co/go/js/dom/v2"
 
+	. "github.com/tbellembois/gochimitheque-wasm/globals"
 	"github.com/tbellembois/gochimitheque-wasm/jsutils"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
@@ -31,9 +32,11 @@ func Select2SymbolTemplateResults(this js.Value, args []js.Value) interface{} {
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
 		},
-		Src:   fmt.Sprintf("data:%s", symbol.SymbolLabel),
-		Alt:   symbol.SymbolLabel,
-		Title: symbol.SymbolLabel,
+		Height: "30",
+		Width:  "30",
+		Src:    fmt.Sprintf("%sstatic/img/%s.svg", ApplicationProxyPath, symbol.SymbolLabel),
+		Alt:    symbol.SymbolLabel,
+		Title:  symbol.SymbolLabel,
 	})
 	spanLabel := widgets.NewSpan(widgets.SpanAttributes{
 		BaseAttributes: widgets.BaseAttributes{

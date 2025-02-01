@@ -107,20 +107,21 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 	storelocation.Entity = models.Entity{}
 
 	if storelocation.Entity.EntityID, err = strconv.Atoi(select2ItemEntity.Select2Data()[0].Id); err != nil {
-		fmt.Println(err)
+		fmt.Println("select2ItemEntity:" + err.Error())
 		return nil
 	}
 
 	storelocation.Entity.EntityName = select2ItemEntity.Select2Data()[0].Text
 
 	select2StoreLocation := select2.NewSelect2(jquery.Jq("select#store_location"), nil)
-	if len(select2StoreLocation.Select2Data()) > 0 {
+
+	if len(select2StoreLocation.Select2Data()) > 0 && select2StoreLocation.Select2Data()[0].Id != "" {
 		select2ItemStoreLocation := select2StoreLocation.Select2Data()[0]
 		if !select2ItemStoreLocation.IsEmpty() {
 			storelocation.StoreLocation.StoreLocation = &models.StoreLocation{}
 
 			if storelocationId, err = strconv.Atoi(select2ItemStoreLocation.Id); err != nil {
-				fmt.Println(err)
+				fmt.Println("select2ItemStoreLocation:" + err.Error())
 				return nil
 			}
 
@@ -128,8 +129,9 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 				Int64: int64(storelocationId),
 				Valid: true,
 			}}
+			// FIELD_REQUIRED_BY_RUST_MODEL_BUT_NOT_USED_IN_CREATE_OR_UPDATE
 			storelocation.StoreLocation.StoreLocation.StoreLocationName = models.NullString{sql.NullString{
-				String: "FIELD_REQUIRED_BY_RUST_MODEL_BUT_NOT_USED_IN_CREATE_OR_UPDATE",
+				String: "",
 				Valid:  true,
 			}}
 			// FIELD_REQUIRED_BY_RUST_MODEL_BUT_NOT_USED_IN_CREATE_OR_UPDATE

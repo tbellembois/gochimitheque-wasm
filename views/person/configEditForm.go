@@ -376,7 +376,7 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 
 	if jquery.Jq("input#person_id").GetVal().Truthy() {
 		if person.PersonID, err = strconv.Atoi(jquery.Jq("input#person_id").GetVal().String()); err != nil {
-			fmt.Println(err)
+			fmt.Println("person_id:" + err.Error())
 			return nil
 		}
 	}
@@ -388,7 +388,7 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 	for _, select2Item := range select2Entities.Select2Data() {
 		entity := &models.Entity{}
 		if entity.EntityID, err = strconv.Atoi(select2Item.Id); err != nil {
-			fmt.Println(err)
+			fmt.Println("entity_id:" + err.Error())
 			return nil
 		}
 		entity.EntityName = select2Item.Text
@@ -396,7 +396,7 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 		person.Entities = append(person.Entities, entity)
 	}
 
-	permissions := jquery.Jq("input[type=radio]:checked").Object
+	permissions := jquery.Jq("div#content input[type=radio]:checked").Object
 	for i := 0; i < permissions.Length(); i++ {
 		permission := &models.Permission{}
 
@@ -405,7 +405,7 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 		entityId := permissions.Index(i).Call("getAttribute", "entity_id").String()
 
 		if permission.PermissionEntityID, err = strconv.Atoi(entityId); err != nil {
-			fmt.Println(err)
+			fmt.Println("permission_entity_id:" + err.Error())
 			return nil
 		}
 

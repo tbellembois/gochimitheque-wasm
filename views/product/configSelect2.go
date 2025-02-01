@@ -99,9 +99,11 @@ func Select2SymbolTemplateResults(this js.Value, args []js.Value) interface{} {
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
 		},
-		Src:   fmt.Sprintf("data:%s", symbol.SymbolLabel),
-		Alt:   symbol.SymbolLabel,
-		Title: symbol.SymbolLabel,
+		Height: "30",
+		Width:  "30",
+		Src:    fmt.Sprintf("%sstatic/img/%s.svg", ApplicationProxyPath, symbol.SymbolLabel),
+		Alt:    symbol.SymbolLabel,
+		Title:  symbol.SymbolLabel,
 	})
 	spanLabel := widgets.NewSpan(widgets.SpanAttributes{
 		BaseAttributes: widgets.BaseAttributes{
@@ -424,7 +426,35 @@ func Select2SupplierRefAjaxData(this js.Value, args []js.Value) interface{} {
 
 }
 
-// TODO; factorise with storage
+func Select2UnitMolecularWeightAjaxData(this js.Value, args []js.Value) interface{} {
+
+	params := args[0]
+
+	search := ""
+	if params.Get("term").Truthy() {
+		search = params.Get("term").String()
+	}
+	page := 1
+	if params.Get("page").Truthy() {
+		page = params.Get("page").Int()
+	}
+	offset := (page - 1) * 10
+	limit := 10
+
+	if offset < 0 {
+		offset = 0
+	}
+
+	return ajax.QueryFilter{
+		UnitType: "temperature",
+		Search:   search,
+		Offset:   offset,
+		Page:     page,
+		Limit:    limit,
+	}.ToJsValue()
+
+}
+
 func Select2UnitTemperatureAjaxData(this js.Value, args []js.Value) interface{} {
 
 	params := args[0]

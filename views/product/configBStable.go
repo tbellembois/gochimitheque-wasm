@@ -1139,9 +1139,11 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Alt:   symbol.SymbolLabel,
-			Title: symbol.SymbolLabel,
-			Src:   fmt.Sprintf("data:%s", globals.SymbolImages[symbol.SymbolLabel]),
+			Height: "30",
+			Width:  "30",
+			Alt:    symbol.SymbolLabel,
+			Title:  symbol.SymbolLabel,
+			Src:    fmt.Sprintf("%sstatic/img/%s.svg", ApplicationProxyPath, symbol.SymbolLabel),
 		}))
 	}
 	// Signal word.
@@ -1884,8 +1886,8 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 		widgets.LinkAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Id:         "select" + strconv.Itoa(globals.CurrentProduct.ProductID),
-				Classes:    []string{"select", "dropdown-item", "text-primary", "iconlabel"},
-				Visible:    true,
+				Classes:    []string{"productselect", "dropdown-item", "text-primary", "iconlabel"},
+				Visible:    false,
 				Attributes: map[string]string{"pid": strconv.Itoa(globals.CurrentProduct.ProductID)},
 			},
 			Href: "#",
@@ -2132,6 +2134,7 @@ func ShowIfAuthorizedActionButtons(this js.Value, args []js.Value) interface{} {
 	}, func() {
 	})
 	jsutils.HasPermission("products", "-2", "put", func() {
+		jquery.Jq(".productselect").FadeIn()
 		jquery.Jq(".productedit").FadeIn()
 	}, func() {
 	})

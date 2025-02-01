@@ -26,7 +26,6 @@ var (
 	CurrentStorages           []types.Storage
 	DBPrecautionaryStatements []types.PrecautionaryStatement // for magic selector
 	DBHazardStatements        []types.HazardStatement        // for magic selector
-	SymbolImages              map[string]string
 
 	// permissions
 	PermItems = [3]string{
