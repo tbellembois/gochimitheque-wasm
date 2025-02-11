@@ -116,7 +116,7 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 	index := args[3].Int()
 	entity := Entity{Entity: &models.Entity{}}.FromJsJSONValue(row).(Entity)
 
-	url := fmt.Sprintf("%sentities/%d", ApplicationProxyPath, entity.EntityID)
+	url := fmt.Sprintf("%sentities?entity=%d", ApplicationProxyPath, entity.EntityID)
 	method := "get"
 
 	done := func(data js.Value) {
@@ -173,7 +173,7 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 				Visible:    true,
 				Attributes: map[string]string{"eid": strconv.Itoa(entity.EntityID)},
 			},
-			Text: strconv.Itoa(entity.EntitySLC),
+			Text: strconv.Itoa(int(*entity.EntityNbStoreLocations)),
 			Icon: themes.NewMdiIcon(themes.MDI_STORELOCATION, ""),
 		},
 		[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
@@ -194,7 +194,7 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 				Visible:    true,
 				Attributes: map[string]string{"eid": strconv.Itoa(entity.EntityID)},
 			},
-			Text: strconv.Itoa(entity.EntityPC),
+			Text: strconv.Itoa(int(*entity.EntityNbPeople)),
 			Icon: themes.NewMdiIcon(themes.MDI_PEOPLE, ""),
 		},
 		[]themes.BSClass{themes.BS_BTN, themes.BS_BNT_LINK},
@@ -243,6 +243,29 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	).OuterHTML()
 
 	return buttonStorelocations + buttonMembers + buttonEdit + buttonDelete
+
+}
+
+func NameFormatter(this js.Value, args []js.Value) interface{} {
+
+	row := args[1]
+	entity := Entity{Entity: &models.Entity{}}.FromJsJSONValue(row).(Entity)
+
+	label := entity.EntityName + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<i>"
+
+	if entity.EntityNbStoreLocations != nil {
+		label += " sl:" + strconv.Itoa(int(*entity.EntityNbStoreLocations))
+	}
+	label += " </i>]"
+
+	span := widgets.NewSpan(widgets.SpanAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+		},
+		Text: label,
+	})
+
+	return span.OuterHTML()
 
 }
 

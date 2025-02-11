@@ -502,6 +502,37 @@ func Storage_productFormatter(this js.Value, args []js.Value) interface{} {
 		)
 	}
 
+	if CurrentStorage.StorageArchive.Valid && CurrentStorage.StorageArchive.Bool {
+		d.AppendChild(
+			widgets.NewSpan(widgets.SpanAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+					Attributes: map[string]string{
+						"style": "float: right; color: orange; font-size: 0.8em; font-style: bold; margin-right: 1em;",
+					},
+				},
+				Text: locales.Translate("storage_archive", globals.HTTPHeaderAcceptLanguage),
+			}),
+		)
+	}
+
+	// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", CurrentStorage.Storage.Storage.StorageID.Valid))
+	// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", CurrentStorage.Storage.Storage.StorageID.Int64))
+
+	if CurrentStorage.Storage.Storage != nil && CurrentStorage.Storage.Storage.StorageID.Valid && CurrentStorage.Storage.Storage.StorageID.Int64 != 0 {
+		d.AppendChild(
+			widgets.NewSpan(widgets.SpanAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+					Attributes: map[string]string{
+						"style": "float: right; color: grey; font-size: 0.8em; font-style: bold; margin-right: 1em;",
+					},
+				},
+				Text: locales.Translate("storage_history", globals.HTTPHeaderAcceptLanguage),
+			}),
+		)
+	}
+
 	// if CurrentStorage.StorageBatchNumber.Valid {
 	// 	d.AppendChild(
 	// 		widgets.NewBr(widgets.BrAttributes{

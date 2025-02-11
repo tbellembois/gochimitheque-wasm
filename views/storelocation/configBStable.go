@@ -223,7 +223,7 @@ func StoreLocationFullPathFormatter(this js.Value, args []js.Value) interface{} 
 	if storelocation.StoreLocationNbStorage != nil {
 		label += " st:" + strconv.Itoa(int(*storelocation.StoreLocationNbStorage))
 	}
-	if storelocation.StoreLocationNbStorage != nil {
+	if storelocation.StoreLocationNbChildren != nil {
 		label += " chil.: " + strconv.Itoa(int(*storelocation.StoreLocationNbChildren))
 	}
 	label += " </i>]"

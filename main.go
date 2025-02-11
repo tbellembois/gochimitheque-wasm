@@ -234,6 +234,7 @@ func main() {
 	js.Global().Set("Entity_operateEventsEdit", js.FuncOf(entity.OperateEventsEdit))
 	js.Global().Set("Entity_operateEventsDelete", js.FuncOf(entity.OperateEventsDelete))
 	js.Global().Set("Entity_getTableData", js.FuncOf(entity.GetTableData))
+	js.Global().Set("Entity_nameFormatter", js.FuncOf(entity.NameFormatter))
 	js.Global().Set("Entity_managersFormatter", js.FuncOf(entity.ManagersFormatter))
 	js.Global().Set("Entity_operateFormatter", js.FuncOf(entity.OperateFormatter))
 	js.Global().Set("Entity_saveEntity", js.FuncOf(entity.SaveEntity))
