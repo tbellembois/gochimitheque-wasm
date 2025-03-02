@@ -163,6 +163,50 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 
 }
 
+func MemberOfFormatter(this js.Value, args []js.Value) interface{} {
+
+	row := args[1]
+	person := Person{Person: &models.Person{}}.FromJsJSONValue(row).(Person)
+
+	label := "<ul>"
+
+	for _, entity := range person.Entities {
+		label += "<li>" + entity.EntityName + "</li>"
+	}
+	label += "<ul>"
+
+	span := widgets.NewSpan(widgets.SpanAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+		},
+		Text: label,
+	})
+
+	return span.OuterHTML()
+}
+
+func ManagerOfFormatter(this js.Value, args []js.Value) interface{} {
+
+	row := args[1]
+	person := Person{Person: &models.Person{}}.FromJsJSONValue(row).(Person)
+
+	label := "<ul>"
+
+	for _, entity := range person.ManagedEntities {
+		label += "<li>" + entity.EntityName + "</li>"
+	}
+	label += "<ul>"
+
+	span := widgets.NewSpan(widgets.SpanAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+		},
+		Text: label,
+	})
+
+	return span.OuterHTML()
+}
+
 func DataQueryParams(this js.Value, args []js.Value) interface{} {
 
 	params := args[0]

@@ -39,21 +39,21 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 	// then setting up new permissions
 	for _, p := range permissions {
 
-		pentityid := strconv.Itoa(p.PermissionEntityID)
-		if _, ok := managedEntitiesIds[p.PermissionEntityID]; ok {
+		pentityid := strconv.Itoa(p.PermissionEntity)
+		if _, ok := managedEntitiesIds[p.PermissionEntity]; ok {
 			continue
 		}
 
-		switch p.PermissionItemName {
+		switch p.PermissionItem {
 		case "products":
-			switch p.PermissionPermName {
+			switch p.PermissionName {
 			case "w", "all":
 				if pentityid == "-1" {
 					for _, e := range Doc.GetElementsByClassName("permwproducts") {
 						e.(*dom.HTMLInputElement).SetChecked(true)
 					}
 				} else {
-					input := Doc.GetElementByID("permw" + p.PermissionItemName + pentityid)
+					input := Doc.GetElementByID("permw" + p.PermissionItem + pentityid)
 					if input != nil {
 						input.(*dom.HTMLInputElement).SetChecked(true)
 					}
@@ -63,14 +63,14 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 					for _, e := range Doc.GetElementsByClassName("permrproducts") {
 						// avoid selecting r if w is already selected
 						eid := e.GetAttribute("entity_id")
-						if !Doc.GetElementByID("permw" + p.PermissionItemName + eid).(*dom.HTMLInputElement).Checked() {
+						if !Doc.GetElementByID("permw" + p.PermissionItem + eid).(*dom.HTMLInputElement).Checked() {
 							e.(*dom.HTMLInputElement).SetChecked(true)
 						}
 					}
 				} else {
 					// avoid selecting r if w is already selected
-					if !Doc.GetElementByID("permw" + p.PermissionItemName + pentityid).(*dom.HTMLInputElement).Checked() {
-						Doc.GetElementByID("permr" + p.PermissionItemName + pentityid).(*dom.HTMLInputElement).SetChecked(true)
+					if !Doc.GetElementByID("permw" + p.PermissionItem + pentityid).(*dom.HTMLInputElement).Checked() {
+						Doc.GetElementByID("permr" + p.PermissionItem + pentityid).(*dom.HTMLInputElement).SetChecked(true)
 					}
 				}
 			case "n":
@@ -79,11 +79,11 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 						e.(*dom.HTMLInputElement).SetChecked(true)
 					}
 				} else {
-					Doc.GetElementByID("permn" + p.PermissionItemName + pentityid).(*dom.HTMLInputElement).SetChecked(true)
+					Doc.GetElementByID("permn" + p.PermissionItem + pentityid).(*dom.HTMLInputElement).SetChecked(true)
 				}
 			}
 		case "rproducts":
-			switch p.PermissionPermName {
+			switch p.PermissionName {
 			case "w", "all":
 				if pentityid == "-1" {
 					// for _, e := range Doc.GetElementsByClassName("permwrproducts") {
@@ -91,7 +91,7 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 						e.(*dom.HTMLInputElement).SetChecked(true)
 					}
 				} else {
-					input := Doc.GetElementByID("permw" + p.PermissionItemName + pentityid)
+					input := Doc.GetElementByID("permw" + p.PermissionItem + pentityid)
 					if input != nil {
 						input.(*dom.HTMLInputElement).SetChecked(true)
 					}
@@ -102,15 +102,15 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 						// avoid selecting r if w is already selected
 						e.(*dom.HTMLInputElement).SetChecked(true)
 						// eid := e.GetAttribute("entity_id")
-						// if !Doc.GetElementByID("permw" + p.PermissionItemName + eid).(*dom.HTMLInputElement).Checked() {
+						// if !Doc.GetElementByID("permw" + p.PermissionItem + eid).(*dom.HTMLInputElement).Checked() {
 						// 	e.(*dom.HTMLInputElement).SetChecked(true)
 						// }
 					}
 				} else {
 					// avoid selecting r if w is already selected
-					Doc.GetElementByID("permr" + p.PermissionItemName + pentityid).(*dom.HTMLInputElement).SetChecked(true)
-					// if !Doc.GetElementByID("permw" + p.PermissionItemName + pentityid).(*dom.HTMLInputElement).Checked() {
-					// 	Doc.GetElementByID("permr" + p.PermissionItemName + pentityid).(*dom.HTMLInputElement).SetChecked(true)
+					Doc.GetElementByID("permr" + p.PermissionItem + pentityid).(*dom.HTMLInputElement).SetChecked(true)
+					// if !Doc.GetElementByID("permw" + p.PermissionItem + pentityid).(*dom.HTMLInputElement).Checked() {
+					// 	Doc.GetElementByID("permr" + p.PermissionItem + pentityid).(*dom.HTMLInputElement).SetChecked(true)
 					// }
 				}
 			case "n":
@@ -119,37 +119,37 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 						e.(*dom.HTMLInputElement).SetChecked(true)
 					}
 				} else {
-					Doc.GetElementByID("permn" + p.PermissionItemName + pentityid).(*dom.HTMLInputElement).SetChecked(true)
+					Doc.GetElementByID("permn" + p.PermissionItem + pentityid).(*dom.HTMLInputElement).SetChecked(true)
 				}
 			}
 		case "storages":
-			switch p.PermissionPermName {
+			switch p.PermissionName {
 			case "w", "all":
 				if pentityid == "-1" {
 					for _, e := range Doc.GetElementsByClassName("permwstorages") {
 						e.(*dom.HTMLInputElement).SetChecked(true)
 					}
 				} else {
-					Doc.GetElementByID("permw" + p.PermissionItemName + pentityid).(*dom.HTMLInputElement).SetChecked(true)
+					Doc.GetElementByID("permw" + p.PermissionItem + pentityid).(*dom.HTMLInputElement).SetChecked(true)
 				}
 			case "r":
 				if pentityid == "-1" {
 					for _, e := range Doc.GetElementsByClassName("permrstorages") {
 						// avoid selecting r if w is already selected
 						eid := e.GetAttribute("entity_id")
-						if !Doc.GetElementByID("permw" + p.PermissionItemName + eid).(*dom.HTMLInputElement).Checked() {
+						if !Doc.GetElementByID("permw" + p.PermissionItem + eid).(*dom.HTMLInputElement).Checked() {
 							e.(*dom.HTMLInputElement).SetChecked(true)
 						}
 					}
 				} else {
 					// avoid selecting r if w is already selected
-					if !Doc.GetElementByID("permw" + p.PermissionItemName + pentityid).(*dom.HTMLInputElement).Checked() {
-						Doc.GetElementByID("permr" + p.PermissionItemName + pentityid).(*dom.HTMLInputElement).SetChecked(true)
+					if !Doc.GetElementByID("permw" + p.PermissionItem + pentityid).(*dom.HTMLInputElement).Checked() {
+						Doc.GetElementByID("permr" + p.PermissionItem + pentityid).(*dom.HTMLInputElement).SetChecked(true)
 					}
 				}
 			}
 		case "all":
-			switch p.PermissionPermName {
+			switch p.PermissionName {
 			case "w", "all":
 				if pentityid == "-1" {
 					// super admin (if "all")
@@ -400,11 +400,11 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 	for i := 0; i < permissions.Length(); i++ {
 		permission := &models.Permission{}
 
-		permission.PermissionPermName = permissions.Index(i).Call("getAttribute", "perm_name").String()
-		permission.PermissionItemName = permissions.Index(i).Call("getAttribute", "item_name").String()
+		permission.PermissionName = permissions.Index(i).Call("getAttribute", "perm_name").String()
+		permission.PermissionItem = permissions.Index(i).Call("getAttribute", "item_name").String()
 		entityId := permissions.Index(i).Call("getAttribute", "entity_id").String()
 
-		if permission.PermissionEntityID, err = strconv.Atoi(entityId); err != nil {
+		if permission.PermissionEntity, err = strconv.Atoi(entityId); err != nil {
 			fmt.Println("permission_entity_id:" + err.Error())
 			return nil
 		}

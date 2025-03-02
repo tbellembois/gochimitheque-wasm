@@ -267,6 +267,8 @@ func main() {
 	js.Global().Set("Person_dataQueryParams", js.FuncOf(person.DataQueryParams))
 	js.Global().Set("Person_operateFormatter", js.FuncOf(person.OperateFormatter))
 	js.Global().Set("Person_selectAllEntity", js.FuncOf(person.SelectAllEntity))
+	js.Global().Set("Person_memberofFormatter", js.FuncOf(person.MemberOfFormatter))
+	js.Global().Set("Person_managerofFormatter", js.FuncOf(person.ManagerOfFormatter))
 
 	// Person page load callbacks.
 	js.Global().Set("Person_list", js.FuncOf(person.Person_listCallback))
