@@ -1,8 +1,8 @@
 module github.com/tbellembois/gochimitheque-wasm
 
-go 1.22.0
+go 1.24
 
-toolchain go1.23.3
+toolchain go1.24.1
 
 replace github.com/tbellembois/gochimitheque v0.0.0 => /home/thbellem/workspace/workspace_go/src/github.com/tbellembois/gochimitheque
 
@@ -12,7 +12,7 @@ require (
 	github.com/go-ldap/ldap/v3 v3.4.6
 	github.com/rocketlaunchr/react v1.0.9
 	github.com/tbellembois/gochimitheque v0.0.0
-	golang.org/x/text v0.14.0
+	golang.org/x/text v0.24.0
 	honnef.co/go/js/dom/v2 v2.0.0-20231112215516-51f43a291193
 )
 
@@ -22,6 +22,6 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
-	golang.org/x/crypto v0.21.0 // indirect
-	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/crypto v0.37.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
 )

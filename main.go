@@ -1,4 +1,4 @@
-//go:build go1.21 && js && wasm
+//go:build go1.24 && js && wasm
 
 package main
 
@@ -108,6 +108,7 @@ func init() {
 	}
 
 	r = csv.NewReader(strings.NewReader(globals.HAZARDSTATEMENT))
+	r.FieldsPerRecord = 3
 	r.Comma = '\t'
 	if records, err = r.ReadAll(); err != nil {
 		panic(err)
@@ -119,6 +120,20 @@ func init() {
 				HazardStatementID:        id + 1,
 				HazardStatementLabel:     record[0],
 				HazardStatementReference: record[1],
+			}})
+	}
+
+	r = csv.NewReader(strings.NewReader(globals.SYMBOLS))
+	r.Comma = '\t'
+	if records, err = r.ReadAll(); err != nil {
+		panic(err)
+	}
+	// FIXME: we assume here that the id starts by 1 in the DB
+	for id, record := range records {
+		globals.DBSymbols = append(globals.DBSymbols,
+			types.Symbol{Symbol: &models.Symbol{
+				SymbolID:    id + 1,
+				SymbolLabel: record[0],
 			}})
 	}
 
@@ -304,6 +319,7 @@ func main() {
 	jsutils.LoadContent("div#content", "login", fmt.Sprintf("%slogin", ApplicationProxyPath), loginCallbackWrapper)
 
 	fmt.Println("wasm loaded")
+	fmt.Println("ApplicationProxyPath:" + ApplicationProxyPath)
 
 	keepAlive()
 

@@ -1,3 +1,5 @@
+//go:build go1.24 && js && wasm
+
 package product
 
 import (
@@ -104,14 +106,17 @@ func Magic(this js.Value, args []js.Value) interface{} {
 
 	rhs := regexp.MustCompile("((?:EU){0,1}H[0-9]{3}[FfDdAi]{0,2})")
 	rps := regexp.MustCompile("(P[0-9]{3})")
+	rsymbols := regexp.MustCompile("(GHS[0-9]{2})")
 
 	shs := rhs.FindAllStringSubmatch(magic, -1)
 	sps := rps.FindAllStringSubmatch(magic, -1)
+	ssymbols := rsymbols.FindAllStringSubmatch(magic, -1)
 
 	var (
-		processedH map[string]string
-		processedP map[string]string
-		ok         bool
+		processedH       map[string]string
+		processedP       map[string]string
+		processedSymbols map[string]string
+		ok               bool
 	)
 
 	processedH = make(map[string]string)
@@ -154,6 +159,31 @@ func Magic(this js.Value, args []js.Value) interface{} {
 						widgets.NewOption(widgets.OptionAttributes{
 							Text:            p[0],
 							Value:           strconv.Itoa(hs.PrecautionaryStatementID),
+							DefaultSelected: true,
+							Selected:        true,
+						}).HTMLElement.OuterHTML())
+					break
+				}
+			}
+
+		}
+	}
+
+	processedSymbols = make(map[string]string)
+
+	select2Symbols := select2.NewSelect2(jquery.Jq("select#symbols"), nil)
+	select2Symbols.Select2Clear()
+	for _, p := range ssymbols {
+
+		if _, ok = processedSymbols[p[1]]; !ok {
+			processedSymbols[p[1]] = ""
+
+			for _, symbol := range globals.DBSymbols {
+				if symbol.SymbolLabel == p[1] {
+					select2Symbols.Select2AppendOption(
+						widgets.NewOption(widgets.OptionAttributes{
+							Text:            p[0],
+							Value:           strconv.Itoa(symbol.SymbolID),
 							DefaultSelected: true,
 							Selected:        true,
 						}).HTMLElement.OuterHTML())
@@ -576,7 +606,7 @@ func product_common() {
 		},
 	}).Select2ify()
 
-	jquery.Jq("#product_twodformula").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq("#product_twod_formula").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		js.Global().Call("load2dimage")
 		return nil
 	}))
@@ -707,6 +737,17 @@ func PubchemUpdateProduct(this js.Value, args []js.Value) interface{} {
 		jsutils.DisplayGenericErrorMessage()
 	}
 
+	pubChemProduct := struct {
+		Name string
+	}{}
+
+	err = json.Unmarshal(jsonPubchemProduct, &pubChemProduct)
+	if err != nil {
+		js.Global().Get("console").Call("log", fmt.Sprintf("%#v", string(jsonPubchemProduct)))
+
+	}
+	globals.CurrentProduct.Name = models.Name{NameLabel: pubChemProduct.Name}
+
 	ajax.Ajax{
 		URL:    ApplicationProxyPath + "products/pubchemcreateproduct/" + product_id,
 		Method: "post",
@@ -721,6 +762,8 @@ func PubchemUpdateProduct(this js.Value, args []js.Value) interface{} {
 				fmt.Println(err)
 				return
 			}
+
+			globals.CurrentProduct.ProductID = product_id
 
 			href := fmt.Sprintf("%sv/products", ApplicationProxyPath)
 			jsutils.ClearSearch(js.Null(), nil)
@@ -748,6 +791,17 @@ func PubchemCreateProduct(this js.Value, args []js.Value) interface{} {
 		jsutils.DisplayGenericErrorMessage()
 	}
 
+	pubChemProduct := struct {
+		Name string
+	}{}
+
+	err = json.Unmarshal(jsonPubchemProduct, &pubChemProduct)
+	if err != nil {
+		js.Global().Get("console").Call("log", fmt.Sprintf("%#v", string(jsonPubchemProduct)))
+
+	}
+	globals.CurrentProduct.Name = models.Name{NameLabel: pubChemProduct.Name}
+
 	ajax.Ajax{
 		URL:    ApplicationProxyPath + "products/pubchemcreateproduct",
 		Method: "post",
@@ -762,6 +816,8 @@ func PubchemCreateProduct(this js.Value, args []js.Value) interface{} {
 				fmt.Println(err)
 				return
 			}
+
+			globals.CurrentProduct.ProductID = product_id
 
 			href := fmt.Sprintf("%sv/products", ApplicationProxyPath)
 			jsutils.ClearSearch(js.Null(), nil)
@@ -804,7 +860,29 @@ func PubchemGetProductByName(this js.Value, args []js.Value) interface{} {
 				fmt.Println(err)
 			}
 
-			fmt.Println(data.String())
+			if pubchemProduct.Cas != nil {
+
+				ajax.Ajax{
+					URL:    ApplicationProxyPath + "products?cas_number_string=" + *pubchemProduct.Cas,
+					Method: "get",
+					Done: func(data js.Value) {
+						var (
+							products Products
+							err      error
+						)
+						if err = json.Unmarshal([]byte(data.String()), &products); err != nil {
+							fmt.Println(err)
+						}
+
+						if products.GetTotal() != 0 {
+							jquery.Jq("#pubchemcasexist").Empty()
+							jquery.Jq("#pubchemcasexist").Append(`<div class="alert alert-danger" role="alert">` + locales.Translate("cas_number_validate_cas", HTTPHeaderAcceptLanguage) + `</div>`)
+						}
+					},
+				}.Send()
+
+			}
+			// fmt.Println(data.String())
 
 			base64JsonPubchem := base64.StdEncoding.EncodeToString([]byte(data.String()))
 
@@ -1151,9 +1229,9 @@ func Product_SaveCallback(args ...interface{}) {
 	BSTableQueryFilter.QueryFilter.Product = strconv.Itoa(args[0].(int))
 
 	if CurrentProduct.ProductSpecificity != nil {
-		BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", CurrentProduct.Name.NameLabel, *CurrentProduct.ProductSpecificity)
+		BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("#%d %s %s", CurrentProduct.ProductID, CurrentProduct.Name.NameLabel, *CurrentProduct.ProductSpecificity)
 	} else {
-		BSTableQueryFilter.QueryFilter.ProductFilterLabel = CurrentProduct.Name.NameLabel
+		BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("#%d %s", CurrentProduct.ProductID, CurrentProduct.Name.NameLabel)
 	}
 
 	bstable.NewBootstraptable(jquery.Jq("#Product_table"), nil).Refresh(nil)

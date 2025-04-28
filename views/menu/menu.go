@@ -1,3 +1,5 @@
+//go:build go1.24 && js && wasm
+
 package menu
 
 import (
@@ -124,7 +126,7 @@ func ShowIfAuthorizedMenuItems(args ...interface{}) {
 	}, func() {
 	})
 
-	jsutils.HasPermission("storelocations", "", "post", func() {
+	jsutils.HasPermission("store_locations", "", "post", func() {
 		jquery.Jq("#menu_create_store_location").FadeIn()
 		jquery.Jq("#menu_management").FadeIn()
 	}, func() {

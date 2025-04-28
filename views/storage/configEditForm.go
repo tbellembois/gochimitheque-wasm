@@ -1,3 +1,5 @@
+//go:build go1.24 && js && wasm
+
 package storage
 
 import (
@@ -103,7 +105,7 @@ func SaveBorrowing(this js.Value, args []js.Value) interface{} {
 
 	}
 
-	ajaxURL = fmt.Sprintf("%sborrowings", ApplicationProxyPath)
+	ajaxURL = fmt.Sprintf("%sstorages/borrow", ApplicationProxyPath)
 	ajaxMethod = "put"
 
 	if dataBytes, err = json.Marshal(s); err != nil {

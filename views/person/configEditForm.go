@@ -1,9 +1,10 @@
+//go:build go1.24 && js && wasm
+
 package person
 
 import (
 	"fmt"
 	"strconv"
-	"sync"
 	"syscall/js"
 
 	"github.com/rocketlaunchr/react/forks/encoding/json"
@@ -38,6 +39,8 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 
 	// then setting up new permissions
 	for _, p := range permissions {
+
+		// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", p))
 
 		pentityid := strconv.Itoa(p.PermissionEntity)
 		if _, ok := managedEntitiesIds[p.PermissionEntity]; ok {
@@ -227,18 +230,27 @@ func SelectAllEntity(this js.Value, args []js.Value) interface{} {
 
 func FillInPersonForm(p Person, id string) {
 
+	// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", p))
+
 	type Permissions []Permission
 	type Entities []Entity
 
 	var (
-		wg                        sync.WaitGroup
-		entities, managedEntities Entities
-		managedEntitiesIds        map[int]string
-		permissions               Permissions
-		err                       error
+		// wg                        sync.WaitGroup
+		// entities, managedEntities Entities
+		managedEntitiesIds map[int]string
+		permissions        Permissions
+	// err                       error
 	)
 
 	managedEntitiesIds = make(map[int]string)
+	for _, entity := range p.ManagedEntities {
+		managedEntitiesIds[entity.EntityID] = entity.EntityName
+	}
+
+	for _, permission := range p.Permissions {
+		permissions = append(permissions, Permission{Permission: permission})
+	}
 
 	select2Entities := select2.NewSelect2(jquery.Jq("select#entities"), nil)
 	select2Entities.Select2Clear()
@@ -246,83 +258,82 @@ func FillInPersonForm(p Person, id string) {
 	jquery.Jq("#permissions").Empty()
 
 	// Getting the entities the person is manager of.
-	wg.Add(1)
-	go func() {
-
-		ajax.Ajax{
-			URL:    fmt.Sprintf("%speople/%d/manageentities", ApplicationProxyPath, p.PersonID),
-			Method: "get",
-			Done: func(data js.Value) {
-				if err = json.Unmarshal([]byte(data.String()), &managedEntities); err != nil {
-					fmt.Println(err)
-					jsutils.DisplayGenericErrorMessage()
-				}
-				for _, entity := range managedEntities {
-					managedEntitiesIds[entity.EntityID] = entity.EntityName
-				}
-				wg.Done()
-			},
-			Fail: func(jqXHR js.Value) {
-				jsutils.DisplayGenericErrorMessage()
-				wg.Done()
-			},
-		}.Send()
-
-	}()
+	// wg.Add(1)
+	// go func() {
+	//
+	// 	ajax.Ajax{
+	// 		URL:    fmt.Sprintf("%speople/%d/manageentities", ApplicationProxyPath, p.PersonID),
+	// 		Method: "get",
+	// 		Done: func(data js.Value) {
+	// 			if err = json.Unmarshal([]byte(data.String()), &managedEntities); err != nil {
+	// 				fmt.Println(err)
+	// 				jsutils.DisplayGenericErrorMessage()
+	// 			}
+	// 			for _, entity := range managedEntities {
+	// 				managedEntitiesIds[entity.EntityID] = entity.EntityName
+	// 			}
+	// 			wg.Done()
+	// 		},
+	// 		Fail: func(jqXHR js.Value) {
+	// 			jsutils.DisplayGenericErrorMessage()
+	// 			wg.Done()
+	// 		},
+	// 	}.Send()
+	//
+	// }()
 
 	// Getting the person permissions.
-	wg.Add(1)
-	go func() {
-
-		ajax.Ajax{
-			URL:    fmt.Sprintf("%speople/%d/permissions", ApplicationProxyPath, p.PersonID),
-			Method: "get",
-			Done: func(data js.Value) {
-				if err = json.Unmarshal([]byte(data.String()), &permissions); err != nil {
-					fmt.Println(err)
-					jsutils.DisplayGenericErrorMessage()
-				}
-				wg.Done()
-			},
-			Fail: func(jqXHR js.Value) {
-				jsutils.DisplayGenericErrorMessage()
-				wg.Done()
-			},
-		}.Send()
-
-	}()
+	// wg.Add(1)
+	// go func() {
+	//
+	// 	ajax.Ajax{
+	// 		URL:    fmt.Sprintf("%speople/%d/permissions", ApplicationProxyPath, p.PersonID),
+	// 		Method: "get",
+	// 		Done: func(data js.Value) {
+	// 			if err = json.Unmarshal([]byte(data.String()), &permissions); err != nil {
+	// 				fmt.Println(err)
+	// 				jsutils.DisplayGenericErrorMessage()
+	// 			}
+	// 			wg.Done()
+	// 		},
+	// 		Fail: func(jqXHR js.Value) {
+	// 			jsutils.DisplayGenericErrorMessage()
+	// 			wg.Done()
+	// 		},
+	// 	}.Send()
+	//
+	// }()
 
 	// Getting the person entities.
-	wg.Add(1)
-	go func() {
-
-		ajax.Ajax{
-			URL:    fmt.Sprintf("%speople/%d/entities", ApplicationProxyPath, p.PersonID),
-			Method: "get",
-			Done: func(data js.Value) {
-				if err = json.Unmarshal([]byte(data.String()), &entities); err != nil {
-					fmt.Println(err)
-					jsutils.DisplayGenericErrorMessage()
-				}
-				wg.Done()
-			},
-			Fail: func(jqXHR js.Value) {
-				jsutils.DisplayGenericErrorMessage()
-				wg.Done()
-			},
-		}.Send()
-
-	}()
-
-	wg.Wait()
-
+	// wg.Add(1)
+	// go func() {
+	//
+	// 	ajax.Ajax{
+	// 		URL:    fmt.Sprintf("%speople/%d/entities", ApplicationProxyPath, p.PersonID),
+	// 		Method: "get",
+	// 		Done: func(data js.Value) {
+	// 			if err = json.Unmarshal([]byte(data.String()), &entities); err != nil {
+	// 				fmt.Println(err)
+	// 				jsutils.DisplayGenericErrorMessage()
+	// 			}
+	// 			wg.Done()
+	// 		},
+	// 		Fail: func(jqXHR js.Value) {
+	// 			jsutils.DisplayGenericErrorMessage()
+	// 			wg.Done()
+	// 		},
+	// 	}.Send()
+	//
+	// }()
+	//
+	// wg.Wait()
 	jquery.Jq(fmt.Sprintf("#%s #person_id", id)).SetVal(p.PersonID)
 	jquery.Jq(fmt.Sprintf("#%s #person_email", id)).SetVal(p.PersonEmail)
 	jquery.Jq(fmt.Sprintf("#%s #person_password", id)).SetVal("")
 
 	// Appending managed entities in hidden inputs for further use.
 	jquery.Jq(fmt.Sprintf("#%s option.manageentities", id)).Remove()
-	for _, entity := range managedEntities {
+	for _, entity := range p.ManagedEntities {
 		option := widgets.NewOption(widgets.OptionAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Classes: []string{"manageentities"},
@@ -336,7 +347,7 @@ func FillInPersonForm(p Person, id string) {
 	}
 
 	// Populating the entities select2.
-	for _, entity := range entities {
+	for _, entity := range p.Entities {
 		select2Entities.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            entity.EntityName,
@@ -348,7 +359,7 @@ func FillInPersonForm(p Person, id string) {
 
 	// Adding a permission widget for each entity
 	// except for managed entities.
-	for _, entity := range entities {
+	for _, entity := range p.Entities {
 		if _, ok := managedEntitiesIds[entity.EntityID]; !ok {
 			jquery.Jq("#permissions").Append(widgets.Permission(entity.EntityID, entity.EntityName, false).OuterHTML())
 		}

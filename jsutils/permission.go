@@ -1,3 +1,5 @@
+//go:build go1.24 && js && wasm
+
 package jsutils
 
 import (
@@ -25,17 +27,19 @@ func HasPermission(item, id, method string, done, fail func()) {
 		} else {
 			var url string
 			if id != "" {
-				url = ApplicationProxyPath + "f/" + item + "/" + id
+				url = ApplicationProxyPath + "f/" + item + "?id=" + id
 			} else {
 				url = ApplicationProxyPath + "f/" + item
 			}
 
 			ajaxDone := func(js.Value) {
 				globals.LocalStorage.SetItem(cacheKey, "true")
+
 				done()
 			}
 			ajaxFail := func(js.Value) {
 				globals.LocalStorage.SetItem(cacheKey, "false")
+
 				fail()
 			}
 			ajax := ajax.Ajax{

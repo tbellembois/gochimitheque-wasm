@@ -1,3 +1,5 @@
+//go:build go1.24 && js && wasm
+
 package entity
 
 import (
@@ -47,16 +49,16 @@ func entity_common() {
 	}).Select2ify()
 
 	// select2
-	select2.NewSelect2(jquery.Jq("select#ldapgroups"), &select2.Select2Config{
-		Placeholder:    locales.Translate("entity_ldap_group_placeholder", HTTPHeaderAcceptLanguage),
-		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(LDAPEntry{})),
-		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "ldapgroup",
-			DataType:       "json",
-			Data:           js.FuncOf(Select2LDAPGroupAjaxData),
-			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(LDAPSearchResults{})),
-		},
-	}).Select2ify()
+	// select2.NewSelect2(jquery.Jq("select#ldapgroups"), &select2.Select2Config{
+	// 	Placeholder:    locales.Translate("entity_ldap_group_placeholder", HTTPHeaderAcceptLanguage),
+	// 	TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(LDAPEntry{})),
+	// 	Ajax: select2.Select2Ajax{
+	// 		URL:            ApplicationProxyPath + "ldapgroup",
+	// 		DataType:       "json",
+	// 		Data:           js.FuncOf(Select2LDAPGroupAjaxData),
+	// 		ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(LDAPSearchResults{})),
+	// 	},
+	// }).Select2ify()
 
 	jquery.Jq("#searchbar").Hide()
 	jquery.Jq("#actions").Hide()

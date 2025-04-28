@@ -1,3 +1,5 @@
+//go:build go1.24 && js && wasm
+
 package person
 
 import (
@@ -75,7 +77,7 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 	index := args[3].Int()
 	person := Person{Person: &models.Person{}}.FromJsJSONValue(row).(Person)
 
-	url := fmt.Sprintf("%speople/%d", ApplicationProxyPath, person.PersonID)
+	url := fmt.Sprintf("%speople?person=%d", ApplicationProxyPath, person.PersonID)
 	method := "get"
 
 	done := func(data js.Value) {
@@ -88,6 +90,8 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 		if err = json.Unmarshal([]byte(data.String()), &person); err != nil {
 			fmt.Println(err)
 		}
+
+		// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", person))
 
 		FillInPersonForm(person, "edit-collapse")
 

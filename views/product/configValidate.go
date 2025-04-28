@@ -1,3 +1,5 @@
+//go:build go1.24 && js && wasm
+
 package product
 
 import (
@@ -43,7 +45,7 @@ func ValidateProductCasNumberBeforeSend(this js.Value, args []js.Value) interfac
 		id = pid.GetVal().String()
 	}
 
-	settings.Set("url", fmt.Sprintf("%svalidate/product/%s/casnumber/", ApplicationProxyPath, id))
+	settings.Set("url", fmt.Sprintf("%svalidate/product/%s/cas_number/", ApplicationProxyPath, id))
 
 	return nil
 

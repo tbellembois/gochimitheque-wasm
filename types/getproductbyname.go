@@ -1,3 +1,5 @@
+//go:build go1.24 && js && wasm
+
 package types
 
 type PubchemProduct struct {

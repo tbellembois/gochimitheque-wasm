@@ -1,3 +1,5 @@
+//go:build go1.24 && js && wasm
+
 package storage
 
 import (
@@ -384,10 +386,14 @@ func ShowIfAuthorizedActionButtons(this js.Value, args []js.Value) interface{} {
 
 			jquery.Jq("#history" + storageId).FadeIn()
 
+			jsutils.HasPermission("storages", storageId, "get", func() {
+				jquery.Jq("#borrow" + storageId).FadeIn()
+			}, func() {
+			})
+
 			jsutils.HasPermission("storages", storageId, "put", func() {
 				jquery.Jq("#edit" + storageId).FadeIn()
 				jquery.Jq("#clone" + storageId).FadeIn()
-				jquery.Jq("#borrow" + storageId).FadeIn()
 			}, func() {
 			})
 
@@ -1803,6 +1809,10 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 	if jquery.Jq("#s_storage_batch_number").GetVal().Truthy() {
 		queryFilter.StorageBatchNumber = jquery.Jq("#s_storage_batch_number").GetVal().String()
 		queryFilter.StorageBatchNumberFilterLabel = jquery.Jq("#s_storage_batch_number").GetVal().String()
+	}
+	if jquery.Jq("#s_storage").GetVal().Truthy() {
+		queryFilter.Storage = jquery.Jq("#s_storage").GetVal().String()
+		queryFilter.StorageFilterLabel = jquery.Jq("#s_storage").GetVal().String()
 	}
 	if jquery.Jq("#s_storage_barecode").GetVal().Truthy() {
 		queryFilter.StorageBarecode = jquery.Jq("#s_storage_barecode").GetVal().String()

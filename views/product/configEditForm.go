@@ -1,3 +1,5 @@
+//go:build go1.24 && js && wasm
+
 package product
 
 import (
@@ -425,14 +427,14 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		*globals.CurrentProduct.ProductMolecularWeight = productMolecularWeight
 	}
 
-	if jquery.Jq("input#hidden_product_twodformula_content").Html() != "" {
+	if jquery.Jq("input#hidden_product_twod_formula_content").Html() != "" {
 		globals.CurrentProduct.ProductTwoDFormula = new(string)
-		*globals.CurrentProduct.ProductTwoDFormula = jquery.Jq("input#hidden_product_twodformula_content").Html()
+		*globals.CurrentProduct.ProductTwoDFormula = jquery.Jq("input#hidden_product_twod_formula_content").Html()
 	}
 
-	if jquery.Jq("input#product_threedformula").GetVal().Truthy() {
+	if jquery.Jq("input#product_threed_formula").GetVal().Truthy() {
 		globals.CurrentProduct.ProductThreeDFormula = new(string)
-		*globals.CurrentProduct.ProductThreeDFormula = jquery.Jq("input#product_threedformula").GetVal().String()
+		*globals.CurrentProduct.ProductThreeDFormula = jquery.Jq("input#product_threed_formula").GetVal().String()
 	}
 
 	// if jquery.Jq("#hidden_product_molformula_content").GetVal().Truthy() {

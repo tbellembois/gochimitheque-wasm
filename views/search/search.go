@@ -1,3 +1,5 @@
+//go:build go1.24 && js && wasm
+
 package search
 
 import (
@@ -58,7 +60,7 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(Select2StoreLocationTemplateResults),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "storelocations",
+			URL:            ApplicationProxyPath + "store_locations",
 			DataType:       "json",
 			Data:           js.FuncOf(Select2StoreLocationAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(StoreLocations{})),

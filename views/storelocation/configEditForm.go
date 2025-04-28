@@ -1,3 +1,5 @@
+//go:build go1.24 && js && wasm
+
 package storelocation
 
 import (
@@ -148,10 +150,10 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 	}
 
 	if jquery.Jq("form#store_location input#store_location_id").Object.Length() > 0 {
-		ajaxURL = fmt.Sprintf("%sstorelocations/%d", ApplicationProxyPath, storelocation.StoreLocationID.Int64)
+		ajaxURL = fmt.Sprintf("%sstore_locations/%d", ApplicationProxyPath, storelocation.StoreLocationID.Int64)
 		ajaxMethod = "put"
 	} else {
-		ajaxURL = fmt.Sprintf("%sstorelocations", ApplicationProxyPath)
+		ajaxURL = fmt.Sprintf("%sstore_locations", ApplicationProxyPath)
 		ajaxMethod = "post"
 	}
 
@@ -174,7 +176,7 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 			// }
 
 			// TODO: use entityId for redirection
-			href := fmt.Sprintf("%sv/storelocations", ApplicationProxyPath)
+			href := fmt.Sprintf("%sv/store_locations", ApplicationProxyPath)
 			jsutils.ClearSearch(js.Null(), nil)
 			jsutils.LoadContent("div#content", "store_location", href, StoreLocation_SaveCallback, storelocation.StoreLocationName.String)
 
