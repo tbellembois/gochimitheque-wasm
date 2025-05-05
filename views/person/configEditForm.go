@@ -243,13 +243,17 @@ func FillInPersonForm(p Person, id string) {
 	// err                       error
 	)
 
-	managedEntitiesIds = make(map[int]string)
-	for _, entity := range p.ManagedEntities {
-		managedEntitiesIds[entity.EntityID] = entity.EntityName
+	if p.ManagedEntities != nil && len(p.ManagedEntities) > 0 {
+		managedEntitiesIds = make(map[int]string)
+		for _, entity := range p.ManagedEntities {
+			managedEntitiesIds[entity.EntityID] = entity.EntityName
+		}
 	}
 
-	for _, permission := range p.Permissions {
-		permissions = append(permissions, Permission{Permission: permission})
+	if p.Permissions != nil && len(p.Permissions) > 0 {
+		for _, permission := range p.Permissions {
+			permissions = append(permissions, Permission{Permission: permission})
+		}
 	}
 
 	select2Entities := select2.NewSelect2(jquery.Jq("select#entities"), nil)

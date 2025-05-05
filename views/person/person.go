@@ -29,8 +29,11 @@ func person_common() {
 				Email:    true,
 				Remote: validate.ValidateRemote{
 					URL:        "",
-					Type:       "get",
+					Type:       "post",
 					BeforeSend: js.FuncOf(ValidatePersonEmailBeforeSend),
+					Data: map[string]interface{}{
+						"email": js.FuncOf(ValidatePersonEmailData),
+					},
 				},
 			},
 		},

@@ -33,7 +33,7 @@ func OperateEventsBookmark(this js.Value, args []js.Value) interface{} {
 	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
 	url := fmt.Sprintf("%sbookmarks/%d", ApplicationProxyPath, globals.CurrentProduct.ProductID)
-	method := "put"
+	method := "get"
 
 	done := func(data js.Value) {
 
@@ -1751,7 +1751,7 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	row := args[1]
 	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
-	if globals.CurrentProduct.Bookmark != nil && globals.CurrentProduct.Bookmark.BookmarkID != nil {
+	if globals.CurrentProduct.ProductHasBookmark {
 		iconBookmark = themes.MDI_BOOKMARK
 		textBookmark = locales.Translate("unbookmark", HTTPHeaderAcceptLanguage)
 	} else {
@@ -2127,7 +2127,7 @@ func Biofy() {
 func ShowIfAuthorizedActionButtons(this js.Value, args []js.Value) interface{} {
 
 	jquery.Jq(".bookmark").FadeIn()
-	jsutils.HasPermission("storages", "", "post", func() {
+	jsutils.HasPermission("storages", "-2", "post", func() {
 		jquery.Jq(".store").FadeIn()
 	}, func() {
 	})

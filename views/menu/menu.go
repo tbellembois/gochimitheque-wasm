@@ -96,7 +96,7 @@ func ShowIfAuthorizedMenuItems(args ...interface{}) {
 	}, func() {
 	})
 
-	jsutils.HasPermission("products", "", "post", func() {
+	jsutils.HasPermission("products", "-2", "put", func() {
 		jquery.Jq("#menu_create_product").FadeIn()
 	}, func() {
 	})
@@ -107,7 +107,7 @@ func ShowIfAuthorizedMenuItems(args ...interface{}) {
 	}, func() {
 	})
 
-	jsutils.HasPermission("entities", "", "post", func() {
+	jsutils.HasPermission("entities", "-2", "put", func() {
 		jquery.Jq("#menu_create_entity").FadeIn()
 		jquery.Jq("#menu_management").FadeIn()
 	}, func() {
@@ -126,7 +126,7 @@ func ShowIfAuthorizedMenuItems(args ...interface{}) {
 	}, func() {
 	})
 
-	jsutils.HasPermission("store_locations", "", "post", func() {
+	jsutils.HasPermission("store_locations", "-2", "put", func() {
 		jquery.Jq("#menu_create_store_location").FadeIn()
 		jquery.Jq("#menu_management").FadeIn()
 	}, func() {
@@ -134,12 +134,6 @@ func ShowIfAuthorizedMenuItems(args ...interface{}) {
 
 	jsutils.HasPermission("people", "-2", "get", func() {
 		jquery.Jq("#menu_people").FadeIn()
-		jquery.Jq("#menu_management").FadeIn()
-	}, func() {
-	})
-
-	jsutils.HasPermission("people", "", "post", func() {
-		jquery.Jq("#menu_create_person").FadeIn()
 		jquery.Jq("#menu_management").FadeIn()
 	}, func() {
 	})

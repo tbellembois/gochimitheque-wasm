@@ -77,7 +77,7 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 	index := args[3].Int()
 	person := Person{Person: &models.Person{}}.FromJsJSONValue(row).(Person)
 
-	url := fmt.Sprintf("%speople?person=%d", ApplicationProxyPath, person.PersonID)
+	url := fmt.Sprintf("%speople/%d", ApplicationProxyPath, person.PersonID)
 	method := "get"
 
 	done := func(data js.Value) {

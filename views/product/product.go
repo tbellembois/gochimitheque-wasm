@@ -59,7 +59,7 @@ func LinearToEmpirical(this js.Value, args []js.Value) interface{} {
 	}
 
 	ajax.Ajax{
-		URL:    fmt.Sprintf("%sformat/product/empiricalformula/", ApplicationProxyPath),
+		URL:    fmt.Sprintf("%sformat/empiricalformula/", ApplicationProxyPath),
 		Method: "post",
 		Data:   ajaxDataJson,
 		Done: func(data js.Value) {

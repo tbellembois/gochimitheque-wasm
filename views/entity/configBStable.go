@@ -118,7 +118,7 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 	index := args[3].Int()
 	entity := Entity{Entity: &models.Entity{}}.FromJsJSONValue(row).(Entity)
 
-	url := fmt.Sprintf("%sentities?entity=%d", ApplicationProxyPath, entity.EntityID)
+	url := fmt.Sprintf("%sentities/%d", ApplicationProxyPath, entity.EntityID)
 	method := "get"
 
 	done := func(data js.Value) {

@@ -45,7 +45,6 @@ func SaveBorrowing(this js.Value, args []js.Value) interface{} {
 
 	var (
 		ajaxURL, ajaxMethod string
-		dataBytes           []byte
 		s                   *Storage
 		err                 error
 	)
@@ -105,18 +104,25 @@ func SaveBorrowing(this js.Value, args []js.Value) interface{} {
 
 	}
 
-	ajaxURL = fmt.Sprintf("%sstorages/borrow", ApplicationProxyPath)
-	ajaxMethod = "put"
+	var borrowing_comment *string
+	if s.Borrowing.BorrowingComment.Valid {
+		borrowing_comment = &s.Borrowing.BorrowingComment.String
+	}
+	var borrower_id int
+	if s.Borrowing.Borrower != nil {
+		borrower_id = s.Borrowing.Borrower.PersonID
+	}
 
-	if dataBytes, err = json.Marshal(s); err != nil {
-		fmt.Println(err)
-		return nil
+	ajaxURL = fmt.Sprintf("%sborrows/%d?borrower_id=%d", ApplicationProxyPath, s.StorageID.Int64, borrower_id)
+	ajaxMethod = "get"
+
+	if borrowing_comment != nil {
+		ajaxURL += fmt.Sprintf("&borrowing_comment=%s", *borrowing_comment)
 	}
 
 	ajax.Ajax{
 		URL:    ajaxURL,
 		Method: ajaxMethod,
-		Data:   dataBytes,
 		Done: func(data js.Value) {
 
 			jquery.Jq("#borrow").Object.Call("modal", "hide")
