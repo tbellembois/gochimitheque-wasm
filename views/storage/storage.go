@@ -324,8 +324,8 @@ func Storage_SaveCallback(args ...interface{}) {
 		filterLabel       string
 	)
 	for _, storage := range CurrentStorages {
-		currentStorageIds = append(currentStorageIds, int(storage.StorageID.Int64))
-		filterLabel += fmt.Sprintf("#%d ", storage.StorageID.Int64)
+		currentStorageIds = append(currentStorageIds, int(*storage.StorageID))
+		filterLabel += fmt.Sprintf("#%d ", storage.StorageID)
 	}
 
 	BSTableQueryFilter.Lock()

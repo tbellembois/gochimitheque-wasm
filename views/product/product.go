@@ -1064,7 +1064,7 @@ func PubchemGetCompoundByName(this js.Value, args []js.Value) interface{} {
 						BaseAttributes: widgets.BaseAttributes{
 							Visible: true,
 						},
-						Src:   fmt.Sprintf("data:image/png;base64,%s", compounds.Base64Png),
+						Src:   fmt.Sprintf("%s", compounds.Base64Png),
 						Alt:   "2dpng",
 						Title: "2dpng",
 					}).OuterHTML())
@@ -1226,7 +1226,7 @@ func Product_createCallback(args ...interface{}) {
 func Product_SaveCallback(args ...interface{}) {
 
 	BSTableQueryFilter.Lock()
-	BSTableQueryFilter.QueryFilter.Product = strconv.Itoa(args[0].(int))
+	BSTableQueryFilter.QueryFilter.Id = args[0].(int)
 
 	if CurrentProduct.ProductSpecificity != nil {
 		BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("#%d %s %s", CurrentProduct.ProductID, CurrentProduct.Name.NameLabel, *CurrentProduct.ProductSpecificity)

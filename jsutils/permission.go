@@ -33,12 +33,12 @@ func HasPermission(item, id, method string, done, fail func()) {
 			}
 
 			ajaxDone := func(js.Value) {
-				globals.LocalStorage.SetItem(cacheKey, "true")
+				// globals.LocalStorage.SetItem(cacheKey, "true")
 
 				done()
 			}
 			ajaxFail := func(js.Value) {
-				globals.LocalStorage.SetItem(cacheKey, "false")
+				// globals.LocalStorage.SetItem(cacheKey, "false")
 
 				fail()
 			}

@@ -390,7 +390,7 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 					fmt.Println(err)
 				}
 
-				// jsutils.ConsoleLog(fmt.Sprintf("%#v", data.String()))
+				jsutils.ConsoleLog(fmt.Sprintf("%#v", data.String()))
 
 				if products.GetExportFn() != "" {
 					jsutils.DisplaySuccessMessage(locales.Translate("export_done", HTTPHeaderAcceptLanguage))
@@ -454,7 +454,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 	queryFilter := ajax.QueryFilterFromJsJSONValue(params)
 
 	// Product_SaveCallback product id.
-	queryFilter.Product = BSTableQueryFilter.Product
+	queryFilter.Id = BSTableQueryFilter.Id
 	queryFilter.ProductFilterLabel = BSTableQueryFilter.ProductFilterLabel
 	queryFilter.ProductBookmark = BSTableQueryFilter.ProductBookmark
 	queryFilter.Export = BSTableQueryFilter.Export
@@ -657,7 +657,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				Visible: true,
 			},
 			Width: "200",
-			Src:   "data:image/png;base64," + *globals.CurrentProduct.ProductTwoDFormula,
+			Src:   *globals.CurrentProduct.ProductTwoDFormula,
 		}))
 	}
 	// Synonym.
@@ -2127,7 +2127,7 @@ func Biofy() {
 func ShowIfAuthorizedActionButtons(this js.Value, args []js.Value) interface{} {
 
 	jquery.Jq(".bookmark").FadeIn()
-	jsutils.HasPermission("storages", "-2", "post", func() {
+	jsutils.HasPermission("storages", "-2", "put", func() {
 		jquery.Jq(".store").FadeIn()
 	}, func() {
 	})

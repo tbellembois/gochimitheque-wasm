@@ -84,6 +84,7 @@ type QueryFilter struct {
 	Order  string `json:"order,omitempty"`
 	Offset int    `json:"offset,omitempty"`
 	Limit  int    `json:"limit,omitempty"`
+	Id     int    `json:"id,omitempty"`
 }
 
 // QueryFilterFromJsJSONValue converts a JS JSON into a
@@ -139,6 +140,9 @@ func (q QueryFilter) ToRawQuery() string {
 	values.Set("page", strconv.Itoa(q.Page))
 	values.Set("offset", strconv.Itoa(q.Offset))
 	values.Set("limit", strconv.Itoa(q.Limit))
+	if q.Id != 0 {
+		values.Set("id", strconv.Itoa(q.Id))
+	}
 
 	if q.Product != "" {
 		values.Set("product", q.Product)

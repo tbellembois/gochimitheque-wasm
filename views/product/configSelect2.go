@@ -448,7 +448,7 @@ func Select2UnitMolecularWeightAjaxData(this js.Value, args []js.Value) interfac
 	}
 
 	return ajax.QueryFilter{
-		UnitType: "temperature",
+		UnitType: "molecular_weight",
 		Search:   search,
 		Offset:   offset,
 		Page:     page,

@@ -75,10 +75,8 @@ func SaveBorrowing(this js.Value, args []js.Value) interface{} {
 			return nil
 		}
 
-		s.StorageID = sql.NullInt64{
-			Valid: true,
-			Int64: int64(storageId),
-		}
+		var storageIdInt int64 = int64(storageId)
+		s.StorageID = &storageIdInt
 
 	}
 
@@ -113,7 +111,7 @@ func SaveBorrowing(this js.Value, args []js.Value) interface{} {
 		borrower_id = s.Borrowing.Borrower.PersonID
 	}
 
-	ajaxURL = fmt.Sprintf("%sborrows/%d?borrower_id=%d", ApplicationProxyPath, s.StorageID.Int64, borrower_id)
+	ajaxURL = fmt.Sprintf("%sborrows/%d?borrower_id=%d", ApplicationProxyPath, s.StorageID, borrower_id)
 	ajaxMethod = "get"
 
 	if borrowing_comment != nil {
@@ -142,7 +140,7 @@ func SaveBorrowing(this js.Value, args []js.Value) interface{} {
 
 }
 
-func SaveStorage(this js.Value, args []js.Value) interface{} {
+func SaveStorage(this js.Value, args []js.Value) any {
 
 	var (
 		ajaxURL, ajaxMethod string
@@ -168,10 +166,8 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		globals.CurrentStorage.StorageID = sql.NullInt64{
-			Valid: true,
-			Int64: int64(storageId),
-		}
+		var storageIdInt int64 = int64(storageId)
+		globals.CurrentStorage.StorageID = &storageIdInt
 	}
 
 	if jquery.Jq("input#storage_nbitem").GetVal().Truthy() {
@@ -181,10 +177,7 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 		}
 	}
 	if jquery.Jq("input#storage_identicalbarecode:checked").Object.Length() > 0 {
-		globals.CurrentStorage.StorageIdenticalBarecode = sql.NullBool{
-			Bool:  true,
-			Valid: true,
-		}
+		globals.CurrentStorage.StorageIdenticalBarecode = true
 	}
 
 	select2StoreLocation := select2.NewSelect2(jquery.Jq("select#store_location"), nil)
@@ -196,26 +189,31 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		globals.CurrentStorage.StoreLocation.StoreLocationID = models.NullInt64{sql.NullInt64{
-			Int64: int64(storelocationId),
-			Valid: true,
-		}}
-		globals.CurrentStorage.StoreLocation.StoreLocationName = models.NullString{sql.NullString{
-			String: select2ItemStorelocation.Text,
-			Valid:  true,
-		}}
+		globals.CurrentStorage.StoreLocation.StoreLocationID = models.NullInt64{
+			NullInt64: sql.NullInt64{
+				Int64: int64(storelocationId),
+				Valid: true,
+			},
+		}
+		globals.CurrentStorage.StoreLocation.StoreLocationName = models.NullString{
+			NullString: sql.NullString{
+				String: select2ItemStorelocation.Text,
+				Valid:  true,
+			},
+		}
 	}
+
+	js.Global().Get("console").Call("log", fmt.Sprintf("%#v", jquery.Jq("#storage_quantity").GetVal().String()))
+	js.Global().Get("console").Call("log", fmt.Sprintf("%#v", jquery.Jq("#storage_concentration").GetVal().String()))
 
 	if jquery.Jq("input#storage_quantity").GetVal().Truthy() {
 		var storageQuantity float64
-		if storageQuantity, err = strconv.ParseFloat(jquery.Jq("#storage_quantity").GetVal().String(), 64); err != nil {
+		if storageQuantity, err = strconv.ParseFloat(jquery.Jq("input#storage_quantity").GetVal().String(), 64); err != nil {
 			fmt.Println(err)
 			return nil
 		}
-		globals.CurrentStorage.StorageQuantity = sql.NullFloat64{
-			Valid:   true,
-			Float64: storageQuantity,
-		}
+		var storageQuantityFloat float64 = float64(storageQuantity)
+		globals.CurrentStorage.StorageQuantity = &storageQuantityFloat
 	}
 
 	select2UnitQuantity := select2.NewSelect2(jquery.Jq("select#unit_quantity"), nil)
@@ -240,20 +238,26 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 
 	if jquery.Jq("input#storage_concentration").GetVal().Truthy() {
 		var storageConcentration int
-		if storageConcentration, err = strconv.Atoi(jquery.Jq("#storage_concentration").GetVal().String()); err != nil {
+		if storageConcentration, err = strconv.Atoi(jquery.Jq("input#storage_concentration").GetVal().String()); err != nil {
 			fmt.Println(err)
 			return nil
 		}
-		globals.CurrentStorage.StorageConcentration = sql.NullInt64{
-			Valid: true,
-			Int64: int64(storageConcentration),
-		}
+		var storageConcentrationInt int64 = int64(storageConcentration)
+		globals.CurrentStorage.StorageConcentration = &storageConcentrationInt
 	}
 
 	select2UnitConcentration := select2.NewSelect2(jquery.Jq("select#unit_concentration"), nil)
 	if len(select2UnitConcentration.Select2Data()) > 0 {
+
 		select2ItemUnitConcentration := select2UnitConcentration.Select2Data()[0]
-		globals.CurrentStorage.UnitConcentration = models.Unit{}
+
+		label := ""
+		id := int64(0)
+		globals.CurrentStorage.UnitConcentration = models.Unit{
+			UnitID:    &id,
+			UnitLabel: &label,
+		}
+
 		var unitId int
 		if unitId, err = strconv.Atoi(select2ItemUnitConcentration.Id); err != nil {
 			fmt.Println(err)
@@ -287,10 +291,8 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		globals.CurrentStorage.StorageEntryDate = models.MyNullTime(sql.NullTime{
-			Valid: true,
-			Time:  storageEntryDate,
-		})
+		var storage_entry_date time.Time = storageEntryDate
+		globals.CurrentStorage.StorageEntryDate = &storage_entry_date
 	}
 	if jquery.Jq("input#storage_exit_date").GetVal().Truthy() {
 		var storageExitDate time.Time
@@ -298,10 +300,8 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		globals.CurrentStorage.StorageExitDate = models.MyNullTime(sql.NullTime{
-			Valid: true,
-			Time:  storageExitDate,
-		})
+		var storage_exit_date time.Time = storageExitDate
+		globals.CurrentStorage.StorageExitDate = &storage_exit_date
 	}
 	if jquery.Jq("input#storage_opening_date").GetVal().Truthy() {
 		var storageOpeningDate time.Time
@@ -309,10 +309,8 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		globals.CurrentStorage.StorageOpeningDate = models.MyNullTime(sql.NullTime{
-			Valid: true,
-			Time:  storageOpeningDate,
-		})
+		var storage_opening_date time.Time = storageOpeningDate
+		globals.CurrentStorage.StorageOpeningDate = &storage_opening_date
 	}
 	if jquery.Jq("input#storage_expiration_date").GetVal().Truthy() {
 		var storageExpirationDate time.Time
@@ -320,35 +318,25 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		globals.CurrentStorage.StorageExpirationDate = models.MyNullTime(sql.NullTime{
-			Valid: true,
-			Time:  storageExpirationDate,
-		})
+		var storage_expiration_date time.Time = storageExpirationDate
+		globals.CurrentStorage.StorageExpirationDate = &storage_expiration_date
 	}
 
 	if jquery.Jq("input#storage_reference").GetVal().Truthy() {
-		globals.CurrentStorage.StorageReference = sql.NullString{
-			Valid:  true,
-			String: jquery.Jq("input#storage_reference").GetVal().String(),
-		}
+		var storage_reference string = jquery.Jq("input#storage_reference").GetVal().String()
+		globals.CurrentStorage.StorageReference = &storage_reference
 	}
 	if jquery.Jq("input#storage_batch_number").GetVal().Truthy() {
-		globals.CurrentStorage.StorageBatchNumber = sql.NullString{
-			Valid:  true,
-			String: jquery.Jq("input#storage_batch_number").GetVal().String(),
-		}
+		var storage_batch_number string = jquery.Jq("input#storage_batch_number").GetVal().String()
+		globals.CurrentStorage.StorageBatchNumber = &storage_batch_number
 	}
 	if jquery.Jq("input#storage_barecode").GetVal().Truthy() {
-		globals.CurrentStorage.StorageBarecode = sql.NullString{
-			Valid:  true,
-			String: jquery.Jq("input#storage_barecode").GetVal().String(),
-		}
+		var storage_barecode string = jquery.Jq("input#storage_barecode").GetVal().String()
+		globals.CurrentStorage.StorageBarecode = &storage_barecode
 	}
 	if jquery.Jq("input#storage_comment").GetVal().Truthy() {
-		globals.CurrentStorage.StorageComment = sql.NullString{
-			Valid:  true,
-			String: jquery.Jq("input#storage_comment").GetVal().String(),
-		}
+		var storage_comment string = jquery.Jq("input#storage_comment").GetVal().String()
+		globals.CurrentStorage.StorageComment = &storage_comment
 	}
 
 	if jquery.Jq("input#storage_number_of_bag").GetVal().Truthy() {
@@ -357,10 +345,8 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		globals.CurrentStorage.StorageNumberOfBag = sql.NullInt64{
-			Valid: true,
-			Int64: int64(StorageNumberOfBag),
-		}
+		var storage_number_of_bag int64 = int64(StorageNumberOfBag)
+		globals.CurrentStorage.StorageNumberOfBag = &storage_number_of_bag
 	}
 	if jquery.Jq("input#storage_number_of_carton").GetVal().Truthy() {
 		var StorageNumberOfCarton int
@@ -368,21 +354,16 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 			fmt.Println(err)
 			return nil
 		}
-		globals.CurrentStorage.StorageNumberOfCarton = sql.NullInt64{
-			Valid: true,
-			Int64: int64(StorageNumberOfCarton),
-		}
+		var storage_number_of_carton int64 = int64(StorageNumberOfCarton)
+		globals.CurrentStorage.StorageNumberOfCarton = &storage_number_of_carton
 	}
 
 	if jquery.Jq("input#storage_to_destroy:checked").Object.Length() > 0 {
-		globals.CurrentStorage.StorageToDestroy = sql.NullBool{
-			Bool:  true,
-			Valid: true,
-		}
+		globals.CurrentStorage.StorageToDestroy = true
 	}
 
 	if (!jquery.Jq("form#storage input#storage_id").GetVal().IsUndefined()) && jquery.Jq("form#storage input#storage_id").GetVal().String() != "" {
-		ajaxURL = fmt.Sprintf("%sstorages/%d", ApplicationProxyPath, globals.CurrentStorage.StorageID.Int64)
+		ajaxURL = fmt.Sprintf("%sstorages/%d", ApplicationProxyPath, globals.CurrentStorage.StorageID)
 		ajaxMethod = "put"
 	} else {
 		ajaxURL = fmt.Sprintf("%sstorages", ApplicationProxyPath)
@@ -427,8 +408,12 @@ func SaveStorage(this js.Value, args []js.Value) interface{} {
 
 func FillInStorageForm(s Storage, id string) {
 
-	if s.StorageID.Valid {
-		jquery.Jq(fmt.Sprintf("#%s #storage_id", id)).SetVal(s.StorageID.Int64)
+	js.Global().Get("console").Call("log", fmt.Sprintf("%#v", s.Storage))
+	js.Global().Get("console").Call("log", fmt.Sprintf("%#v", s.Storage.StorageID))
+	js.Global().Get("console").Call("log", fmt.Sprintf("%#v", id))
+
+	if s.StorageID != nil {
+		jquery.Jq(fmt.Sprintf("#%s #storage_id", id)).SetVal(*s.StorageID)
 	}
 
 	select2StoreLocation := select2.NewSelect2(jquery.Jq("select#store_location"), nil)
@@ -444,8 +429,8 @@ func FillInStorageForm(s Storage, id string) {
 	}
 
 	jquery.Jq("input#storage_quantity").SetVal("")
-	if s.StorageQuantity.Valid {
-		jquery.Jq("input#storage_quantity").SetVal(s.StorageQuantity.Float64)
+	if s.StorageQuantity != nil {
+		jquery.Jq("input#storage_quantity").SetVal(*s.StorageQuantity)
 	}
 
 	select2UnitQuantity := select2.NewSelect2(jquery.Jq("select#unit_quantity"), nil)
@@ -461,8 +446,8 @@ func FillInStorageForm(s Storage, id string) {
 	}
 
 	jquery.Jq("input#storage_concentration").SetVal("")
-	if s.StorageConcentration.Valid {
-		jquery.Jq("input#storage_concentration").SetVal(s.StorageConcentration.Int64)
+	if s.StorageConcentration != nil {
+		jquery.Jq("input#storage_concentration").SetVal(*s.StorageConcentration)
 	}
 
 	select2UnitConcentration := select2.NewSelect2(jquery.Jq("select#unit_concentration"), nil)
@@ -490,50 +475,50 @@ func FillInStorageForm(s Storage, id string) {
 	}
 
 	jquery.Jq("input#storage_number_of_bag").SetVal("")
-	if s.StorageNumberOfBag.Valid {
-		jquery.Jq("input#storage_number_of_bag").SetVal(s.StorageNumberOfBag.Int64)
+	if s.StorageNumberOfBag != nil {
+		jquery.Jq("input#storage_number_of_bag").SetVal(*s.StorageNumberOfBag)
 	}
 	jquery.Jq("input#storage_number_of_carton").SetVal("")
-	if s.StorageNumberOfCarton.Valid {
-		jquery.Jq("input#storage_number_of_carton").SetVal(s.StorageNumberOfCarton.Int64)
+	if s.StorageNumberOfCarton != nil {
+		jquery.Jq("input#storage_number_of_carton").SetVal(*s.StorageNumberOfCarton)
 	}
 
 	jquery.Jq("input#storage_entry_date").SetVal("")
-	if s.StorageEntryDate.Valid {
-		jquery.Jq("input#storage_entry_date").SetVal(s.StorageEntryDate.Time.Format("2006-01-02"))
+	if s.StorageEntryDate != nil {
+		jquery.Jq("input#storage_entry_date").SetVal(s.StorageEntryDate.Format("2006-01-02"))
 	}
 	jquery.Jq("input#storage_exit_date").SetVal("")
-	if s.StorageExitDate.Valid {
-		jquery.Jq("input#storage_exit_date").SetVal(s.StorageExitDate.Time.Format("2006-01-02"))
+	if s.StorageExitDate != nil {
+		jquery.Jq("input#storage_exit_date").SetVal(s.StorageExitDate.Format("2006-01-02"))
 	}
 	jquery.Jq("#storage_opening_date").SetVal("")
-	if s.StorageOpeningDate.Valid {
-		jquery.Jq("#storage_opening_date").SetVal(s.StorageOpeningDate.Time.Format("2006-01-02"))
+	if s.StorageOpeningDate != nil {
+		jquery.Jq("#storage_opening_date").SetVal(s.StorageOpeningDate.Format("2006-01-02"))
 	}
 	jquery.Jq("input#storage_expiration_date").SetVal("")
-	if s.StorageExpirationDate.Valid {
-		jquery.Jq("input#storage_expiration_date").SetVal(s.StorageExpirationDate.Time.Format("2006-01-02"))
+	if s.StorageExpirationDate != nil {
+		jquery.Jq("input#storage_expiration_date").SetVal(s.StorageExpirationDate.Format("2006-01-02"))
 	}
 
 	jquery.Jq("input#storage_reference").SetVal("")
-	if s.StorageReference.Valid {
-		jquery.Jq("input#storage_reference").SetVal(s.StorageReference.String)
+	if s.StorageReference != nil {
+		jquery.Jq("input#storage_reference").SetVal(*s.StorageReference)
 	}
 	jquery.Jq("input#storage_batch_number").SetVal("")
-	if s.StorageBatchNumber.Valid {
-		jquery.Jq("input#storage_batch_number").SetVal(s.StorageBatchNumber.String)
+	if s.StorageBatchNumber != nil {
+		jquery.Jq("input#storage_batch_number").SetVal(*s.StorageBatchNumber)
 	}
 	jquery.Jq("input#storage_barecode").SetVal("")
-	if s.StorageBarecode.Valid {
-		jquery.Jq("input#storage_barecode").SetVal(s.StorageBarecode.String)
+	if s.StorageBarecode != nil {
+		jquery.Jq("input#storage_barecode").SetVal(*s.StorageBarecode)
 	}
 	jquery.Jq("input#storage_comment").SetVal("")
-	if s.StorageComment.Valid {
-		jquery.Jq("input#storage_comment").SetVal(s.StorageComment.String)
+	if s.StorageComment != nil {
+		jquery.Jq("input#storage_comment").SetVal(*s.StorageComment)
 	}
 
 	jquery.Jq("input#storage_todestroy").SetProp("checked", false)
-	if s.StorageToDestroy.Valid && s.StorageToDestroy.Bool {
+	if s.StorageToDestroy {
 		jquery.Jq("input#storage_todestroy").SetProp("checked", "checked")
 	}
 

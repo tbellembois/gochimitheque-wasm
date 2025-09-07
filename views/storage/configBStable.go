@@ -3,7 +3,6 @@
 package storage
 
 import (
-	"database/sql"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -113,7 +112,7 @@ func Storage_operateEventsRestore(this js.Value, args []js.Value) interface{} {
 	confirm := widgets.NewLink(
 		widgets.LinkAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:      fmt.Sprintf("restore%d", CurrentStorage.StorageID.Int64),
+				Id:      fmt.Sprintf("restore%d", CurrentStorage.StorageID),
 				Classes: []string{"text-primary", "iconlabel"},
 				Visible: true,
 			},
@@ -130,11 +129,11 @@ func Storage_operateEventsRestore(this js.Value, args []js.Value) interface{} {
 		},
 	).OuterHTML()
 
-	jquery.Jq(fmt.Sprintf("div#confirm%d", CurrentStorage.StorageID.Int64)).SetHtml(confirm)
+	jquery.Jq(fmt.Sprintf("div#confirm%d", CurrentStorage.StorageID)).SetHtml(confirm)
 
-	jquery.Jq(fmt.Sprintf("a#restore%d", CurrentStorage.StorageID.Int64)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq(fmt.Sprintf("a#restore%d", CurrentStorage.StorageID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-		url := fmt.Sprintf("%sstorages/%d/r", ApplicationProxyPath, CurrentStorage.StorageID.Int64)
+		url := fmt.Sprintf("%sstorages/%d/r", ApplicationProxyPath, CurrentStorage.StorageID)
 		method := "put"
 
 		done := func(data js.Value) {
@@ -142,8 +141,8 @@ func Storage_operateEventsRestore(this js.Value, args []js.Value) interface{} {
 			jsutils.DisplaySuccessMessage(locales.Translate("storage_restored_message", HTTPHeaderAcceptLanguage))
 			BSTableQueryFilter.Lock()
 			BSTableQueryFilter.QueryFilter.StorageArchive = false
-			BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(int(CurrentStorage.StorageID.Int64))
-			BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d", CurrentStorage.StorageID.Int64)
+			BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(int(*CurrentStorage.StorageID))
+			BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d", CurrentStorage.StorageID)
 			bstable.NewBootstraptable(jquery.Jq("#Storage_table"), nil).Refresh(nil)
 
 		}
@@ -173,10 +172,8 @@ func Storage_operateEventsClone(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
-	CurrentStorage.StorageID = sql.NullInt64{
-		Valid: false,
-		Int64: 0,
-	}
+	var storage_id int64 = 0
+	CurrentStorage.StorageID = &storage_id
 
 	href := fmt.Sprintf("%svc/storages", ApplicationProxyPath)
 	jsutils.LoadContent("div#content", "storage", href, Storage_createCallback, CurrentStorage, "clone")
@@ -192,8 +189,8 @@ func Storage_operateEventsHistory(this js.Value, args []js.Value) interface{} {
 
 	BSTableQueryFilter.Lock()
 	BSTableQueryFilter.QueryFilter.StorageHistory = true
-	BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(int(CurrentStorage.StorageID.Int64))
-	BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d", CurrentStorage.StorageID.Int64)
+	BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(int(*CurrentStorage.StorageID))
+	BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d", CurrentStorage.StorageID)
 	bstable.NewBootstraptable(jquery.Jq("#Storage_table"), nil).Refresh(nil)
 
 	return nil
@@ -205,7 +202,7 @@ func Storage_operateEventsBorrow(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
-	jquery.Jq("input#bstorage_id").SetVal(CurrentStorage.StorageID.Int64)
+	jquery.Jq("input#bstorage_id").SetVal(CurrentStorage.StorageID)
 
 	if CurrentStorage.Borrowing.BorrowingID.Valid {
 
@@ -242,8 +239,8 @@ func Storage_operateEventsEdit(this js.Value, args []js.Value) interface{} {
 	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
 	BSTableQueryFilter.Lock()
-	BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(int(CurrentStorage.StorageID.Int64))
-	BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d", CurrentStorage.StorageID.Int64)
+	BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(int(*CurrentStorage.StorageID))
+	BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d", CurrentStorage.StorageID)
 	BSTableQueryFilter.Unlock()
 
 	href := fmt.Sprintf("%svc/storages", ApplicationProxyPath)
@@ -261,7 +258,7 @@ func Storage_operateEventsArchive(this js.Value, args []js.Value) interface{} {
 	confirm := widgets.NewLink(
 		widgets.LinkAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:      fmt.Sprintf("archive%d", CurrentStorage.StorageID.Int64),
+				Id:      fmt.Sprintf("archive%d", CurrentStorage.StorageID),
 				Classes: []string{"text-primary", "iconlabel"},
 				Visible: true,
 			},
@@ -278,11 +275,11 @@ func Storage_operateEventsArchive(this js.Value, args []js.Value) interface{} {
 		},
 	).OuterHTML()
 
-	jquery.Jq(fmt.Sprintf("div#confirm%d", CurrentStorage.StorageID.Int64)).SetHtml(confirm)
+	jquery.Jq(fmt.Sprintf("div#confirm%d", CurrentStorage.StorageID)).SetHtml(confirm)
 
-	jquery.Jq(fmt.Sprintf("a#archive%d", CurrentStorage.StorageID.Int64)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq(fmt.Sprintf("a#archive%d", CurrentStorage.StorageID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-		url := fmt.Sprintf("%sstorages/%d/a", ApplicationProxyPath, CurrentStorage.StorageID.Int64)
+		url := fmt.Sprintf("%sstorages/%d/a", ApplicationProxyPath, CurrentStorage.StorageID)
 		method := "delete"
 
 		done := func(data js.Value) {
@@ -320,7 +317,7 @@ func Storage_operateEventsDelete(this js.Value, args []js.Value) interface{} {
 	confirm := widgets.NewLink(
 		widgets.LinkAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:      fmt.Sprintf("delete%d", CurrentStorage.StorageID.Int64),
+				Id:      fmt.Sprintf("delete%d", CurrentStorage.StorageID),
 				Classes: []string{"text-primary", "iconlabel"},
 				Visible: true,
 			},
@@ -337,11 +334,11 @@ func Storage_operateEventsDelete(this js.Value, args []js.Value) interface{} {
 		},
 	).OuterHTML()
 
-	jquery.Jq(fmt.Sprintf("div#confirm%d", CurrentStorage.StorageID.Int64)).SetHtml(confirm)
+	jquery.Jq(fmt.Sprintf("div#confirm%d", CurrentStorage.StorageID)).SetHtml(confirm)
 
-	jquery.Jq(fmt.Sprintf("a#delete%d", CurrentStorage.StorageID.Int64)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq(fmt.Sprintf("a#delete%d", CurrentStorage.StorageID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-		url := fmt.Sprintf("%sstorages/%d", ApplicationProxyPath, CurrentStorage.StorageID.Int64)
+		url := fmt.Sprintf("%sstorages/%d", ApplicationProxyPath, CurrentStorage.StorageID)
 		method := "delete"
 
 		done := func(data js.Value) {
@@ -430,13 +427,13 @@ func Storage_batchnumberFormatter(this js.Value, args []js.Value) interface{} {
 		},
 	})
 
-	if CurrentStorage.StorageBatchNumber.Valid {
+	if CurrentStorage.StorageBatchNumber != nil {
 		d.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
 				},
-				Text: CurrentStorage.StorageBatchNumber.String,
+				Text: *CurrentStorage.StorageBatchNumber,
 			}),
 		)
 	}
@@ -508,7 +505,7 @@ func Storage_productFormatter(this js.Value, args []js.Value) interface{} {
 		)
 	}
 
-	if CurrentStorage.StorageArchive.Valid && CurrentStorage.StorageArchive.Bool {
+	if CurrentStorage.StorageArchive {
 		d.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -523,9 +520,9 @@ func Storage_productFormatter(this js.Value, args []js.Value) interface{} {
 	}
 
 	// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", CurrentStorage.Storage.Storage.StorageID.Valid))
-	// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", CurrentStorage.Storage.Storage.StorageID.Int64))
+	// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", CurrentStorage.Storage.Storage.StorageID))
 
-	if CurrentStorage.Storage.Storage != nil && CurrentStorage.Storage.Storage.StorageID.Valid && CurrentStorage.Storage.Storage.StorageID.Int64 != 0 {
+	if CurrentStorage.Storage.Storage != nil && CurrentStorage.Storage.Storage.StorageID != nil && *CurrentStorage.Storage.Storage.StorageID != 0 {
 		d.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -615,12 +612,12 @@ func Storage_quantityFormatter(this js.Value, args []js.Value) interface{} {
 	row := args[1]
 	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
-	if CurrentStorage.StorageQuantity.Valid && CurrentStorage.StorageQuantity.Float64 != 0 {
+	if CurrentStorage.StorageQuantity != nil && *CurrentStorage.StorageQuantity != 0 {
 
 		if CurrentStorage.UnitQuantity.UnitLabel != nil {
-			ret = fmt.Sprintf("%v %s", CurrentStorage.StorageQuantity.Float64, *CurrentStorage.UnitQuantity.UnitLabel)
+			ret = fmt.Sprintf("%v %s", *CurrentStorage.StorageQuantity, *CurrentStorage.UnitQuantity.UnitLabel)
 		} else {
-			ret = fmt.Sprintf("%v", CurrentStorage.StorageQuantity.Float64)
+			ret = fmt.Sprintf("%v", *CurrentStorage.StorageQuantity)
 		}
 
 	} else {
@@ -631,18 +628,18 @@ func Storage_quantityFormatter(this js.Value, args []js.Value) interface{} {
 
 		if CurrentStorage.Product.ProductNumberPerCarton != nil &&
 			*CurrentStorage.Product.ProductNumberPerCarton != 0 &&
-			CurrentStorage.StorageNumberOfCarton.Valid &&
-			CurrentStorage.StorageNumberOfCarton.Int64 != 0 {
+			CurrentStorage.StorageNumberOfCarton != nil &&
+			*CurrentStorage.StorageNumberOfCarton != 0 {
 
-			totalUnits += *CurrentStorage.Product.ProductNumberPerCarton * CurrentStorage.StorageNumberOfCarton.Int64
+			totalUnits += *CurrentStorage.Product.ProductNumberPerCarton * *CurrentStorage.StorageNumberOfCarton
 
 		}
 		if CurrentStorage.Product.ProductNumberPerBag != nil &&
 			*CurrentStorage.Product.ProductNumberPerBag != 0 &&
-			CurrentStorage.StorageNumberOfBag.Valid &&
-			CurrentStorage.StorageNumberOfBag.Int64 != 0 {
+			CurrentStorage.StorageNumberOfBag != nil &&
+			*CurrentStorage.StorageNumberOfBag != 0 {
 
-			totalUnits += *CurrentStorage.Product.ProductNumberPerBag * CurrentStorage.StorageNumberOfBag.Int64
+			totalUnits += *CurrentStorage.Product.ProductNumberPerBag * *CurrentStorage.StorageNumberOfBag
 
 		}
 		// if CurrentStorage.StorageNumberOfUnit.Valid &&
@@ -669,7 +666,7 @@ func Storage_barecodeFormatter(this js.Value, args []js.Value) interface{} {
 		},
 	})
 
-	for _, chunk := range chunks(CurrentStorage.StorageBarecode.String, 10) {
+	for _, chunk := range chunks(*CurrentStorage.StorageBarecode, 10) {
 		d.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -717,13 +714,13 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 		iconBorrowingTitle = locales.Translate("storage_unborrow", HTTPHeaderAcceptLanguage)
 	}
 
-	if CurrentStorage.StorageArchive.Valid && CurrentStorage.StorageArchive.Bool {
+	if CurrentStorage.StorageArchive {
 
 		// This is an archive.
 		buttonClone = widgets.NewLink(
 			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
-					Id:      "clone" + strconv.Itoa(int(CurrentStorage.StorageID.Int64)),
+					Id:      "clone" + strconv.Itoa(int(*CurrentStorage.StorageID)),
 					Classes: []string{"clone", "dropdown-item", "text-primary", "iconlabel"},
 					Visible: false,
 				},
@@ -743,10 +740,10 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 		buttonRestore = widgets.NewLink(
 			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
-					Id:         "restore" + strconv.Itoa(int(CurrentStorage.StorageID.Int64)),
+					Id:         "restore" + strconv.Itoa(int(*CurrentStorage.StorageID)),
 					Classes:    []string{"restore", "dropdown-item", "text-primary", "iconlabel"},
 					Visible:    false,
-					Attributes: map[string]string{"sid": strconv.Itoa(int(CurrentStorage.StorageID.Int64))},
+					Attributes: map[string]string{"sid": strconv.Itoa(int(*CurrentStorage.StorageID))},
 				},
 				Href: "#",
 				Label: widgets.NewSpan(
@@ -764,7 +761,7 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 		buttonDelete = widgets.NewLink(
 			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
-					Id:      "delete" + strconv.Itoa(int(CurrentStorage.StorageID.Int64)),
+					Id:      "delete" + strconv.Itoa(int(*CurrentStorage.StorageID)),
 					Classes: []string{"storagedelete", "dropdown-item", "text-primary", "iconlabel"},
 					Visible: false,
 				},
@@ -781,13 +778,13 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 			},
 		).OuterHTML()
 
-	} else if CurrentStorage.Storage.Storage.StorageID.Valid {
+	} else if CurrentStorage.Storage != nil && CurrentStorage.Storage.Storage != nil && CurrentStorage.Storage.Storage.StorageID != nil {
 
 		// This is an history.
 		buttonClone = widgets.NewLink(
 			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
-					Id:      "clone" + strconv.Itoa(int(CurrentStorage.StorageID.Int64)),
+					Id:      "clone" + strconv.Itoa(int(*CurrentStorage.StorageID)),
 					Classes: []string{"clone", "dropdown-item", "text-primary", "iconlabel"},
 					Visible: false,
 				},
@@ -809,7 +806,7 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 		buttonEdit = widgets.NewLink(
 			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
-					Id:      "edit" + strconv.Itoa(int(CurrentStorage.StorageID.Int64)),
+					Id:      "edit" + strconv.Itoa(int(*CurrentStorage.StorageID)),
 					Classes: []string{"storageedit", "dropdown-item", "text-primary", "iconlabel"},
 					Visible: false,
 				},
@@ -829,7 +826,7 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 		buttonClone = widgets.NewLink(
 			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
-					Id:      "clone" + strconv.Itoa(int(CurrentStorage.StorageID.Int64)),
+					Id:      "clone" + strconv.Itoa(int(*CurrentStorage.StorageID)),
 					Classes: []string{"clone", "dropdown-item", "text-primary", "iconlabel"},
 					Visible: false,
 				},
@@ -849,7 +846,7 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 		buttonArchive = widgets.NewLink(
 			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
-					Id:      "archive" + strconv.Itoa(int(CurrentStorage.StorageID.Int64)),
+					Id:      "archive" + strconv.Itoa(int(*CurrentStorage.StorageID)),
 					Classes: []string{"archive", "dropdown-item", "text-primary", "iconlabel"},
 					Visible: false,
 				},
@@ -869,10 +866,10 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 		buttonBorrow = widgets.NewLink(
 			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
-					Id:         "borrow" + strconv.Itoa(int(CurrentStorage.StorageID.Int64)),
+					Id:         "borrow" + strconv.Itoa(int(*CurrentStorage.StorageID)),
 					Classes:    []string{"borrow", "dropdown-item", "text-primary", "iconlabel"},
 					Visible:    false,
-					Attributes: map[string]string{"sid": strconv.Itoa(int(CurrentStorage.StorageID.Int64))},
+					Attributes: map[string]string{"sid": strconv.Itoa(int(*CurrentStorage.StorageID))},
 				},
 				Href: "#",
 				Label: widgets.NewSpan(
@@ -894,7 +891,7 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 		buttonHistory = widgets.NewLink(
 			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
-					Id:      "history" + strconv.Itoa(int(CurrentStorage.StorageID.Int64)),
+					Id:      "history" + strconv.Itoa(int(*CurrentStorage.StorageID)),
 					Classes: []string{"history", "dropdown-item", "text-primary", "iconlabel"},
 					Visible: false,
 				},
@@ -935,15 +932,15 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 
 	finalDiv := `
 <div class="dropdown">
-  <button class="btn btn-secondary dropdown-toggle" type="button" id="storageActions` + strconv.Itoa(int(CurrentStorage.StorageID.Int64)) + `" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="storageActions` + strconv.Itoa(int(*CurrentStorage.StorageID)) + `" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     <span class="mdi mdi-menu">&nbsp;</span>
   </button>
-  <div class="dropdown-menu" aria-labelledby="storageActions` + strconv.Itoa(int(CurrentStorage.StorageID.Int64)) + `">
+  <div class="dropdown-menu" aria-labelledby="storageActions` + strconv.Itoa(int(*CurrentStorage.StorageID)) + `">
   ` + buttonClone + buttonRestore + buttonDelete + buttonArchive + buttonBorrow + buttonEdit + buttonHistory +
 		`
   </div>
 </div>
-<div id="confirm` + strconv.Itoa(int(CurrentStorage.StorageID.Int64)) + `">
+<div id="confirm` + strconv.Itoa(int(*CurrentStorage.StorageID)) + `">
 </div>
 `
 
@@ -978,7 +975,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	// Qrcode.
 	colQrcode := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
-			Id:      fmt.Sprintf("qrcode%d", CurrentStorage.StorageID.Int64),
+			Id:      fmt.Sprintf("qrcode%d", CurrentStorage.StorageID),
 			Visible: true,
 			Classes: []string{"ml-sm-4"},
 			Attributes: map[string]string{
@@ -1057,7 +1054,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Visible: true,
 			Classes: []string{"iconlabel"},
 		},
-		Text: fmt.Sprintf("%s #%d", CurrentStorage.StoreLocation.StoreLocationFullPath, CurrentStorage.StorageID.Int64),
+		Text: fmt.Sprintf("%s #%d", CurrentStorage.StoreLocation.StoreLocationFullPath, CurrentStorage.StorageID),
 	})
 	qrcodeStoreLocationNameCol.AppendChild(qrcodeStoreLocationNameSpan)
 
@@ -1076,7 +1073,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col"},
 		},
 	})
-	if CurrentStorage.StorageToDestroy.Valid && CurrentStorage.StorageToDestroy.Bool {
+	if CurrentStorage.StorageToDestroy {
 		colToDestroy.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -1127,7 +1124,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			documentTitle: ' ',
 			css: ['../css/chimitheque.css', '../css/bootstrap.min.css'],
 			scanStyles: false,
-			})`, CurrentStorage.StorageID.Int64),
+			})`, CurrentStorage.StorageID),
 		Href:  "#",
 		Label: icon,
 	}))
@@ -1209,7 +1206,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-4"},
 		},
 	})
-	if CurrentStorage.StorageNumberOfCarton.Int64 != 0 {
+	if CurrentStorage.StorageNumberOfCarton != nil && *CurrentStorage.StorageNumberOfCarton != 0 {
 		colNumberOfCarton.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -1222,7 +1219,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
 				},
-				Text: fmt.Sprintf("%d", CurrentStorage.StorageNumberOfCarton.Int64),
+				Text: fmt.Sprintf("%d", CurrentStorage.StorageNumberOfCarton),
 			}))
 	}
 	// Bags.
@@ -1232,7 +1229,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-4"},
 		},
 	})
-	if CurrentStorage.StorageNumberOfBag.Int64 != 0 {
+	if CurrentStorage.StorageNumberOfBag != nil && *CurrentStorage.StorageNumberOfBag != 0 {
 		colNumberOfBag.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -1245,7 +1242,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
 				},
-				Text: fmt.Sprintf("%d", CurrentStorage.StorageNumberOfBag.Int64),
+				Text: fmt.Sprintf("%d", CurrentStorage.StorageNumberOfBag),
 			}))
 	}
 	// Units.
@@ -1292,7 +1289,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-6"},
 		},
 	})
-	if CurrentStorage.StorageQuantity.Float64 != 0 {
+	if CurrentStorage.StorageQuantity != nil && *CurrentStorage.StorageQuantity != 0 {
 		colQuantity.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -1302,7 +1299,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		}))
 		unit_label := ""
 		if CurrentStorage.UnitQuantity.UnitLabel != nil {
-			unit_label = fmt.Sprintf("%v %s", CurrentStorage.StorageQuantity.Float64, *CurrentStorage.UnitQuantity.UnitLabel)
+			unit_label = fmt.Sprintf("%v %s", CurrentStorage.StorageQuantity, *CurrentStorage.UnitQuantity.UnitLabel)
 		}
 		colQuantity.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
@@ -1331,7 +1328,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: CurrentStorage.StorageBarecode.String,
+			Text: *CurrentStorage.StorageBarecode,
 		}))
 
 	rowQuantityandBarecode.AppendChild(colQuantity)
@@ -1353,7 +1350,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-6"},
 		},
 	})
-	if CurrentStorage.StorageConcentration.Valid {
+	if CurrentStorage.StorageConcentration != nil {
 		colConcentration.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -1366,7 +1363,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
 				},
-				Text: fmt.Sprintf("%d %s", CurrentStorage.StorageConcentration.Int64, *CurrentStorage.UnitConcentration.UnitLabel),
+				Text: fmt.Sprintf("%d %s", CurrentStorage.StorageConcentration, *CurrentStorage.UnitConcentration.UnitLabel),
 			}))
 	}
 	// Batch number.
@@ -1376,7 +1373,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-6"},
 		},
 	})
-	if CurrentStorage.StorageBatchNumber.Valid && CurrentStorage.StorageBatchNumber.String != "" {
+	if CurrentStorage.StorageBatchNumber != nil && *CurrentStorage.StorageBatchNumber != "" {
 		colBatchnumber.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -1389,7 +1386,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
 				},
-				Text: CurrentStorage.StorageBatchNumber.String,
+				Text: *CurrentStorage.StorageBatchNumber,
 			}))
 	}
 
@@ -1435,7 +1432,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-6"},
 		},
 	})
-	if CurrentStorage.StorageReference.Valid {
+	if CurrentStorage.StorageReference != nil {
 		colReference.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -1448,7 +1445,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
 				},
-				Text: CurrentStorage.StorageReference.String,
+				Text: *CurrentStorage.StorageReference,
 			}))
 	}
 
@@ -1471,7 +1468,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-3"},
 		},
 	})
-	if CurrentStorage.StorageEntryDate.Valid {
+	if CurrentStorage.StorageEntryDate != nil {
 		colEntryDate.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -1484,7 +1481,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
 				},
-				Text: CurrentStorage.StorageEntryDate.Time.String(),
+				Text: CurrentStorage.StorageEntryDate.String(),
 			}))
 	}
 	// Exit date.
@@ -1494,7 +1491,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-3"},
 		},
 	})
-	if CurrentStorage.StorageExitDate.Valid {
+	if CurrentStorage.StorageExitDate != nil {
 		colExitDate.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -1507,7 +1504,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
 				},
-				Text: CurrentStorage.StorageExitDate.Time.String(),
+				Text: CurrentStorage.StorageExitDate.String(),
 			}))
 	}
 	// Opening date.
@@ -1517,7 +1514,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-3"},
 		},
 	})
-	if CurrentStorage.StorageOpeningDate.Valid {
+	if CurrentStorage.StorageOpeningDate != nil {
 		colOpeningDate.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -1530,7 +1527,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
 				},
-				Text: CurrentStorage.StorageOpeningDate.Time.String(),
+				Text: CurrentStorage.StorageOpeningDate.String(),
 			}))
 	}
 	// Expiration date.
@@ -1540,7 +1537,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-3"},
 		},
 	})
-	if CurrentStorage.StorageExpirationDate.Valid {
+	if CurrentStorage.StorageExpirationDate != nil {
 		colExpirationDate.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -1553,7 +1550,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
 				},
-				Text: CurrentStorage.StorageExpirationDate.Time.String(),
+				Text: CurrentStorage.StorageExpirationDate.String(),
 			}))
 	}
 
@@ -1578,7 +1575,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-12"},
 		},
 	})
-	if CurrentStorage.StorageComment.Valid && CurrentStorage.StorageComment.String != "" {
+	if CurrentStorage.StorageComment != nil && *CurrentStorage.StorageComment != "" {
 		colComment.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -1591,7 +1588,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
 				},
-				Text: CurrentStorage.StorageComment.String,
+				Text: *CurrentStorage.StorageComment,
 			}))
 	}
 
@@ -1660,7 +1657,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Visible: true,
 			Classes: []string{"blockquote-footer", "mr-sm-2"},
 		},
-		Text: fmt.Sprintf("%s id: %d", CurrentStorage.Person.PersonEmail, CurrentStorage.StorageID.Int64),
+		Text: fmt.Sprintf("%s id: %d", CurrentStorage.Person.PersonEmail, CurrentStorage.StorageID),
 	}))
 
 	rowCreationDateAndPerson.AppendChild(colCreationDate)

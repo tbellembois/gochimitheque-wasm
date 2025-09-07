@@ -324,6 +324,21 @@ func DisplayFilter(q ajax.QueryFilter) {
 			return nil
 		}))
 	}
+	if q.Id != 0 {
+		// isFilter = true
+		jquery.Jq("#filter-item").Append(widgets.FilterItem("storage_product_table_header", q.ProductFilterLabel))
+		jquery.Jq("#removefilterstorage_product_table_header").On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			globals.BSTableQueryFilter.Lock()
+			globals.BSTableQueryFilter.Id = 0
+			globals.BSTableQueryFilter.Unlock()
+
+			jquery.Jq("#s_storage_stock_button").SetInvisible()
+			jquery.Jq("#stock").SetHtml("")
+
+			Search(js.Null(), nil)
+			return nil
+		}))
+	}
 	if q.Storage != "" {
 		// isFilter = true
 		jquery.Jq("#filter-item").Append(widgets.FilterItem("storage", q.StorageFilterLabel))

@@ -23,6 +23,8 @@ import (
 
 func FillInProductForm(p Product, id string) {
 
+	// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", p.Product))
+
 	jquery.Jq(fmt.Sprintf("#%s #product_id", id)).SetVal(p.ProductID)
 
 	select2Category := select2.NewSelect2(jquery.Jq("select#category"), nil)
@@ -219,9 +221,9 @@ func FillInProductForm(p Product, id string) {
 	if p.ProductSheet != nil {
 		jquery.Jq("#product_sheet").SetVal(*p.ProductSheet)
 	}
-	jquery.Jq("#product_threedformula").SetVal("")
+	jquery.Jq("#product_threed_formula").SetVal("")
 	if p.ProductThreeDFormula != nil {
-		jquery.Jq("#product_threedformula").SetVal(*p.ProductThreeDFormula)
+		jquery.Jq("#product_threed_formula").SetVal(*p.ProductThreeDFormula)
 	}
 
 	select2PhysicalState := select2.NewSelect2(jquery.Jq("select#physical_state"), nil)
