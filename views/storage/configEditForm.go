@@ -3,7 +3,6 @@
 package storage
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -82,10 +81,8 @@ func SaveBorrowing(this js.Value, args []js.Value) interface{} {
 
 	if jquery.Jq("textarea#borrowing_comment").GetVal().Truthy() {
 
-		s.Borrowing.BorrowingComment = sql.NullString{
-			Valid:  true,
-			String: jquery.Jq("textarea#borrowing_comment").GetVal().String(),
-		}
+		var _comment = jquery.Jq("textarea#borrowing_comment").GetVal().String()
+		s.Borrowing.BorrowingComment = &_comment
 
 	}
 
@@ -94,21 +91,25 @@ func SaveBorrowing(this js.Value, args []js.Value) interface{} {
 
 		select2ItemBorrower := select2Borrower.Select2Data()[0]
 		s.Borrowing.Borrower = &models.Person{}
-		if s.Borrowing.Borrower.PersonID, err = strconv.Atoi(select2ItemBorrower.Id); err != nil {
+
+		var _person_id int
+		if _person_id, err = strconv.Atoi(select2ItemBorrower.Id); err != nil {
 			fmt.Println(err)
 			return nil
 		}
+		var _person_id_64 int64 = int64(_person_id)
+		s.Borrowing.Borrower.PersonID = &_person_id_64
 		s.Borrowing.Borrower.PersonEmail = select2ItemBorrower.Text
 
 	}
 
 	var borrowing_comment *string
-	if s.Borrowing.BorrowingComment.Valid {
-		borrowing_comment = &s.Borrowing.BorrowingComment.String
+	if s.Borrowing.BorrowingComment != nil {
+		borrowing_comment = s.Borrowing.BorrowingComment
 	}
-	var borrower_id int
+	var borrower_id int64
 	if s.Borrowing.Borrower != nil {
-		borrower_id = s.Borrowing.Borrower.PersonID
+		borrower_id = *s.Borrowing.Borrower.PersonID
 	}
 
 	ajaxURL = fmt.Sprintf("%sborrows/%d?borrower_id=%d", ApplicationProxyPath, s.StorageID, borrower_id)
@@ -156,10 +157,13 @@ func SaveStorage(this js.Value, args []js.Value) any {
 	globals.CurrentStorage = Storage{Storage: &models.Storage{}}
 	globals.CurrentStorage.Product = models.Product{}
 
-	if globals.CurrentStorage.Product.ProductID, err = strconv.Atoi(jquery.Jq("input#product_id").GetVal().String()); err != nil {
+	var _productID int
+	if _productID, err = strconv.Atoi(jquery.Jq("input#product_id").GetVal().String()); err != nil {
 		fmt.Println(err)
 		return nil
 	}
+	var _product_id_64 int64 = int64(_productID)
+	globals.CurrentStorage.Product.ProductID = &_product_id_64
 
 	if jquery.Jq("input#storage_id").GetVal().Truthy() {
 		if storageId, err = strconv.Atoi(jquery.Jq("input#storage_id").GetVal().String()); err != nil {
@@ -189,18 +193,12 @@ func SaveStorage(this js.Value, args []js.Value) any {
 			fmt.Println(err)
 			return nil
 		}
-		globals.CurrentStorage.StoreLocation.StoreLocationID = models.NullInt64{
-			NullInt64: sql.NullInt64{
-				Int64: int64(storelocationId),
-				Valid: true,
-			},
-		}
-		globals.CurrentStorage.StoreLocation.StoreLocationName = models.NullString{
-			NullString: sql.NullString{
-				String: select2ItemStorelocation.Text,
-				Valid:  true,
-			},
-		}
+
+		var _store_location_id_64 int64 = int64(storelocationId)
+		globals.CurrentStorage.StoreLocation.StoreLocationID = &_store_location_id_64
+
+		var _store_location_name string = select2ItemStorelocation.Text
+		globals.CurrentStorage.StoreLocation.StoreLocationName = _store_location_name
 	}
 
 	js.Global().Get("console").Call("log", fmt.Sprintf("%#v", jquery.Jq("#storage_quantity").GetVal().String()))
@@ -408,9 +406,9 @@ func SaveStorage(this js.Value, args []js.Value) any {
 
 func FillInStorageForm(s Storage, id string) {
 
-	js.Global().Get("console").Call("log", fmt.Sprintf("%#v", s.Storage))
-	js.Global().Get("console").Call("log", fmt.Sprintf("%#v", s.Storage.StorageID))
-	js.Global().Get("console").Call("log", fmt.Sprintf("%#v", id))
+	// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", s.Storage))
+	// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", s.Storage.StorageID))
+	// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", id))
 
 	if s.StorageID != nil {
 		jquery.Jq(fmt.Sprintf("#%s #storage_id", id)).SetVal(*s.StorageID)
@@ -418,11 +416,11 @@ func FillInStorageForm(s Storage, id string) {
 
 	select2StoreLocation := select2.NewSelect2(jquery.Jq("select#store_location"), nil)
 	select2StoreLocation.Select2Clear()
-	if s.StoreLocation.StoreLocationID.Valid {
+	if s.StoreLocation.StoreLocationID != nil {
 		select2StoreLocation.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
-				Text:            s.StoreLocation.StoreLocationName.String,
-				Value:           strconv.Itoa(int(s.StoreLocation.StoreLocationID.Int64)),
+				Text:            s.StoreLocation.StoreLocationName,
+				Value:           strconv.Itoa(int(*s.StoreLocation.StoreLocationID)),
 				DefaultSelected: true,
 				Selected:        true,
 			}).HTMLElement.OuterHTML())

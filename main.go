@@ -99,9 +99,10 @@ func init() {
 	}
 	// FIXME: we assume here that the id starts by 1 in the DB
 	for id, record := range records {
+		_id := int64(id + 1)
 		globals.DBPrecautionaryStatements = append(globals.DBPrecautionaryStatements,
 			types.PrecautionaryStatement{PrecautionaryStatement: &models.PrecautionaryStatement{
-				PrecautionaryStatementID:        id + 1,
+				PrecautionaryStatementID:        &_id,
 				PrecautionaryStatementLabel:     record[0],
 				PrecautionaryStatementReference: record[1],
 			}})
@@ -115,9 +116,10 @@ func init() {
 	}
 	// FIXME: we assume here that the id starts by 1 in the DB
 	for id, record := range records {
+		_id := int64(id + 1)
 		globals.DBHazardStatements = append(globals.DBHazardStatements,
 			types.HazardStatement{HazardStatement: &models.HazardStatement{
-				HazardStatementID:        id + 1,
+				HazardStatementID:        &_id,
 				HazardStatementLabel:     record[0],
 				HazardStatementReference: record[1],
 			}})
@@ -130,9 +132,10 @@ func init() {
 	}
 	// FIXME: we assume here that the id starts by 1 in the DB
 	for id, record := range records {
+		_id := int64(id + 1)
 		globals.DBSymbols = append(globals.DBSymbols,
 			types.Symbol{Symbol: &models.Symbol{
-				SymbolID:    id + 1,
+				SymbolID:    &_id,
 				SymbolLabel: record[0],
 			}})
 	}

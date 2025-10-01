@@ -39,7 +39,7 @@ func Select2StoreLocationTemplateResults(this js.Value, args []js.Value) interfa
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
 			Attributes: map[string]string{
-				"style": fmt.Sprintf("color: %s", store_location.StoreLocationColor.String),
+				"style": fmt.Sprintf("color: %s", *store_location.StoreLocationColor),
 			},
 		},
 		Icon: themes.NewMdiIcon(themes.MDI_COLOR, themes.MDI_24PX),
@@ -52,7 +52,7 @@ func Select2StoreLocationTemplateResults(this js.Value, args []js.Value) interfa
 		Text: store_location.StoreLocationFullPath,
 	})
 
-	if store_location.StoreLocationCanStore.Valid && store_location.StoreLocationCanStore.Bool {
+	if store_location.StoreLocationCanStore {
 		iconCanStore = widgets.NewIcon(widgets.IconAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -210,7 +210,7 @@ func Select2ProducerRefCreateTag(this js.Value, args []js.Value) interface{} {
 	}
 
 	if len(select2.NewSelect2(jquery.Jq("select#producer"), nil).Select2Data()) == 0 {
-		jsutils.DisplayErrorMessage(locales.Translate("producerref_create_needproducer", HTTPHeaderAcceptLanguage))
+		jsutils.DisplayErrorMessage(locales.Translate("producer_ref_create_needproducer", HTTPHeaderAcceptLanguage))
 		return nil
 	}
 
@@ -331,7 +331,7 @@ func Select2SupplierRefTemplateSelection(this js.Value, args []js.Value) interfa
 		// return jsutils.CreateJsHTMLElementFromString(widgets.NewDiv(widgets.DivAttributes{}).OuterHTML())
 	}
 
-	if supplierRef.SupplierRefID == 0 {
+	if supplierRef.SupplierRefID != nil {
 		// Autofill.
 		return data.Get("text")
 	}
@@ -371,7 +371,7 @@ func Select2SupplierRefCreateTag(this js.Value, args []js.Value) interface{} {
 	select2Supplier := select2.NewSelect2(jquery.Jq("select#supplier"), nil)
 
 	if len(select2Supplier.Select2Data()) == 0 {
-		jsutils.DisplayErrorMessage(locales.Translate("supplierref_create_needsupplier", HTTPHeaderAcceptLanguage))
+		jsutils.DisplayErrorMessage(locales.Translate("supplier_ref_create_needsupplier", HTTPHeaderAcceptLanguage))
 		return nil
 	}
 

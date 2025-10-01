@@ -41,7 +41,7 @@ func (elems EmpiricalFormulas) IsExactMatch() bool {
 func (e *EmpiricalFormula) MarshalJSON() ([]byte, error) {
 	type Copy EmpiricalFormula
 	return json.Marshal(&struct {
-		Id   int    `json:"id"`
+		Id   int64  `json:"id"`
 		Text string `json:"text"`
 
 		*Copy
@@ -102,9 +102,9 @@ func (e EmpiricalFormulas) GetTotal() int {
 
 }
 
-func (e EmpiricalFormula) GetSelect2Id() int {
+func (e EmpiricalFormula) GetSelect2Id() int64 {
 
-	return int(*e.EmpiricalFormulaID)
+	return *e.EmpiricalFormulaID
 
 }
 

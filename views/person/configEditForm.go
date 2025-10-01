@@ -23,7 +23,7 @@ import (
 )
 
 // populatePermission checks the permissions checkboxes in the person edition page
-func populatePermission(permissions []types.Permission, managedEntitiesIds map[int]string) {
+func populatePermission(permissions []types.Permission, managedEntitiesIds map[int64]string) {
 
 	Doc := dom.GetWindow().Document()
 
@@ -42,7 +42,7 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 
 		// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", p))
 
-		pentityid := strconv.Itoa(p.PermissionEntity)
+		pentityid := strconv.Itoa(int(p.PermissionEntity))
 		if _, ok := managedEntitiesIds[p.PermissionEntity]; ok {
 			continue
 		}
@@ -196,12 +196,12 @@ func SelectAllEntity(this js.Value, args []js.Value) interface{} {
 			select2Entities.Select2AppendOption(
 				widgets.NewOption(widgets.OptionAttributes{
 					Text:            entity.EntityName,
-					Value:           strconv.Itoa(entity.EntityID),
+					Value:           strconv.Itoa(int(*entity.EntityID)),
 					DefaultSelected: true,
 					Selected:        true,
 				}).HTMLElement.OuterHTML())
 
-			jquery.Jq("#permissions").Append(widgets.Permission(entity.EntityID, entity.EntityName, false).OuterHTML())
+			jquery.Jq("#permissions").Append(widgets.Permission(*entity.EntityID, entity.EntityName, false).OuterHTML())
 
 		}
 
@@ -238,15 +238,15 @@ func FillInPersonForm(p Person, id string) {
 	var (
 		// wg                        sync.WaitGroup
 		// entities, managedEntities Entities
-		managedEntitiesIds map[int]string
+		managedEntitiesIds map[int64]string
 		permissions        Permissions
 	// err                       error
 	)
 
 	if p.ManagedEntities != nil && len(p.ManagedEntities) > 0 {
-		managedEntitiesIds = make(map[int]string)
+		managedEntitiesIds = make(map[int64]string)
 		for _, entity := range p.ManagedEntities {
-			managedEntitiesIds[entity.EntityID] = entity.EntityName
+			managedEntitiesIds[*entity.EntityID] = entity.EntityName
 		}
 	}
 
@@ -331,7 +331,7 @@ func FillInPersonForm(p Person, id string) {
 	// }()
 	//
 	// wg.Wait()
-	jquery.Jq(fmt.Sprintf("#%s #person_id", id)).SetVal(p.PersonID)
+	jquery.Jq(fmt.Sprintf("#%s #person_id", id)).SetVal(*p.PersonID)
 	jquery.Jq(fmt.Sprintf("#%s #person_email", id)).SetVal(p.PersonEmail)
 	jquery.Jq(fmt.Sprintf("#%s #person_password", id)).SetVal("")
 
@@ -345,7 +345,7 @@ func FillInPersonForm(p Person, id string) {
 					"type": "hidden",
 				},
 			},
-			Value: strconv.Itoa(entity.EntityID),
+			Value: strconv.Itoa(int(*entity.EntityID)),
 		})
 		jquery.Jq("form#person").Append(option.OuterHTML())
 	}
@@ -355,7 +355,7 @@ func FillInPersonForm(p Person, id string) {
 		select2Entities.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            entity.EntityName,
-				Value:           strconv.Itoa(entity.EntityID),
+				Value:           strconv.Itoa(int(*entity.EntityID)),
 				DefaultSelected: true,
 				Selected:        true,
 			}).HTMLElement.OuterHTML())
@@ -364,8 +364,8 @@ func FillInPersonForm(p Person, id string) {
 	// Adding a permission widget for each entity
 	// except for managed entities.
 	for _, entity := range p.Entities {
-		if _, ok := managedEntitiesIds[entity.EntityID]; !ok {
-			jquery.Jq("#permissions").Append(widgets.Permission(entity.EntityID, entity.EntityName, false).OuterHTML())
+		if _, ok := managedEntitiesIds[*entity.EntityID]; !ok {
+			jquery.Jq("#permissions").Append(widgets.Permission(*entity.EntityID, entity.EntityName, false).OuterHTML())
 		}
 	}
 
@@ -390,10 +390,13 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 	person = &Person{Person: &models.Person{}}
 
 	if jquery.Jq("input#person_id").GetVal().Truthy() {
-		if person.PersonID, err = strconv.Atoi(jquery.Jq("input#person_id").GetVal().String()); err != nil {
+		var _person_id int
+		if _person_id, err = strconv.Atoi(jquery.Jq("input#person_id").GetVal().String()); err != nil {
 			fmt.Println("person_id:" + err.Error())
 			return nil
 		}
+		_person_id_64 := int64(_person_id)
+		person.PersonID = &_person_id_64
 	}
 
 	person.PersonEmail = jquery.Jq("input#person_email").GetVal().String()
@@ -402,10 +405,13 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 
 	for _, select2Item := range select2Entities.Select2Data() {
 		entity := &models.Entity{}
-		if entity.EntityID, err = strconv.Atoi(select2Item.Id); err != nil {
+		var _entity_id int
+		if _entity_id, err = strconv.Atoi(select2Item.Id); err != nil {
 			fmt.Println("entity_id:" + err.Error())
 			return nil
 		}
+		_entity_id_64 := int64(_entity_id)
+		entity.EntityID = &_entity_id_64
 		entity.EntityName = select2Item.Text
 
 		person.Entities = append(person.Entities, entity)
@@ -419,10 +425,13 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 		permission.PermissionItem = permissions.Index(i).Call("getAttribute", "item_name").String()
 		entityId := permissions.Index(i).Call("getAttribute", "entity_id").String()
 
-		if permission.PermissionEntity, err = strconv.Atoi(entityId); err != nil {
+		var _entity_id int
+		if _entity_id, err = strconv.Atoi(entityId); err != nil {
 			fmt.Println("permission_entity_id:" + err.Error())
 			return nil
 		}
+		_entity_id_64 := int64(_entity_id)
+		permission.PermissionEntity = _entity_id_64
 
 		person.Permissions = append(person.Permissions, permission)
 	}

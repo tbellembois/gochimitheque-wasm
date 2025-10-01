@@ -36,7 +36,7 @@ func (s *StoreLocation) MarshalJSON() ([]byte, error) {
 
 	type Copy StoreLocation
 	return json.Marshal(struct {
-		Id   int    `json:"id"`
+		Id   int64  `json:"id"`
 		Text string `json:"text"`
 		Copy
 	}{
@@ -97,9 +97,9 @@ func (s StoreLocation) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble
 
 }
 
-func (s StoreLocation) GetSelect2Id() int {
+func (s StoreLocation) GetSelect2Id() int64 {
 
-	return int(s.StoreLocationID.Int64)
+	return *s.StoreLocationID
 
 }
 

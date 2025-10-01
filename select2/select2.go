@@ -92,7 +92,7 @@ type Select2ResultAble interface {
 }
 
 type Select2ItemAble interface {
-	GetSelect2Id() int
+	GetSelect2Id() int64
 	GetSelect2Text() string
 	FromJsJSONValue(js.Value) Select2ItemAble
 }

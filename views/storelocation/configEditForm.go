@@ -3,7 +3,6 @@
 package storelocation
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -23,17 +22,17 @@ import (
 
 func FillInStoreLocationForm(s StoreLocation, id string) {
 
-	jquery.Jq(fmt.Sprintf("#%s #store_location_id", id)).SetVal(s.StoreLocationID.Int64)
-	jquery.Jq(fmt.Sprintf("#%s #store_location_name", id)).SetVal(s.StoreLocationName.String)
-	jquery.Jq(fmt.Sprintf("#%s #store_location_can_store", id)).SetProp("checked", s.StoreLocationCanStore.Bool)
-	jquery.Jq(fmt.Sprintf("#%s #store_location_color", id)).SetVal(s.StoreLocationColor.String)
+	jquery.Jq(fmt.Sprintf("#%s #store_location_id", id)).SetVal(*s.StoreLocationID)
+	jquery.Jq(fmt.Sprintf("#%s #store_location_name", id)).SetVal(s.StoreLocationName)
+	jquery.Jq(fmt.Sprintf("#%s #store_location_can_store", id)).SetProp("checked", s.StoreLocationCanStore)
+	jquery.Jq(fmt.Sprintf("#%s #store_location_color", id)).SetVal(*s.StoreLocationColor)
 
 	select2Entity := select2.NewSelect2(jquery.Jq("select#entity"), nil)
 	select2Entity.Select2Clear()
 	select2Entity.Select2AppendOption(
 		widgets.NewOption(widgets.OptionAttributes{
 			Text:            s.Entity.EntityName,
-			Value:           strconv.Itoa(s.Entity.EntityID),
+			Value:           strconv.Itoa(int(*s.Entity.EntityID)),
 			DefaultSelected: true,
 			Selected:        true,
 		}).HTMLElement.OuterHTML())
@@ -43,8 +42,8 @@ func FillInStoreLocationForm(s StoreLocation, id string) {
 
 	var parentId, parentName string
 	if s.StoreLocation.StoreLocation != nil {
-		parentId = strconv.Itoa(int(s.StoreLocation.StoreLocation.StoreLocationID.Int64))
-		parentName = s.StoreLocation.StoreLocation.StoreLocationName.String
+		parentId = strconv.Itoa(int(*s.StoreLocation.StoreLocation.StoreLocationID))
+		parentName = s.StoreLocation.StoreLocation.StoreLocationName
 	}
 	select2StoreLocation.Select2AppendOption(
 		widgets.NewOption(widgets.OptionAttributes{
@@ -78,41 +77,30 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 			return nil
 		}
 
-		storelocation.StoreLocationID = models.NullInt64{sql.NullInt64{
-			Int64: int64(storelocationId),
-			Valid: true,
-		}}
+		var _id64 int64 = int64(storelocationId)
+		storelocation.StoreLocationID = &_id64
 	}
 
 	if jquery.Jq("input#store_location_can_store:checked").Object.Length() > 0 {
-		storelocation.StoreLocationCanStore = models.NullBool{sql.NullBool{
-			Bool:  true,
-			Valid: true,
-		}}
+		storelocation.StoreLocationCanStore = true
 	} else {
-		storelocation.StoreLocationCanStore = models.NullBool{sql.NullBool{
-			Bool:  false,
-			Valid: true,
-		}}
+		storelocation.StoreLocationCanStore = false
 	}
 
-	storelocation.StoreLocationName = models.NullString{sql.NullString{
-		String: jquery.Jq("input#store_location_name").GetVal().String(),
-		Valid:  true,
-	}}
-	storelocation.StoreLocationColor = models.NullString{sql.NullString{
-		String: jquery.Jq("input#store_location_color").GetVal().String(),
-		Valid:  true,
-	}}
+	var _color string = jquery.Jq("input#store_location_color").GetVal().String()
+	storelocation.StoreLocationName = jquery.Jq("input#store_location_name").GetVal().String()
+	storelocation.StoreLocationColor = &_color
 
 	select2ItemEntity := select2.NewSelect2(jquery.Jq("select#entity"), nil)
 	storelocation.Entity = models.Entity{}
 
-	if storelocation.Entity.EntityID, err = strconv.Atoi(select2ItemEntity.Select2Data()[0].Id); err != nil {
+	var _id int
+	if _id, err = strconv.Atoi(select2ItemEntity.Select2Data()[0].Id); err != nil {
 		fmt.Println("select2ItemEntity:" + err.Error())
 		return nil
 	}
-
+	var _id64 = int64(_id)
+	storelocation.Entity.EntityID = &_id64
 	storelocation.Entity.EntityName = select2ItemEntity.Select2Data()[0].Text
 
 	select2StoreLocation := select2.NewSelect2(jquery.Jq("select#store_location"), nil)
@@ -127,20 +115,13 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 				return nil
 			}
 
-			storelocation.StoreLocation.StoreLocation.StoreLocationID = models.NullInt64{sql.NullInt64{
-				Int64: int64(storelocationId),
-				Valid: true,
-			}}
+			var _id64 = int64(storelocationId)
+			storelocation.StoreLocation.StoreLocation.StoreLocationID = &_id64
+
 			// FIELD_REQUIRED_BY_RUST_MODEL_BUT_NOT_USED_IN_CREATE_OR_UPDATE
-			storelocation.StoreLocation.StoreLocation.StoreLocationName = models.NullString{sql.NullString{
-				String: "",
-				Valid:  true,
-			}}
+			storelocation.StoreLocation.StoreLocation.StoreLocationName = ""
 			// FIELD_REQUIRED_BY_RUST_MODEL_BUT_NOT_USED_IN_CREATE_OR_UPDATE
-			storelocation.StoreLocation.StoreLocation.StoreLocationCanStore = models.NullBool{sql.NullBool{
-				Bool:  false,
-				Valid: true,
-			}}
+			storelocation.StoreLocation.StoreLocation.StoreLocationCanStore = false
 		}
 	}
 
@@ -150,7 +131,7 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 	}
 
 	if jquery.Jq("form#store_location input#store_location_id").Object.Length() > 0 {
-		ajaxURL = fmt.Sprintf("%sstore_locations/%d", ApplicationProxyPath, storelocation.StoreLocationID.Int64)
+		ajaxURL = fmt.Sprintf("%sstore_locations/%d", ApplicationProxyPath, storelocation.StoreLocationID)
 		ajaxMethod = "put"
 	} else {
 		ajaxURL = fmt.Sprintf("%sstore_locations", ApplicationProxyPath)
@@ -178,7 +159,7 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 			// TODO: use entityId for redirection
 			href := fmt.Sprintf("%sv/store_locations", ApplicationProxyPath)
 			jsutils.ClearSearch(js.Null(), nil)
-			jsutils.LoadContent("div#content", "store_location", href, StoreLocation_SaveCallback, storelocation.StoreLocationName.String)
+			jsutils.LoadContent("div#content", "store_location", href, StoreLocation_SaveCallback, storelocation.StoreLocationName)
 
 		},
 		Fail: func(jqXHR js.Value) {

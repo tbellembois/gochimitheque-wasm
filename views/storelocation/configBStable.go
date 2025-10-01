@@ -28,9 +28,9 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	storeLocation := StoreLocation{StoreLocation: &models.StoreLocation{}}.FromJsJSONValue(row).(StoreLocation)
 
-	jquery.Jq(fmt.Sprintf("button#delete%d", storeLocation.StoreLocationID.Int64)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq(fmt.Sprintf("button#delete%d", *storeLocation.StoreLocationID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-		url := fmt.Sprintf("%sstore_locations/%d", ApplicationProxyPath, storeLocation.StoreLocationID.Int64)
+		url := fmt.Sprintf("%sstore_locations/%d", ApplicationProxyPath, *storeLocation.StoreLocationID)
 		method := "delete"
 
 		done := func(data js.Value) {
@@ -65,8 +65,8 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 		Icon: themes.NewMdiIcon(themes.MDI_CONFIRM, ""),
 		Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
 	})
-	jquery.Jq(fmt.Sprintf("button#delete%d", storeLocation.StoreLocationID.Int64)).SetHtml("")
-	jquery.Jq(fmt.Sprintf("button#delete%d", storeLocation.StoreLocationID.Int64)).Append(buttonTitle.OuterHTML())
+	jquery.Jq(fmt.Sprintf("button#delete%d", *storeLocation.StoreLocationID)).SetHtml("")
+	jquery.Jq(fmt.Sprintf("button#delete%d", *storeLocation.StoreLocationID)).Append(buttonTitle.OuterHTML())
 
 	return nil
 
@@ -78,7 +78,7 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 	index := args[3].Int()
 	storeLocation := StoreLocation{StoreLocation: &models.StoreLocation{}}.FromJsJSONValue(row).(StoreLocation)
 
-	url := fmt.Sprintf("%sstore_locations/%d", ApplicationProxyPath, storeLocation.StoreLocationID.Int64)
+	url := fmt.Sprintf("%sstore_locations/%d", ApplicationProxyPath, *storeLocation.StoreLocationID)
 	method := "get"
 
 	done := func(data js.Value) {
@@ -123,17 +123,17 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	buttonEdit := widgets.NewBSButtonWithIcon(
 		widgets.ButtonAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:         "edit" + strconv.Itoa(int(storelocation.StoreLocationID.Int64)),
+				Id:         "edit" + strconv.Itoa(int(*storelocation.StoreLocationID)),
 				Classes:    []string{"edit"},
 				Visible:    false,
-				Attributes: map[string]string{"slid": strconv.Itoa(int(storelocation.StoreLocationID.Int64))},
+				Attributes: map[string]string{"slid": strconv.Itoa(int(*storelocation.StoreLocationID))},
 			},
 			Title: locales.Translate("edit", HTTPHeaderAcceptLanguage),
 		},
 		widgets.IconAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible:    true,
-				Attributes: map[string]string{"slid": strconv.Itoa(int(storelocation.StoreLocationID.Int64))},
+				Attributes: map[string]string{"slid": strconv.Itoa(int(*storelocation.StoreLocationID))},
 			},
 			Text: "",
 			Icon: themes.NewMdiIcon(themes.MDI_EDIT, ""),
@@ -144,17 +144,17 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	buttonDelete := widgets.NewBSButtonWithIcon(
 		widgets.ButtonAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:         "delete" + strconv.Itoa(int(storelocation.StoreLocationID.Int64)),
+				Id:         "delete" + strconv.Itoa(int(*storelocation.StoreLocationID)),
 				Classes:    []string{"delete"},
 				Visible:    false,
-				Attributes: map[string]string{"slid": strconv.Itoa(int(storelocation.StoreLocationID.Int64))},
+				Attributes: map[string]string{"slid": strconv.Itoa(int(*storelocation.StoreLocationID))},
 			},
 			Title: locales.Translate("delete", HTTPHeaderAcceptLanguage),
 		},
 		widgets.IconAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible:    true,
-				Attributes: map[string]string{"slid": strconv.Itoa(int(storelocation.StoreLocationID.Int64))},
+				Attributes: map[string]string{"slid": strconv.Itoa(int(*storelocation.StoreLocationID))},
 			},
 			Text: "",
 			Icon: themes.NewMdiIcon(themes.MDI_DELETE, ""),
@@ -181,7 +181,7 @@ func ColorFormatter(this js.Value, args []js.Value) interface{} {
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
 			Attributes: map[string]string{
-				"style": "background-color:" + storelocation.StoreLocationColor.String,
+				"style": "background-color:" + *storelocation.StoreLocationColor,
 			},
 		}})
 
@@ -198,7 +198,7 @@ func CanStoreFormatter(this js.Value, args []js.Value) interface{} {
 
 	var icon themes.IconFace
 
-	if storelocation.StoreLocationCanStore.Bool {
+	if storelocation.StoreLocationCanStore {
 		icon = themes.MDI_CHECK
 	} else {
 		icon = themes.MDI_NO_CHECK
@@ -249,7 +249,7 @@ func StoreLocationFormatter(this js.Value, args []js.Value) interface{} {
 	var storeLocationName string
 
 	if storelocation.StoreLocation.StoreLocation != nil {
-		storeLocationName = storelocation.StoreLocation.StoreLocation.StoreLocationName.String
+		storeLocationName = storelocation.StoreLocation.StoreLocation.StoreLocationName
 	}
 
 	span := widgets.NewSpan(widgets.SpanAttributes{

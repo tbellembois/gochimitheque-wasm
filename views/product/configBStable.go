@@ -73,7 +73,7 @@ func OperateEventsStore(this js.Value, args []js.Value) interface{} {
 	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
 	BSTableQueryFilter.Lock()
-	BSTableQueryFilter.QueryFilter.Product = strconv.Itoa(globals.CurrentProduct.ProductID)
+	BSTableQueryFilter.QueryFilter.Product = strconv.Itoa(int(*globals.CurrentProduct.ProductID))
 	if globals.CurrentProduct.ProductSpecificity != nil {
 		BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", globals.CurrentProduct.Name.NameLabel, *globals.CurrentProduct.ProductSpecificity)
 	} else {
@@ -98,7 +98,7 @@ func OperateEventsStorages(this js.Value, args []js.Value) interface{} {
 	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
 	BSTableQueryFilter.Lock()
-	BSTableQueryFilter.QueryFilter.Product = strconv.Itoa(globals.CurrentProduct.ProductID)
+	BSTableQueryFilter.QueryFilter.Product = strconv.Itoa(int(*globals.CurrentProduct.ProductID))
 	if globals.CurrentProduct.ProductSpecificity != nil {
 		BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", globals.CurrentProduct.Name.NameLabel, *globals.CurrentProduct.ProductSpecificity)
 	} else {
@@ -209,7 +209,7 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
 	BSTableQueryFilter.Lock()
-	BSTableQueryFilter.QueryFilter.Product = strconv.Itoa(globals.CurrentProduct.ProductID)
+	BSTableQueryFilter.QueryFilter.Product = strconv.Itoa(int(*globals.CurrentProduct.ProductID))
 	if globals.CurrentProduct.ProductSpecificity != nil {
 		BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", globals.CurrentProduct.Name.NameLabel, *globals.CurrentProduct.ProductSpecificity)
 	} else {
@@ -290,7 +290,7 @@ func OperateEventsSelect(this js.Value, args []js.Value) interface{} {
 	jquery.Jq("input[name=selected_product_id]").SetVal(globals.CurrentProduct.ProductID)
 	jquery.Jq("input[name=selected_product_name]").SetVal(globals.CurrentProduct.Name.NameLabel)
 
-	jsutils.DisplaySuccessMessage(locales.Translate("selected", HTTPHeaderAcceptLanguage) + ": #" + strconv.Itoa(globals.CurrentProduct.ProductID) + " " + globals.CurrentProduct.Name.NameLabel)
+	jsutils.DisplaySuccessMessage(locales.Translate("selected", HTTPHeaderAcceptLanguage) + ": #" + strconv.Itoa(int(*globals.CurrentProduct.ProductID)) + " " + globals.CurrentProduct.Name.NameLabel)
 
 	return nil
 }
@@ -303,7 +303,7 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 	confirm := widgets.NewLink(
 		widgets.LinkAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:      fmt.Sprintf("delete%d", globals.CurrentProduct.ProductID),
+				Id:      fmt.Sprintf("delete%d", *globals.CurrentProduct.ProductID),
 				Classes: []string{"text-primary", "iconlabel"},
 				Visible: true,
 			},
@@ -320,11 +320,11 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 		},
 	).OuterHTML()
 
-	jquery.Jq(fmt.Sprintf("div#confirm%d", globals.CurrentProduct.ProductID)).SetHtml(confirm)
+	jquery.Jq(fmt.Sprintf("div#confirm%d", *globals.CurrentProduct.ProductID)).SetHtml(confirm)
 
-	jquery.Jq(fmt.Sprintf("a#delete%d", globals.CurrentProduct.ProductID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq(fmt.Sprintf("a#delete%d", *globals.CurrentProduct.ProductID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-		url := fmt.Sprintf("%sproducts/%d", ApplicationProxyPath, globals.CurrentProduct.ProductID)
+		url := fmt.Sprintf("%sproducts/%d", ApplicationProxyPath, *globals.CurrentProduct.ProductID)
 		method := "delete"
 
 		done := func(data js.Value) {
@@ -701,7 +701,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: strconv.Itoa(globals.CurrentProduct.ProductID) + globals.CurrentProduct.ProductType,
+			Text: strconv.Itoa(int(*globals.CurrentProduct.ProductID)) + globals.CurrentProduct.ProductType,
 		}))
 	// Person.
 	colPerson := widgets.NewDiv(widgets.DivAttributes{
@@ -729,7 +729,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
-	if globals.CurrentProduct.Category.CategoryID != nil {
+	if globals.CurrentProduct.Category != nil && globals.CurrentProduct.Category.CategoryID != nil {
 		colCategory.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -772,7 +772,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
-	if globals.CurrentProduct.ProducerRef.ProducerRefID != nil {
+	if globals.CurrentProduct.ProducerRef != nil && globals.CurrentProduct.ProducerRef.ProducerRefID != nil {
 		colProducer.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -853,7 +853,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
-	if globals.CurrentProduct.ProductNumberPerBag != nil {
+	if globals.CurrentProduct.ProductNumberPerBag != nil && *globals.CurrentProduct.ProductNumberPerBag > 0 {
 		colNumberPerBag.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -919,7 +919,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		},
 	})
 	// if globals.CurrentProduct.CasNumber.CasNumberID!= nil {
-	if globals.CurrentProduct.CasNumber.CasNumberID != nil {
+	if globals.CurrentProduct.CasNumber != nil && globals.CurrentProduct.CasNumber.CasNumberID != nil {
 		colCas.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -935,7 +935,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Text: *globals.CurrentProduct.CasNumber.CasNumberLabel,
 		}))
 	}
-	if globals.CurrentProduct.CasNumber.CasNumberCMR != nil {
+	if globals.CurrentProduct.CasNumber != nil && globals.CurrentProduct.CasNumber.CasNumberCMR != nil {
 		colCas.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -968,7 +968,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
-	if globals.CurrentProduct.CeNumber.CeNumberID != nil {
+	if globals.CurrentProduct.CeNumber != nil && globals.CurrentProduct.CeNumber.CeNumberID != nil {
 		colCe.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -1056,7 +1056,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
-	if globals.CurrentProduct.EmpiricalFormula.EmpiricalFormulaID != nil {
+	if globals.CurrentProduct.EmpiricalFormula != nil && globals.CurrentProduct.EmpiricalFormula.EmpiricalFormulaID != nil {
 		colEmpiricalFormula.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -1079,7 +1079,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
-	if globals.CurrentProduct.LinearFormula.LinearFormulaID != nil {
+	if globals.CurrentProduct.LinearFormula != nil && globals.CurrentProduct.LinearFormula.LinearFormulaID != nil {
 		colLinearFormula.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -1159,7 +1159,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
-	if globals.CurrentProduct.SignalWord.SignalWordID != nil {
+	if globals.CurrentProduct.SignalWord != nil && globals.CurrentProduct.SignalWord.SignalWordID != nil {
 		colSignalWord.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -1182,7 +1182,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-auto m-1"},
 		},
 	})
-	if globals.CurrentProduct.PhysicalState.PhysicalStateID != nil {
+	if globals.CurrentProduct.PhysicalState != nil && globals.CurrentProduct.PhysicalState.PhysicalStateID != nil {
 		colPhysicalState.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -1422,7 +1422,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	// detailCardRow.AppendChild(colPin)
 
 	detailCardRow.AppendChild(colID)
-	if globals.CurrentProduct.Category.CategoryID != nil {
+	if globals.CurrentProduct.Category != nil && globals.CurrentProduct.Category.CategoryID != nil {
 		detailCardRow.AppendChild(colCategory)
 	}
 	if len(globals.CurrentProduct.Tags) > 0 {
@@ -1434,10 +1434,10 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	if len(globals.CurrentProduct.Synonyms) > 0 {
 		detailCardRow.AppendChild(colSynonym)
 	}
-	if globals.CurrentProduct.EmpiricalFormula.EmpiricalFormulaID != nil {
+	if globals.CurrentProduct.EmpiricalFormula != nil && globals.CurrentProduct.EmpiricalFormula.EmpiricalFormulaID != nil {
 		detailCardRow.AppendChild(colEmpiricalFormula)
 	}
-	if globals.CurrentProduct.LinearFormula.LinearFormulaID != nil {
+	if globals.CurrentProduct.LinearFormula != nil && globals.CurrentProduct.LinearFormula.LinearFormulaID != nil {
 		detailCardRow.AppendChild(colLinearFormula)
 	}
 	if globals.CurrentProduct.ProductThreeDFormula != nil && *globals.CurrentProduct.ProductThreeDFormula != "" {
@@ -1509,38 +1509,44 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 
 		span := dom.GetWindow().Document().CreateElement("span")
 		molecularweight_html := span.(*dom.HTMLSpanElement)
-		molecularweight_html.SetInnerHTML(fmt.Sprintf("%f %s", *globals.CurrentProduct.ProductMolecularWeight, *globals.CurrentProduct.UnitMolecularWeight.UnitLabel))
 
+		if globals.CurrentProduct.UnitMolecularWeight != nil {
+			molecularweight_html.SetInnerHTML(fmt.Sprintf("%f %s", *globals.CurrentProduct.ProductMolecularWeight, *globals.CurrentProduct.UnitMolecularWeight.UnitLabel))
+		} else {
+			molecularweight_html.SetInnerHTML(fmt.Sprintf("%f", *globals.CurrentProduct.ProductMolecularWeight))
+
+		}
 		molecularweight_div.AppendChild(molecularweight_title_html)
 		molecularweight_div.AppendChild(molecularweight_html)
 		detailCardRow.AppendChild(molecularweight_div)
 	}
+
 	// if globals.CurrentProduct.CasNumber.CasNumberID!= nil {
-	if globals.CurrentProduct.CasNumber.CasNumberID != nil {
+	if globals.CurrentProduct.CasNumber != nil && globals.CurrentProduct.CasNumber.CasNumberID != nil {
 		detailCardRow.AppendChild(colCas)
 	}
-	if globals.CurrentProduct.CeNumber.CeNumberID != nil {
+	if globals.CurrentProduct.CeNumber != nil && globals.CurrentProduct.CeNumber.CeNumberID != nil {
 		detailCardRow.AppendChild(colCe)
 	}
 	if globals.CurrentProduct.ProductMSDS != nil && *globals.CurrentProduct.ProductMSDS != "" {
 		detailCardRow.AppendChild(colMsds)
 	}
-	if globals.CurrentProduct.Producer != nil && globals.CurrentProduct.Producer.ProducerID != nil {
+	if globals.CurrentProduct.ProducerRef != nil && globals.CurrentProduct.Producer.ProducerID != nil {
 		detailCardRow.AppendChild(colProducer)
 	}
 	if len(globals.CurrentProduct.SupplierRefs) > 0 {
 		detailCardRow.AppendChild(colSuppliers)
 	}
-	if globals.CurrentProduct.ProductNumberPerCarton != nil {
+	if globals.CurrentProduct.ProductNumberPerCarton != nil && *globals.CurrentProduct.ProductNumberPerCarton > 0 {
 		detailCardRow.AppendChild(colNumberPerCarton)
 	}
-	if globals.CurrentProduct.ProductNumberPerBag != nil {
+	if globals.CurrentProduct.ProductNumberPerBag != nil && *globals.CurrentProduct.ProductNumberPerBag > 0 {
 		detailCardRow.AppendChild(colNumberPerBag)
 	}
 	if len(globals.CurrentProduct.Symbols) > 0 {
 		detailCardRow.AppendChild(colSymbols)
 	}
-	if globals.CurrentProduct.SignalWord.SignalWordID != nil {
+	if globals.CurrentProduct.SignalWord != nil && globals.CurrentProduct.SignalWord.SignalWordID != nil {
 		detailCardRow.AppendChild(colSignalWord)
 	}
 	if len(globals.CurrentProduct.HazardStatements) > 0 {
@@ -1552,7 +1558,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	if len(globals.CurrentProduct.ClassOfCompound) > 0 {
 		detailCardRow.AppendChild(colCoc)
 	}
-	if globals.CurrentProduct.PhysicalState.PhysicalStateID != nil {
+	if globals.CurrentProduct.PhysicalState != nil && globals.CurrentProduct.PhysicalState.PhysicalStateID != nil {
 		detailCardRow.AppendChild(colPhysicalState)
 	}
 	if globals.CurrentProduct.ProductSheet != nil && *globals.CurrentProduct.ProductSheet != "" {
@@ -1574,6 +1580,35 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		detailCardRow.AppendChild(colRestricted)
 	}
 	detailCardRow.AppendChild(colPerson)
+
+	if globals.CurrentProduct.ProductAvailability != nil {
+		div := dom.GetWindow().Document().CreateElement("div")
+		availability_div := div.(*dom.HTMLDivElement)
+		availability_div.SetClass("col-sm-12 m-1")
+
+		span_title := dom.GetWindow().Document().CreateElement("span")
+		availability_title_html := span_title.(*dom.HTMLSpanElement)
+		availability_title_html.SetInnerHTML(locales.Translate("product_availability_title", HTTPHeaderAcceptLanguage))
+		availability_title_html.SetClass("iconlabel mr-sm-2")
+
+		span := dom.GetWindow().Document().CreateElement("span")
+		availability_html := span.(*dom.HTMLSpanElement)
+
+		var span_content string
+		for _, entity := range *globals.CurrentProduct.ProductAvailability {
+			span_content = span_content + fmt.Sprintf(" %s", entity.EntityName)
+			span_content = span_content + " ("
+			for _, manager := range entity.Managers {
+				span_content = span_content + fmt.Sprintf("%s ", manager.PersonEmail)
+			}
+			span_content = span_content + ")"
+		}
+		availability_html.SetInnerHTML(span_content)
+
+		availability_div.AppendChild(availability_title_html)
+		availability_div.AppendChild(availability_html)
+		detailCardRow.AppendChild(availability_div)
+	}
 
 	return detailCard.OuterHTML()
 
@@ -1609,7 +1644,7 @@ func EmpiricalformulaFormatter(this js.Value, args []js.Value) interface{} {
 	row := args[1]
 	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
-	if globals.CurrentProduct.EmpiricalFormulaID != nil {
+	if globals.CurrentProduct.EmpiricalFormula != nil {
 		return *globals.CurrentProduct.EmpiricalFormulaLabel
 	} else {
 		return ""
@@ -1652,8 +1687,7 @@ func CasnumberFormatter(this js.Value, args []js.Value) interface{} {
 		spanCasNumber, spanCasCMR, spanHSCMR, imgSGH02, iconRestricted string
 	)
 
-	// if globals.CurrentProduct.CasNumberID!= nil {
-	if globals.CurrentProduct.CasNumberID != nil {
+	if globals.CurrentProduct.CasNumber != nil {
 		spanCasNumber = widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -1662,7 +1696,7 @@ func CasnumberFormatter(this js.Value, args []js.Value) interface{} {
 		}).OuterHTML()
 	}
 
-	if globals.CurrentProduct.CasNumberCMR != nil {
+	if globals.CurrentProduct.CasNumber != nil && globals.CurrentProduct.CasNumberCMR != nil {
 		spanCasCMR = widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
@@ -1742,7 +1776,6 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 
 	var (
 		buttonStorages   string
-		buttonOStorages  string
 		buttonTotalStock string
 		iconBookmark     themes.IconFace
 		textBookmark     string
@@ -1759,12 +1792,22 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 		textBookmark = locales.Translate("bookmark", HTTPHeaderAcceptLanguage)
 	}
 
-	if globals.CurrentProduct.ProductSC != 0 || globals.CurrentProduct.ProductASC != 0 {
+	if globals.CurrentProduct.ProductSC != nil || globals.CurrentProduct.ProductASC != nil {
+
+		var _product_sc = 0
+		var _product_asc = 0
+
+		if globals.CurrentProduct.ProductSC != nil {
+			_product_sc = *globals.CurrentProduct.ProductSC
+		}
+		if globals.CurrentProduct.ProductASC != nil {
+			_product_asc = *globals.CurrentProduct.ProductASC
+		}
 
 		buttonStorages = widgets.NewLink(
 			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
-					Id:      "storages" + strconv.Itoa(globals.CurrentProduct.ProductID),
+					Id:      "storages" + strconv.Itoa(int(*globals.CurrentProduct.ProductID)),
 					Classes: []string{"storages", "dropdown-item", "text-primary", "iconlabel"},
 					Visible: false,
 				},
@@ -1775,31 +1818,7 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 							Classes: []string{"mdi", themes.MDI_STORAGE.ToString()},
 							Visible: true,
 						},
-						Text: fmt.Sprintf("%s %d  (%d)", locales.Translate("storages", HTTPHeaderAcceptLanguage), globals.CurrentProduct.ProductSC, globals.CurrentProduct.ProductASC),
-					},
-				),
-			},
-		).OuterHTML()
-
-	}
-
-	if globals.CurrentProduct.ProductTSC != 0 {
-
-		buttonOStorages = widgets.NewLink(
-			widgets.LinkAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Id:      "ostorages" + strconv.Itoa(globals.CurrentProduct.ProductID),
-					Classes: []string{"ostorages", "dropdown-item", "text-primary", "iconlabel"},
-					Visible: false,
-				},
-				Href: "#",
-				Label: widgets.NewSpan(
-					widgets.SpanAttributes{
-						BaseAttributes: widgets.BaseAttributes{
-							Classes: []string{"mdi", themes.MDI_OSTORAGE.ToString()},
-							Visible: true,
-						},
-						Text: locales.Translate("ostorages", HTTPHeaderAcceptLanguage),
+						Text: fmt.Sprintf("%s %d  (%d)", locales.Translate("storages", HTTPHeaderAcceptLanguage), _product_sc, _product_asc),
 					},
 				),
 			},
@@ -1810,7 +1829,7 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	buttonStore := widgets.NewLink(
 		widgets.LinkAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:      "store" + strconv.Itoa(globals.CurrentProduct.ProductID),
+				Id:      "store" + strconv.Itoa(int(*globals.CurrentProduct.ProductID)),
 				Classes: []string{"store", "dropdown-item", "text-primary", "iconlabel"},
 				Visible: false,
 			},
@@ -1830,7 +1849,7 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	buttonEdit := widgets.NewLink(
 		widgets.LinkAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:      "edit" + strconv.Itoa(globals.CurrentProduct.ProductID),
+				Id:      "edit" + strconv.Itoa(int(*globals.CurrentProduct.ProductID)),
 				Classes: []string{"productedit", "dropdown-item", "text-primary", "iconlabel"},
 				Visible: false,
 			},
@@ -1850,7 +1869,7 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	buttonDelete := widgets.NewLink(
 		widgets.LinkAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:      "delete" + strconv.Itoa(globals.CurrentProduct.ProductID),
+				Id:      "delete" + strconv.Itoa(int(*globals.CurrentProduct.ProductID)),
 				Classes: []string{"productdelete", "dropdown-item", "text-primary", "iconlabel"},
 				Visible: false,
 			},
@@ -1870,10 +1889,10 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	buttonBookmark := widgets.NewLink(
 		widgets.LinkAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:         "bookmark" + strconv.Itoa(globals.CurrentProduct.ProductID),
+				Id:         "bookmark" + strconv.Itoa(int(*globals.CurrentProduct.ProductID)),
 				Classes:    []string{"bookmark", "dropdown-item", "text-primary", "iconlabel"},
 				Visible:    false,
-				Attributes: map[string]string{"pid": strconv.Itoa(globals.CurrentProduct.ProductID)},
+				Attributes: map[string]string{"pid": strconv.Itoa(int(*globals.CurrentProduct.ProductID))},
 			},
 			Href: "#",
 			Label: widgets.NewSpan(
@@ -1891,10 +1910,10 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	buttonSelect := widgets.NewLink(
 		widgets.LinkAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:         "select" + strconv.Itoa(globals.CurrentProduct.ProductID),
+				Id:         "select" + strconv.Itoa(int(*globals.CurrentProduct.ProductID)),
 				Classes:    []string{"productselect", "dropdown-item", "text-primary", "iconlabel"},
 				Visible:    false,
-				Attributes: map[string]string{"pid": strconv.Itoa(globals.CurrentProduct.ProductID)},
+				Attributes: map[string]string{"pid": strconv.Itoa(int(*globals.CurrentProduct.ProductID))},
 			},
 			Href: "#",
 			Label: widgets.NewSpan(
@@ -1909,12 +1928,12 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 		},
 	).OuterHTML()
 
-	if globals.CurrentProduct.ProductSC != 0 {
+	if globals.CurrentProduct.ProductSC != nil {
 
 		buttonTotalStock = widgets.NewLink(
 			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
-					Id:      "totalstock" + strconv.Itoa(globals.CurrentProduct.ProductID),
+					Id:      "totalstock" + strconv.Itoa(int(*globals.CurrentProduct.ProductID)),
 					Classes: []string{"totalstock", "dropdown-item", "text-primary", "iconlabel"},
 					Visible: false,
 				},
@@ -1933,36 +1952,28 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 
 	}
 
-	ostoragesDiv := widgets.NewDiv(widgets.DivAttributes{
-		BaseAttributes: widgets.BaseAttributes{
-			Visible: true,
-			Id:      "ostorages-collapse-" + strconv.Itoa(globals.CurrentProduct.ProductID),
-			Classes: []string{"collapse", "float-left"},
-		},
-	}).OuterHTML()
-
 	totalstockDiv := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
-			Id:      "totalstock-collapse-" + strconv.Itoa(globals.CurrentProduct.ProductID),
+			Id:      "totalstock-collapse-" + strconv.Itoa(int(*globals.CurrentProduct.ProductID)),
 			Classes: []string{"collapse", "float-left"},
 		},
 	}).OuterHTML()
 
 	finalDiv := `
 <div class="dropdown">
-  <button class="btn btn-secondary dropdown-toggle" type="button" id="productActions` + strconv.Itoa(globals.CurrentProduct.ProductID) + `" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="productActions` + strconv.Itoa(int(*globals.CurrentProduct.ProductID)) + `" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     <span class="mdi mdi-menu">&nbsp;</span>
   </button>
-  <div class="dropdown-menu" aria-labelledby="productActions` + strconv.Itoa(globals.CurrentProduct.ProductID) + `">
-  ` + buttonStorages + buttonOStorages + buttonStore + buttonEdit + buttonDelete + buttonBookmark + buttonTotalStock + buttonSelect +
+  <div class="dropdown-menu" aria-labelledby="productActions` + strconv.Itoa(int(*globals.CurrentProduct.ProductID)) + `">
+  ` + buttonStorages + buttonStore + buttonEdit + buttonDelete + buttonBookmark + buttonTotalStock + buttonSelect +
 		`
   </div>
 </div>
-<div id="confirm` + strconv.Itoa(globals.CurrentProduct.ProductID) + `">
+<div id="confirm` + strconv.Itoa(int(*globals.CurrentProduct.ProductID)) + `">
 </div>
 `
-	return finalDiv + ostoragesDiv + totalstockDiv
+	return finalDiv + totalstockDiv
 
 }
 
@@ -2109,6 +2120,7 @@ func Biofy() {
 	jquery.Jq(".bio").Show()
 
 	validate.NewValidate(jquery.Jq("select#producer_ref"), nil).ValidateAddRequired()
+	validate.NewValidate(jquery.Jq("select#producer"), nil).ValidateAddRequired()
 	validate.NewValidate(jquery.Jq("input#storage_batch_number"), nil).ValidateAddRequired()
 
 	jquery.Jq("span#producerref.badge").Show()

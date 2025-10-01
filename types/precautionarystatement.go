@@ -35,7 +35,7 @@ func (elems PrecautionaryStatements) IsExactMatch() bool {
 func (s *PrecautionaryStatement) MarshalJSON() ([]byte, error) {
 	type Copy PrecautionaryStatement
 	return json.Marshal(&struct {
-		Id   int    `json:"id"`
+		Id   int64  `json:"id"`
 		Text string `json:"text"`
 
 		*Copy
@@ -96,9 +96,9 @@ func (s PrecautionaryStatement) FromJsJSONValue(jsvalue js.Value) select2.Select
 
 }
 
-func (s PrecautionaryStatement) GetSelect2Id() int {
+func (s PrecautionaryStatement) GetSelect2Id() int64 {
 
-	return s.PrecautionaryStatementID
+	return *s.PrecautionaryStatementID
 
 }
 

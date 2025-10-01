@@ -41,7 +41,7 @@ func (elems Tags) IsExactMatch() bool {
 func (t *Tag) MarshalJSON() ([]byte, error) {
 	type Copy Tag
 	return json.Marshal(&struct {
-		Id   int    `json:"id"`
+		Id   int64  `json:"id"`
 		Text string `json:"text"`
 
 		*Copy
@@ -102,9 +102,9 @@ func (t Tags) GetTotal() int {
 
 }
 
-func (t Tag) GetSelect2Id() int {
+func (t Tag) GetSelect2Id() int64 {
 
-	return t.TagID
+	return *t.TagID
 
 }
 

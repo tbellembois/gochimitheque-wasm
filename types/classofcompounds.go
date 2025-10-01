@@ -41,7 +41,7 @@ func (elems ClassesOfCompound) IsExactMatch() bool {
 func (c *ClassOfCompound) MarshalJSON() ([]byte, error) {
 	type Copy ClassOfCompound
 	return json.Marshal(&struct {
-		Id   int    `json:"id"`
+		Id   int64  `json:"id"`
 		Text string `json:"text"`
 
 		*Copy
@@ -103,9 +103,9 @@ func (c ClassesOfCompound) GetTotal() int {
 
 }
 
-func (c ClassOfCompound) GetSelect2Id() int {
+func (c ClassOfCompound) GetSelect2Id() int64 {
 
-	return c.ClassOfCompoundID
+	return *c.ClassOfCompoundID
 
 }
 

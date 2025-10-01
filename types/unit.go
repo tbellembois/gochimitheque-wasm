@@ -35,7 +35,7 @@ func (elems Units) IsExactMatch() bool {
 func (u *Unit) MarshalJSON() ([]byte, error) {
 	type Copy Unit
 	return json.Marshal(&struct {
-		Id   int    `json:"id"`
+		Id   int64  `json:"id"`
 		Text string `json:"text"`
 		Copy
 	}{
@@ -95,9 +95,9 @@ func (u Units) GetTotal() int {
 
 }
 
-func (u Unit) GetSelect2Id() int {
+func (u Unit) GetSelect2Id() int64 {
 
-	return int(*u.UnitID)
+	return *u.UnitID
 
 }
 

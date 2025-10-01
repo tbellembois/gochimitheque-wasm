@@ -13,13 +13,13 @@ import (
 
 func PermissionWrapper(this js.Value, args []js.Value) interface{} {
 
-	p := Permission(args[0].Int(), args[1].String(), args[2].Bool())
+	p := Permission(int64(args[0].Int()), args[1].String(), args[2].Bool())
 	return js.ValueOf(p)
 
 }
 
 // Permission return a widget to setup people permissions
-func Permission(entityID int, entityName string, ismanager bool) *dom.HTMLDivElement {
+func Permission(entityID int64, entityName string, ismanager bool) *dom.HTMLDivElement {
 
 	Doc := dom.GetWindow().Document()
 

@@ -22,7 +22,9 @@ import (
 
 func FillInEntityForm(e Entity, id string) {
 
-	jquery.Jq(fmt.Sprintf("#%s #entity_id", id)).SetVal(e.EntityID)
+	// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", e.Entity))
+
+	jquery.Jq(fmt.Sprintf("#%s #entity_id", id)).SetVal(*e.EntityID)
 	jquery.Jq(fmt.Sprintf("#%s #entity_name", id)).SetVal(e.EntityName)
 	jquery.Jq(fmt.Sprintf("#%s #entity_description", id)).SetVal(e.EntityDescription)
 
@@ -33,7 +35,7 @@ func FillInEntityForm(e Entity, id string) {
 		select2Managers.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            manager.PersonEmail,
-				Value:           strconv.Itoa(manager.PersonID),
+				Value:           strconv.Itoa(int(*manager.PersonID)),
 				DefaultSelected: true,
 				Selected:        true,
 			}).HTMLElement.OuterHTML())
@@ -69,10 +71,13 @@ func SaveEntity(this js.Value, args []js.Value) interface{} {
 	entity = &Entity{Entity: &models.Entity{}}
 
 	if jquery.Jq("input#entity_id").GetVal().Truthy() {
-		if entity.EntityID, err = strconv.Atoi(jquery.Jq("input#entity_id").GetVal().String()); err != nil {
+		var _entity_id int
+		if _entity_id, err = strconv.Atoi(jquery.Jq("input#entity_id").GetVal().String()); err != nil {
 			fmt.Println(err)
 			return nil
 		}
+		_entity_id_64 := int64(_entity_id)
+		entity.Entity.EntityID = &_entity_id_64
 	}
 
 	entity.EntityName = jquery.Jq("input#entity_name").GetVal().String()
@@ -81,10 +86,13 @@ func SaveEntity(this js.Value, args []js.Value) interface{} {
 	select2Managers := select2.NewSelect2(jquery.Jq("select#managers"), nil)
 	for _, select2Item := range select2Managers.Select2Data() {
 		person := &models.Person{}
-		if person.PersonID, err = strconv.Atoi(select2Item.Id); err != nil {
+		var _person_id int
+		if _person_id, err = strconv.Atoi(select2Item.Id); err != nil {
 			fmt.Println(err)
 			return nil
 		}
+		_person_id_64 := int64(_person_id)
+		person.PersonID = &_person_id_64
 		person.PersonEmail = select2Item.Text
 
 		entity.Managers = append(entity.Managers, person)
@@ -101,7 +109,7 @@ func SaveEntity(this js.Value, args []js.Value) interface{} {
 	}
 
 	if jquery.Jq("form#entity input#entity_id").Object.Length() > 0 {
-		ajaxURL = fmt.Sprintf("%sentities/%d", ApplicationProxyPath, entity.EntityID)
+		ajaxURL = fmt.Sprintf("%sentities/%d", ApplicationProxyPath, *entity.EntityID)
 		ajaxMethod = "put"
 	} else {
 		ajaxURL = fmt.Sprintf("%sentities", ApplicationProxyPath)

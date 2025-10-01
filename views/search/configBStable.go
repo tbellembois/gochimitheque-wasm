@@ -78,7 +78,7 @@ func Select2StoreLocationTemplateResults(this js.Value, args []js.Value) interfa
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
 			Attributes: map[string]string{
-				"style": fmt.Sprintf("color: %s", storelocation.StoreLocationColor.String),
+				"style": fmt.Sprintf("color: %s", *storelocation.StoreLocationColor),
 			},
 		},
 		Icon: themes.NewMdiIcon(themes.MDI_COLOR, themes.MDI_24PX),
@@ -91,7 +91,7 @@ func Select2StoreLocationTemplateResults(this js.Value, args []js.Value) interfa
 		Text: storelocation.StoreLocationFullPath,
 	})
 
-	if storelocation.StoreLocationCanStore.Valid && storelocation.StoreLocationCanStore.Bool {
+	if storelocation.StoreLocationCanStore {
 		iconCanStore = widgets.NewIcon(widgets.IconAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,

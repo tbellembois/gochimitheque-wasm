@@ -133,7 +133,7 @@ func Magic(this js.Value, args []js.Value) interface{} {
 					select2HS.Select2AppendOption(
 						widgets.NewOption(widgets.OptionAttributes{
 							Text:            h[0],
-							Value:           strconv.Itoa(hs.HazardStatementID),
+							Value:           strconv.Itoa(int(*hs.HazardStatementID)),
 							DefaultSelected: true,
 							Selected:        true,
 						}).HTMLElement.OuterHTML())
@@ -158,7 +158,7 @@ func Magic(this js.Value, args []js.Value) interface{} {
 					select2PS.Select2AppendOption(
 						widgets.NewOption(widgets.OptionAttributes{
 							Text:            p[0],
-							Value:           strconv.Itoa(hs.PrecautionaryStatementID),
+							Value:           strconv.Itoa(int(*hs.PrecautionaryStatementID)),
 							DefaultSelected: true,
 							Selected:        true,
 						}).HTMLElement.OuterHTML())
@@ -183,7 +183,7 @@ func Magic(this js.Value, args []js.Value) interface{} {
 					select2Symbols.Select2AppendOption(
 						widgets.NewOption(widgets.OptionAttributes{
 							Text:            p[0],
-							Value:           strconv.Itoa(symbol.SymbolID),
+							Value:           strconv.Itoa(int(*symbol.SymbolID)),
 							DefaultSelected: true,
 							Selected:        true,
 						}).HTMLElement.OuterHTML())
@@ -746,7 +746,7 @@ func PubchemUpdateProduct(this js.Value, args []js.Value) interface{} {
 		js.Global().Get("console").Call("log", fmt.Sprintf("%#v", string(jsonPubchemProduct)))
 
 	}
-	globals.CurrentProduct.Name = models.Name{NameLabel: pubChemProduct.Name}
+	globals.CurrentProduct.Name = &models.Name{NameLabel: pubChemProduct.Name}
 
 	ajax.Ajax{
 		URL:    ApplicationProxyPath + "products/pubchemcreateproduct/" + product_id,
@@ -755,7 +755,7 @@ func PubchemUpdateProduct(this js.Value, args []js.Value) interface{} {
 		Done: func(data js.Value) {
 			var (
 				err        error
-				product_id int
+				product_id int64
 			)
 
 			if err = json.Unmarshal([]byte(data.String()), &product_id); err != nil {
@@ -763,7 +763,7 @@ func PubchemUpdateProduct(this js.Value, args []js.Value) interface{} {
 				return
 			}
 
-			globals.CurrentProduct.ProductID = product_id
+			globals.CurrentProduct.ProductID = &product_id
 
 			href := fmt.Sprintf("%sv/products", ApplicationProxyPath)
 			jsutils.ClearSearch(js.Null(), nil)
@@ -800,7 +800,7 @@ func PubchemCreateProduct(this js.Value, args []js.Value) interface{} {
 		js.Global().Get("console").Call("log", fmt.Sprintf("%#v", string(jsonPubchemProduct)))
 
 	}
-	globals.CurrentProduct.Name = models.Name{NameLabel: pubChemProduct.Name}
+	globals.CurrentProduct.Name = &models.Name{NameLabel: pubChemProduct.Name}
 
 	ajax.Ajax{
 		URL:    ApplicationProxyPath + "products/pubchemcreateproduct",
@@ -809,7 +809,7 @@ func PubchemCreateProduct(this js.Value, args []js.Value) interface{} {
 		Done: func(data js.Value) {
 			var (
 				err        error
-				product_id int
+				product_id int64
 			)
 
 			if err = json.Unmarshal([]byte(data.String()), &product_id); err != nil {
@@ -817,7 +817,7 @@ func PubchemCreateProduct(this js.Value, args []js.Value) interface{} {
 				return
 			}
 
-			globals.CurrentProduct.ProductID = product_id
+			globals.CurrentProduct.ProductID = &product_id
 
 			href := fmt.Sprintf("%sv/products", ApplicationProxyPath)
 			jsutils.ClearSearch(js.Null(), nil)
@@ -1226,12 +1226,12 @@ func Product_createCallback(args ...interface{}) {
 func Product_SaveCallback(args ...interface{}) {
 
 	BSTableQueryFilter.Lock()
-	BSTableQueryFilter.QueryFilter.Id = args[0].(int)
+	BSTableQueryFilter.QueryFilter.Id = int(args[0].(int64))
 
 	if CurrentProduct.ProductSpecificity != nil {
-		BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("#%d %s %s", CurrentProduct.ProductID, CurrentProduct.Name.NameLabel, *CurrentProduct.ProductSpecificity)
+		BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("#%d %s %s", *CurrentProduct.ProductID, CurrentProduct.Name.NameLabel, *CurrentProduct.ProductSpecificity)
 	} else {
-		BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("#%d %s", CurrentProduct.ProductID, CurrentProduct.Name.NameLabel)
+		BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("#%d %s", *CurrentProduct.ProductID, CurrentProduct.Name.NameLabel)
 	}
 
 	bstable.NewBootstraptable(jquery.Jq("#Product_table"), nil).Refresh(nil)

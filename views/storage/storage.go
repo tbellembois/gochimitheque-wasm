@@ -188,7 +188,7 @@ func storage_borrower() {
 func Storage_createCallback(args ...interface{}) {
 
 	var (
-		productId   int
+		productId   int64
 		productName string
 	)
 
@@ -198,7 +198,7 @@ func Storage_createCallback(args ...interface{}) {
 	case reflect.TypeOf(Product{}):
 
 		product := args[0].(Product)
-		productId = product.ProductID
+		productId = *product.ProductID
 
 		if product.ProductSpecificity == nil {
 			productName = product.Name.NameLabel
@@ -221,7 +221,7 @@ func Storage_createCallback(args ...interface{}) {
 	case reflect.TypeOf(Storage{}):
 
 		storage := args[0].(Storage)
-		productId = storage.Product.ProductID
+		productId = *storage.Product.ProductID
 		if storage.Product.ProductSpecificity == nil {
 			productName = storage.Product.Name.NameLabel
 		} else {

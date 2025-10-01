@@ -77,7 +77,7 @@ func (l LDAPSearchResults) GetTotal() int {
 func (l *LDAPEntry) MarshalJSON() ([]byte, error) {
 	type Copy LDAPEntry
 	return json.Marshal(&struct {
-		Id   int    `json:"id"`
+		Id   int64  `json:"id"`
 		Text string `json:"text"`
 
 		*Copy
@@ -95,13 +95,13 @@ func (l LDAPEntry) GetTotal() int {
 
 }
 
-func (l LDAPEntry) GetSelect2Id() int {
+func (l LDAPEntry) GetSelect2Id() int64 {
 
 	h := sha1.New()
 	h.Write([]byte(l.Entry.DN))
 	bs := h.Sum(nil)
 
-	return int(binary.BigEndian.Uint64(bs))
+	return int64(binary.BigEndian.Uint64(bs))
 
 }
 

@@ -41,7 +41,7 @@ func (elems LinearFormulas) IsExactMatch() bool {
 func (e *LinearFormula) MarshalJSON() ([]byte, error) {
 	type Copy LinearFormula
 	return json.Marshal(&struct {
-		Id   int    `json:"id"`
+		Id   int64  `json:"id"`
 		Text string `json:"text"`
 
 		*Copy
@@ -102,9 +102,9 @@ func (e LinearFormulas) GetTotal() int {
 
 }
 
-func (e LinearFormula) GetSelect2Id() int {
+func (e LinearFormula) GetSelect2Id() int64 {
 
-	return int(*e.LinearFormulaID)
+	return *e.LinearFormulaID
 
 }
 

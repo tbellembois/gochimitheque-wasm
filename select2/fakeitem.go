@@ -9,7 +9,7 @@ import (
 )
 
 type FakeItem struct {
-	Id   int    `json:"id"`
+	Id   int64  `json:"id"`
 	Text string `json:"text"`
 }
 
@@ -29,7 +29,7 @@ func (f FakeItem) FromJsJSONValue(jsvalue js.Value) Select2ItemAble {
 
 }
 
-func (f FakeItem) GetSelect2Id() int {
+func (f FakeItem) GetSelect2Id() int64 {
 
 	return f.Id
 

@@ -35,7 +35,7 @@ func OperateEventsStorelocations(this js.Value, args []js.Value) interface{} {
 	entity := Entity{Entity: &models.Entity{}}.FromJsJSONValue(row).(Entity)
 
 	BSTableQueryFilter.Lock()
-	BSTableQueryFilter.QueryFilter.Entity = strconv.Itoa(entity.EntityID)
+	BSTableQueryFilter.QueryFilter.Entity = strconv.Itoa(int(*entity.EntityID))
 
 	href := fmt.Sprintf("%sv/store_locations", ApplicationProxyPath)
 	jsutils.LoadContent("div#content", "store_location", href, store_locationCallbackWrapper)
@@ -54,7 +54,7 @@ func OperateEventsMembers(this js.Value, args []js.Value) interface{} {
 	entity := Entity{Entity: &models.Entity{}}.FromJsJSONValue(row).(Entity)
 
 	BSTableQueryFilter.Lock()
-	BSTableQueryFilter.QueryFilter.Entity = strconv.Itoa(entity.EntityID)
+	BSTableQueryFilter.QueryFilter.Entity = strconv.Itoa(int(*entity.EntityID))
 
 	href := fmt.Sprintf("%sv/people", ApplicationProxyPath)
 	jsutils.LoadContent("div#content", "person", href, personCallbackWrapper)
@@ -118,7 +118,7 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 	index := args[3].Int()
 	entity := Entity{Entity: &models.Entity{}}.FromJsJSONValue(row).(Entity)
 
-	url := fmt.Sprintf("%sentities/%d", ApplicationProxyPath, entity.EntityID)
+	url := fmt.Sprintf("%sentities/%d", ApplicationProxyPath, *entity.EntityID)
 	method := "get"
 
 	done := func(data js.Value) {
@@ -163,17 +163,17 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	buttonStorelocations := widgets.NewBSButtonWithIcon(
 		widgets.ButtonAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:         "store_locations" + strconv.Itoa(entity.EntityID),
+				Id:         "store_locations" + strconv.Itoa(int(*entity.EntityID)),
 				Classes:    []string{"store_locations"},
 				Visible:    false,
-				Attributes: map[string]string{"eid": strconv.Itoa(entity.EntityID)},
+				Attributes: map[string]string{"eid": strconv.Itoa(int(*entity.EntityID))},
 			},
 			Title: locales.Translate("store_locations", HTTPHeaderAcceptLanguage),
 		},
 		widgets.IconAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible:    true,
-				Attributes: map[string]string{"eid": strconv.Itoa(entity.EntityID)},
+				Attributes: map[string]string{"eid": strconv.Itoa(int(*entity.EntityID))},
 			},
 			Text: strconv.Itoa(int(*entity.EntityNbStoreLocations)),
 			Icon: themes.NewMdiIcon(themes.MDI_STORELOCATION, ""),
@@ -184,17 +184,17 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	buttonMembers := widgets.NewBSButtonWithIcon(
 		widgets.ButtonAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:         "members" + strconv.Itoa(entity.EntityID),
+				Id:         "members" + strconv.Itoa(int(*entity.EntityID)),
 				Classes:    []string{"members"},
 				Visible:    false,
-				Attributes: map[string]string{"eid": strconv.Itoa(entity.EntityID)},
+				Attributes: map[string]string{"eid": strconv.Itoa(int(*entity.EntityID))},
 			},
 			Title: locales.Translate("members", HTTPHeaderAcceptLanguage),
 		},
 		widgets.IconAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible:    true,
-				Attributes: map[string]string{"eid": strconv.Itoa(entity.EntityID)},
+				Attributes: map[string]string{"eid": strconv.Itoa(int(*entity.EntityID))},
 			},
 			Text: strconv.Itoa(int(*entity.EntityNbPeople)),
 			Icon: themes.NewMdiIcon(themes.MDI_PEOPLE, ""),
@@ -205,17 +205,17 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	buttonEdit := widgets.NewBSButtonWithIcon(
 		widgets.ButtonAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:         "edit" + strconv.Itoa(entity.EntityID),
+				Id:         "edit" + strconv.Itoa(int(*entity.EntityID)),
 				Classes:    []string{"edit"},
 				Visible:    false,
-				Attributes: map[string]string{"eid": strconv.Itoa(entity.EntityID)},
+				Attributes: map[string]string{"eid": strconv.Itoa(int(*entity.EntityID))},
 			},
 			Title: locales.Translate("edit", HTTPHeaderAcceptLanguage),
 		},
 		widgets.IconAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible:    true,
-				Attributes: map[string]string{"eid": strconv.Itoa(entity.EntityID)},
+				Attributes: map[string]string{"eid": strconv.Itoa(int(*entity.EntityID))},
 			},
 			Text: "",
 			Icon: themes.NewMdiIcon(themes.MDI_EDIT, ""),
@@ -226,17 +226,17 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	buttonDelete := widgets.NewBSButtonWithIcon(
 		widgets.ButtonAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:         "delete" + strconv.Itoa(entity.EntityID),
+				Id:         "delete" + strconv.Itoa(int(*entity.EntityID)),
 				Classes:    []string{"delete"},
 				Visible:    false,
-				Attributes: map[string]string{"eid": strconv.Itoa(entity.EntityID)},
+				Attributes: map[string]string{"eid": strconv.Itoa(int(*entity.EntityID))},
 			},
 			Title: locales.Translate("delete", HTTPHeaderAcceptLanguage),
 		},
 		widgets.IconAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible:    true,
-				Attributes: map[string]string{"eid": strconv.Itoa(entity.EntityID)},
+				Attributes: map[string]string{"eid": strconv.Itoa(int(*entity.EntityID))},
 			},
 			Text: "",
 			Icon: themes.NewMdiIcon(themes.MDI_DELETE, ""),

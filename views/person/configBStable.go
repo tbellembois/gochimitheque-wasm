@@ -124,17 +124,17 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	buttonEdit := widgets.NewBSButtonWithIcon(
 		widgets.ButtonAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:         "edit" + strconv.Itoa(person.PersonID),
+				Id:         "edit" + strconv.Itoa(int(*person.PersonID)),
 				Classes:    []string{"edit"},
 				Visible:    false,
-				Attributes: map[string]string{"pid": strconv.Itoa(person.PersonID)},
+				Attributes: map[string]string{"pid": strconv.Itoa(int(*person.PersonID))},
 			},
 			Title: locales.Translate("edit", HTTPHeaderAcceptLanguage),
 		},
 		widgets.IconAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible:    true,
-				Attributes: map[string]string{"pid": strconv.Itoa(person.PersonID)},
+				Attributes: map[string]string{"pid": strconv.Itoa(int(*person.PersonID))},
 			},
 			Text: "",
 			Icon: themes.NewMdiIcon(themes.MDI_EDIT, ""),
@@ -145,17 +145,17 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 	buttonDelete := widgets.NewBSButtonWithIcon(
 		widgets.ButtonAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:         "delete" + strconv.Itoa(person.PersonID),
+				Id:         "delete" + strconv.Itoa(int(*person.PersonID)),
 				Classes:    []string{"delete"},
 				Visible:    false,
-				Attributes: map[string]string{"pid": strconv.Itoa(person.PersonID)},
+				Attributes: map[string]string{"pid": strconv.Itoa(int(*person.PersonID))},
 			},
 			Title: locales.Translate("delete", HTTPHeaderAcceptLanguage),
 		},
 		widgets.IconAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible:    true,
-				Attributes: map[string]string{"pid": strconv.Itoa(person.PersonID)},
+				Attributes: map[string]string{"pid": strconv.Itoa(int(*person.PersonID))},
 			},
 			Text: "",
 			Icon: themes.NewMdiIcon(themes.MDI_DELETE, ""),

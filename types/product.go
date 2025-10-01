@@ -116,9 +116,9 @@ func (p Products) GetExportFn() string {
 
 }
 
-func (p Product) GetSelect2Id() int {
+func (p Product) GetSelect2Id() int64 {
 
-	return p.ProductID
+	return *p.ProductID
 
 }
 

@@ -41,7 +41,7 @@ func (elems CeNumbers) IsExactMatch() bool {
 func (c *CeNumber) MarshalJSON() ([]byte, error) {
 	type Copy CeNumber
 	return json.Marshal(&struct {
-		Id   int    `json:"id"`
+		Id   int64  `json:"id"`
 		Text string `json:"text"`
 
 		*Copy
@@ -103,9 +103,9 @@ func (c CeNumbers) GetTotal() int {
 
 }
 
-func (c CeNumber) GetSelect2Id() int {
+func (c CeNumber) GetSelect2Id() int64 {
 
-	return int(*c.CeNumberID)
+	return *c.CeNumberID
 
 }
 

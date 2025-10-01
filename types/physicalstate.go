@@ -41,7 +41,7 @@ func (elems PhysicalStates) IsExactMatch() bool {
 func (p *PhysicalState) MarshalJSON() ([]byte, error) {
 	type Copy PhysicalState
 	return json.Marshal(&struct {
-		Id   int    `json:"id"`
+		Id   int64  `json:"id"`
 		Text string `json:"text"`
 
 		*Copy
@@ -102,9 +102,9 @@ func (p PhysicalStates) GetTotal() int {
 
 }
 
-func (p PhysicalState) GetSelect2Id() int {
+func (p PhysicalState) GetSelect2Id() int64 {
 
-	return int(*p.PhysicalStateID)
+	return *p.PhysicalStateID
 
 }
 

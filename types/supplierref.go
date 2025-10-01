@@ -58,7 +58,7 @@ func (s SupplierRef) MarshalJSON() ([]byte, error) {
 
 	type Copy SupplierRef
 	return json.Marshal(&struct {
-		Id   int    `json:"id"`
+		Id   int64  `json:"id"`
 		Text string `json:"text"`
 		Copy
 	}{
@@ -119,9 +119,9 @@ func (s SupplierRef) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 
 }
 
-func (s SupplierRef) GetSelect2Id() int {
+func (s SupplierRef) GetSelect2Id() int64 {
 
-	return s.SupplierRefID
+	return *s.SupplierRefID
 
 }
 

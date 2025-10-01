@@ -35,7 +35,7 @@ func (elems Symbols) IsExactMatch() bool {
 func (s *Symbol) MarshalJSON() ([]byte, error) {
 	type Copy Symbol
 	return json.Marshal(&struct {
-		Id   int    `json:"id"`
+		Id   int64  `json:"id"`
 		Text string `json:"text"`
 
 		*Copy
@@ -96,9 +96,9 @@ func (s Symbol) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 
 }
 
-func (s Symbol) GetSelect2Id() int {
+func (s Symbol) GetSelect2Id() int64 {
 
-	return s.SymbolID
+	return *s.SymbolID
 
 }
 

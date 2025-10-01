@@ -15,7 +15,7 @@ var (
 	URLParameters                                  url.Values
 	ApplicationProxyPath, HTTPHeaderAcceptLanguage string
 	ConnectedUserEmail                             string
-	ConnectedUserID                                int
+	ConnectedUserID                                int64
 	DisableCache                                   bool
 	CurrentView                                    string
 	BSTableQueryFilter                             ajax.SafeQueryFilter
@@ -41,11 +41,7 @@ var (
 func init() {
 	CurrentProduct = types.Product{
 		Product: &models.Product{
-			ProductID: 0,
-			Name: models.Name{
-				NameID:    0,
-				NameLabel: "Product Name",
-			},
+			ProductID: nil,
 		},
 	}
 }

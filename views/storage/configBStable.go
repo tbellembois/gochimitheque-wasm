@@ -204,7 +204,7 @@ func Storage_operateEventsBorrow(this js.Value, args []js.Value) interface{} {
 
 	jquery.Jq("input#bstorage_id").SetVal(CurrentStorage.StorageID)
 
-	if CurrentStorage.Borrowing.BorrowingID.Valid {
+	if CurrentStorage.Borrowing.BorrowingID != nil {
 
 		// The storage has a borrowing.
 
@@ -222,7 +222,7 @@ func Storage_operateEventsBorrow(this js.Value, args []js.Value) interface{} {
 		select2Borrower.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            ConnectedUserEmail,
-				Value:           strconv.Itoa(ConnectedUserID),
+				Value:           strconv.Itoa(int(ConnectedUserID)),
 				DefaultSelected: true,
 				Selected:        true,
 			}).HTMLElement.OuterHTML())
@@ -578,7 +578,7 @@ func Storage_storelocationFormatter(this js.Value, args []js.Value) interface{} 
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
 			Attributes: map[string]string{
-				"style": fmt.Sprintf("color: %s", CurrentStorage.StoreLocation.StoreLocationColor.String),
+				"style": fmt.Sprintf("color: %s", *CurrentStorage.StoreLocation.StoreLocationColor),
 			},
 		},
 		Icon: themes.NewMdiIcon(themes.MDI_COLOR, themes.MDI_24PX),
@@ -706,7 +706,7 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 	row := args[1]
 	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
-	if CurrentStorage.Borrowing == nil || !CurrentStorage.Borrowing.BorrowingID.Valid {
+	if CurrentStorage.Borrowing == nil || CurrentStorage.Borrowing.BorrowingID != nil {
 		iconBorrowing = themes.MDI_BORROW
 		iconBorrowingTitle = locales.Translate("storage_borrow", HTTPHeaderAcceptLanguage)
 	} else {
@@ -923,7 +923,7 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 				Visible: true,
 				Classes: []string{"iconlabel"},
 			},
-			Text: fmt.Sprintf("%s: %s %s", locales.Translate("storage_borrower_title", HTTPHeaderAcceptLanguage), CurrentStorage.Borrowing.Borrower.PersonEmail, CurrentStorage.Borrowing.BorrowingComment.String),
+			Text: fmt.Sprintf("%s: %s %s", locales.Translate("storage_borrower_title", HTTPHeaderAcceptLanguage), CurrentStorage.Borrowing.Borrower.PersonEmail, CurrentStorage.Borrowing.BorrowingComment),
 		})
 		divBorrowing.AppendChild(borrowing)
 		commentBorrowing = divBorrowing.OuterHTML()
@@ -975,7 +975,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	// Qrcode.
 	colQrcode := widgets.NewDiv(widgets.DivAttributes{
 		BaseAttributes: widgets.BaseAttributes{
-			Id:      fmt.Sprintf("qrcode%d", CurrentStorage.StorageID),
+			Id:      fmt.Sprintf("qrcode%d", *CurrentStorage.StorageID),
 			Visible: true,
 			Classes: []string{"ml-sm-4"},
 			Attributes: map[string]string{
@@ -1054,7 +1054,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Visible: true,
 			Classes: []string{"iconlabel"},
 		},
-		Text: fmt.Sprintf("%s #%d", CurrentStorage.StoreLocation.StoreLocationFullPath, CurrentStorage.StorageID),
+		Text: fmt.Sprintf("%s #%d", CurrentStorage.StoreLocation.StoreLocationFullPath, int(*CurrentStorage.StorageID)),
 	})
 	qrcodeStoreLocationNameCol.AppendChild(qrcodeStoreLocationNameSpan)
 

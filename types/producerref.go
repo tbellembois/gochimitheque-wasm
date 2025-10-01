@@ -58,7 +58,7 @@ func (r ProducerRef) MarshalJSON() ([]byte, error) {
 
 	type Copy ProducerRef
 	return json.Marshal(&struct {
-		Id   int    `json:"id"`
+		Id   int64  `json:"id"`
 		Text string `json:"text"`
 		Copy
 	}{
@@ -119,9 +119,9 @@ func (r ProducerRef) FromJsJSONValue(jsvalue js.Value) select2.Select2ItemAble {
 
 }
 
-func (r ProducerRef) GetSelect2Id() int {
+func (r ProducerRef) GetSelect2Id() int64 {
 
-	return int(*r.ProducerRefID)
+	return *r.ProducerRefID
 
 }
 

@@ -95,7 +95,7 @@ func person_common() {
 			return nil
 		}
 
-		jquery.Jq("#permissions").Append(widgets.Permission(entitySelectedId, entitySelected.Text, false).OuterHTML())
+		jquery.Jq("#permissions").Append(widgets.Permission(int64(entitySelectedId), entitySelected.Text, false).OuterHTML())
 		jquery.Jq("#selectAllPermissions").Show()
 
 		return nil

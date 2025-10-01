@@ -93,7 +93,7 @@ func AfterLogin_listCallback(this js.Value, args []js.Value) interface{} {
 			}
 
 			ConnectedUserEmail = person.PersonEmail
-			ConnectedUserID = person.PersonID
+			ConnectedUserID = *person.PersonID
 
 			jquery.Jq("#logged").SetHtml(ConnectedUserEmail)
 
