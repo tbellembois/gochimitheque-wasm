@@ -154,8 +154,8 @@ func SaveStorage(this js.Value, args []js.Value) any {
 		return nil
 	}
 
-	globals.CurrentStorage = Storage{Storage: &models.Storage{}}
-	globals.CurrentStorage.Product = models.Product{}
+	globals.CurrentStorage = Storage{Storage: &models.Storage{Person: models.Person{PersonID: &globals.ConnectedUserID}}}
+	globals.CurrentStorage.Product = models.Product{ProductType: "chem", Name: &models.Name{}, Person: models.Person{PersonID: &globals.ConnectedUserID}} // Fields not used but required
 
 	var _productID int
 	if _productID, err = strconv.Atoi(jquery.Jq("input#product_id").GetVal().String()); err != nil {
@@ -174,20 +174,20 @@ func SaveStorage(this js.Value, args []js.Value) any {
 		globals.CurrentStorage.StorageID = &storageIdInt
 	}
 
-	if jquery.Jq("input#storage_nbitem").GetVal().Truthy() {
-		if globals.CurrentStorage.StorageNbItem, err = strconv.Atoi(jquery.Jq("input#storage_nbitem").GetVal().String()); err != nil {
-			fmt.Println(err)
-			return nil
-		}
-	}
-	if jquery.Jq("input#storage_identicalbarecode:checked").Object.Length() > 0 {
-		globals.CurrentStorage.StorageIdenticalBarecode = true
-	}
+	// if jquery.Jq("input#storage_nbitem").GetVal().Truthy() {
+	// 	if globals.CurrentStorage.StorageNbItem, err = strconv.Atoi(jquery.Jq("input#storage_nbitem").GetVal().String()); err != nil {
+	// 		fmt.Println(err)
+	// 		return nil
+	// 	}
+	// }
+	// if jquery.Jq("input#storage_identicalbarecode:checked").Object.Length() > 0 {
+	// 	globals.CurrentStorage.StorageIdenticalBarecode = true
+	// }
 
 	select2StoreLocation := select2.NewSelect2(jquery.Jq("select#store_location"), nil)
 	if len(select2StoreLocation.Select2Data()) > 0 {
 		select2ItemStorelocation := select2StoreLocation.Select2Data()[0]
-		globals.CurrentStorage.StoreLocation = models.StoreLocation{}
+
 		var storelocationId int
 		if storelocationId, err = strconv.Atoi(select2ItemStorelocation.Id); err != nil {
 			fmt.Println(err)
@@ -201,8 +201,8 @@ func SaveStorage(this js.Value, args []js.Value) any {
 		globals.CurrentStorage.StoreLocation.StoreLocationName = _store_location_name
 	}
 
-	js.Global().Get("console").Call("log", fmt.Sprintf("%#v", jquery.Jq("#storage_quantity").GetVal().String()))
-	js.Global().Get("console").Call("log", fmt.Sprintf("%#v", jquery.Jq("#storage_concentration").GetVal().String()))
+	// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", jquery.Jq("#storage_quantity").GetVal().String()))
+	// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", jquery.Jq("#storage_concentration").GetVal().String()))
 
 	if jquery.Jq("input#storage_quantity").GetVal().Truthy() {
 		var storageQuantity float64
@@ -219,7 +219,7 @@ func SaveStorage(this js.Value, args []js.Value) any {
 		select2ItemUnitQuantity := select2UnitQuantity.Select2Data()[0]
 		label := ""
 		id := int64(0)
-		globals.CurrentStorage.UnitQuantity = models.Unit{
+		globals.CurrentStorage.UnitQuantity = &models.Unit{
 			UnitID:    &id,
 			UnitLabel: &label,
 		}
@@ -246,12 +246,11 @@ func SaveStorage(this js.Value, args []js.Value) any {
 
 	select2UnitConcentration := select2.NewSelect2(jquery.Jq("select#unit_concentration"), nil)
 	if len(select2UnitConcentration.Select2Data()) > 0 {
-
 		select2ItemUnitConcentration := select2UnitConcentration.Select2Data()[0]
 
 		label := ""
 		id := int64(0)
-		globals.CurrentStorage.UnitConcentration = models.Unit{
+		globals.CurrentStorage.UnitConcentration = &models.Unit{
 			UnitID:    &id,
 			UnitLabel: &label,
 		}
@@ -268,8 +267,8 @@ func SaveStorage(this js.Value, args []js.Value) any {
 	select2Supplier := select2.NewSelect2(jquery.Jq("select#supplier"), nil)
 	if len(select2Supplier.Select2Data()) > 0 {
 		select2ItemSupplier := select2Supplier.Select2Data()[0]
-		globals.CurrentStorage.Supplier = models.Supplier{}
-		var supplierId = -1
+
+		var supplierId int
 
 		if select2ItemSupplier.IDIsDigit() {
 			if supplierId, err = strconv.Atoi(select2ItemSupplier.Id); err != nil {
@@ -360,13 +359,28 @@ func SaveStorage(this js.Value, args []js.Value) any {
 		globals.CurrentStorage.StorageToDestroy = true
 	}
 
+	var nb_items int
+	if jquery.Jq("input#storage_nbitem").GetVal().Truthy() {
+		if nb_items, err = strconv.Atoi(jquery.Jq("input#storage_nbitem").GetVal().String()); err != nil {
+			fmt.Println(err)
+			return nil
+		}
+	}
+
+	var identical_barecode bool
+	if jquery.Jq("input#storage_identicalbarecode:checked").Object.Length() > 0 {
+		identical_barecode = true
+	}
+
 	if (!jquery.Jq("form#storage input#storage_id").GetVal().IsUndefined()) && jquery.Jq("form#storage input#storage_id").GetVal().String() != "" {
 		ajaxURL = fmt.Sprintf("%sstorages/%d", ApplicationProxyPath, globals.CurrentStorage.StorageID)
 		ajaxMethod = "put"
 	} else {
-		ajaxURL = fmt.Sprintf("%sstorages", ApplicationProxyPath)
+		ajaxURL = fmt.Sprintf("%sstorages?nb_items=%d&identical_barecode=%t", ApplicationProxyPath, nb_items, identical_barecode)
 		ajaxMethod = "post"
 	}
+
+	js.Global().Get("console").Call("log", fmt.Sprintf("%#v", *globals.CurrentStorage.Storage))
 
 	if dataBytes, err = json.Marshal(globals.CurrentStorage); err != nil {
 		fmt.Println(err)
@@ -383,7 +397,7 @@ func SaveStorage(this js.Value, args []js.Value) any {
 				err error
 			)
 
-			if err = json.Unmarshal([]byte(data.String()), &CurrentStorages); err != nil {
+			if err = json.Unmarshal([]byte(data.String()), &CurrentStorageIds); err != nil {
 				jsutils.DisplayGenericErrorMessage()
 				fmt.Println(err)
 			} else {
@@ -433,7 +447,7 @@ func FillInStorageForm(s Storage, id string) {
 
 	select2UnitQuantity := select2.NewSelect2(jquery.Jq("select#unit_quantity"), nil)
 	select2UnitQuantity.Select2Clear()
-	if s.UnitQuantity.UnitID != nil {
+	if s.UnitQuantity != nil && s.UnitQuantity.UnitID != nil {
 		select2UnitQuantity.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            *s.UnitQuantity.UnitLabel,
@@ -450,7 +464,7 @@ func FillInStorageForm(s Storage, id string) {
 
 	select2UnitConcentration := select2.NewSelect2(jquery.Jq("select#unit_concentration"), nil)
 	select2UnitConcentration.Select2Clear()
-	if s.UnitConcentration.UnitID != nil {
+	if s.UnitConcentration != nil && s.UnitConcentration.UnitID != nil {
 		select2UnitConcentration.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            *s.UnitConcentration.UnitLabel,
@@ -462,7 +476,7 @@ func FillInStorageForm(s Storage, id string) {
 
 	select2Supplier := select2.NewSelect2(jquery.Jq("select#supplier"), nil)
 	select2Supplier.Select2Clear()
-	if s.Supplier.SupplierID != nil {
+	if s.Supplier != nil && s.Supplier.SupplierID != nil {
 		select2Supplier.Select2AppendOption(
 			widgets.NewOption(widgets.OptionAttributes{
 				Text:            *s.Supplier.SupplierLabel,

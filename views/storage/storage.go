@@ -320,16 +320,16 @@ func Storage_listCallback(this js.Value, args []js.Value) interface{} {
 func Storage_SaveCallback(args ...interface{}) {
 
 	var (
-		currentStorageIds []int
-		filterLabel       string
+		// currentStorageIds []int
+		filterLabel string
 	)
-	for _, storage := range CurrentStorages {
-		currentStorageIds = append(currentStorageIds, int(*storage.StorageID))
-		filterLabel += fmt.Sprintf("#%d ", storage.StorageID)
-	}
+	// for _, storage := range CurrentStorages {
+	// 	currentStorageIds = append(currentStorageIds, int(*storage.StorageID))
+	// 	filterLabel += fmt.Sprintf("#%d ", storage.StorageID)
+	// }
 
 	BSTableQueryFilter.Lock()
-	BSTableQueryFilter.QueryFilter.Storages = currentStorageIds
+	BSTableQueryFilter.QueryFilter.Storages = globals.CurrentStorageIds
 	BSTableQueryFilter.QueryFilter.StoragesFilterLabel = filterLabel
 
 	if globals.CurrentProduct.ProductSpecificity != nil {

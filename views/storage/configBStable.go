@@ -483,7 +483,7 @@ func Storage_productFormatter(this js.Value, args []js.Value) interface{} {
 		)
 	}
 
-	if CurrentStorage.Product.ProducerRef.ProducerRefID != nil {
+	if CurrentStorage.Product.ProducerRef != nil && CurrentStorage.Product.ProducerRef.ProducerRefID != nil {
 		d.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -574,11 +574,17 @@ func Storage_storelocationFormatter(this js.Value, args []js.Value) interface{} 
 	row := args[1]
 	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
+	var color string
+	if CurrentStorage.StoreLocation.StoreLocationColor != nil {
+		color = *CurrentStorage.StoreLocation.StoreLocationColor
+	} else {
+		color = "#FFFFFF"
+	}
 	iconColor := widgets.NewIcon(widgets.IconAttributes{
 		BaseAttributes: widgets.BaseAttributes{
 			Visible: true,
 			Attributes: map[string]string{
-				"style": fmt.Sprintf("color: %s", *CurrentStorage.StoreLocation.StoreLocationColor),
+				"style": fmt.Sprintf("color: %s", color),
 			},
 		},
 		Icon: themes.NewMdiIcon(themes.MDI_COLOR, themes.MDI_24PX),
@@ -614,8 +620,8 @@ func Storage_quantityFormatter(this js.Value, args []js.Value) interface{} {
 
 	if CurrentStorage.StorageQuantity != nil && *CurrentStorage.StorageQuantity != 0 {
 
-		if CurrentStorage.UnitQuantity.UnitLabel != nil {
-			ret = fmt.Sprintf("%v %s", *CurrentStorage.StorageQuantity, *CurrentStorage.UnitQuantity.UnitLabel)
+		if CurrentStorage.UnitQuantity != nil && CurrentStorage.UnitQuantity.Unit != nil && CurrentStorage.UnitQuantity.Unit.UnitLabel != nil {
+			ret = fmt.Sprintf("%v %s", *CurrentStorage.StorageQuantity, *CurrentStorage.UnitQuantity.Unit.UnitLabel)
 		} else {
 			ret = fmt.Sprintf("%v", *CurrentStorage.StorageQuantity)
 		}
@@ -1409,7 +1415,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Classes: []string{"col-sm-6"},
 		},
 	})
-	if CurrentStorage.Supplier.SupplierID != nil {
+	if CurrentStorage.Supplier != nil && CurrentStorage.Supplier.SupplierID != nil {
 		colSupplier.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,

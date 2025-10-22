@@ -92,7 +92,7 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 	storelocation.StoreLocationColor = &_color
 
 	select2ItemEntity := select2.NewSelect2(jquery.Jq("select#entity"), nil)
-	storelocation.Entity = models.Entity{}
+	storelocation.Entity = &models.Entity{}
 
 	var _id int
 	if _id, err = strconv.Atoi(select2ItemEntity.Select2Data()[0].Id); err != nil {

@@ -27,6 +27,7 @@ var (
 	CurrentStorage types.Storage
 	// CurrentStorages are the newly created storages.
 	CurrentStorages           []types.Storage
+	CurrentStorageIds         []int
 	DBPrecautionaryStatements []types.PrecautionaryStatement // for magic selector
 	DBHazardStatements        []types.HazardStatement        // for magic selector
 	DBSymbols                 []types.Symbol                 // for magic selector
