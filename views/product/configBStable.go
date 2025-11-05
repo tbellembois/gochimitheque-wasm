@@ -32,7 +32,7 @@ func OperateEventsBookmark(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
-	url := fmt.Sprintf("%sbookmarks/%d", ApplicationProxyPath, globals.CurrentProduct.ProductID)
+	url := fmt.Sprintf("%sbookmarks/%d", ApplicationProxyPath, *globals.CurrentProduct.ProductID)
 	method := "get"
 
 	done := func(data js.Value) {
@@ -236,9 +236,9 @@ func OperateEventsTotalStock(this js.Value, args []js.Value) interface{} {
 	// 	},
 	// }).OuterHTML())
 
-	jquery.Jq(fmt.Sprintf("#totalstock-collapse-%d", product.ProductID)).Show()
+	jquery.Jq(fmt.Sprintf("#totalstock-collapse-%d", *product.ProductID)).Show()
 
-	url := fmt.Sprintf("%sentities/stocks/%d", ApplicationProxyPath, product.ProductID)
+	url := fmt.Sprintf("%sentities/stocks/%d", ApplicationProxyPath, *product.ProductID)
 	method := "get"
 
 	done := func(data js.Value) {
@@ -1598,7 +1598,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		for _, entity := range *globals.CurrentProduct.ProductAvailability {
 			span_content = span_content + fmt.Sprintf(" %s", entity.EntityName)
 			span_content = span_content + " ("
-			for _, manager := range entity.Managers {
+			for _, manager := range *entity.Managers {
 				span_content = span_content + fmt.Sprintf("%s ", manager.PersonEmail)
 			}
 			span_content = span_content + ")"
@@ -1631,9 +1631,17 @@ func NameFormatter(this js.Value, args []js.Value) interface{} {
 		}
 	}
 
+	result += "<div>"
+
 	if globals.CurrentProduct.ProductSL != nil && *globals.CurrentProduct.ProductSL != "" {
-		result += fmt.Sprintf("<div><span class='text-white badge bg-secondary'>%s</span></div>", *globals.CurrentProduct.ProductSL)
+		result += fmt.Sprintf("<span class='text-white badge bg-secondary'>%s</span>", *globals.CurrentProduct.ProductSL)
 	}
+
+	if globals.CurrentProduct.ProductHasBookmark {
+		result += fmt.Sprintf("<span class='mdi mdi-bookmark mdi-24px iconlabel'>%s</span>", "")
+	}
+
+	result += "</div>"
 
 	return result
 

@@ -112,7 +112,7 @@ func Storage_operateEventsRestore(this js.Value, args []js.Value) interface{} {
 	confirm := widgets.NewLink(
 		widgets.LinkAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:      fmt.Sprintf("restore%d", CurrentStorage.StorageID),
+				Id:      fmt.Sprintf("restore%d", *CurrentStorage.StorageID),
 				Classes: []string{"text-primary", "iconlabel"},
 				Visible: true,
 			},
@@ -129,11 +129,11 @@ func Storage_operateEventsRestore(this js.Value, args []js.Value) interface{} {
 		},
 	).OuterHTML()
 
-	jquery.Jq(fmt.Sprintf("div#confirm%d", CurrentStorage.StorageID)).SetHtml(confirm)
+	jquery.Jq(fmt.Sprintf("div#confirm%d", *CurrentStorage.StorageID)).SetHtml(confirm)
 
-	jquery.Jq(fmt.Sprintf("a#restore%d", CurrentStorage.StorageID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq(fmt.Sprintf("a#restore%d", *CurrentStorage.StorageID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-		url := fmt.Sprintf("%sstorages/%d/r", ApplicationProxyPath, CurrentStorage.StorageID)
+		url := fmt.Sprintf("%sstorages/%d/r", ApplicationProxyPath, *CurrentStorage.StorageID)
 		method := "put"
 
 		done := func(data js.Value) {
@@ -142,7 +142,7 @@ func Storage_operateEventsRestore(this js.Value, args []js.Value) interface{} {
 			BSTableQueryFilter.Lock()
 			BSTableQueryFilter.QueryFilter.StorageArchive = false
 			BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(int(*CurrentStorage.StorageID))
-			BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d", CurrentStorage.StorageID)
+			BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d", *CurrentStorage.StorageID)
 			bstable.NewBootstraptable(jquery.Jq("#Storage_table"), nil).Refresh(nil)
 
 		}
@@ -172,8 +172,7 @@ func Storage_operateEventsClone(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
-	var storage_id int64 = 0
-	CurrentStorage.StorageID = &storage_id
+	CurrentStorage.StorageID = nil
 
 	href := fmt.Sprintf("%svc/storages", ApplicationProxyPath)
 	jsutils.LoadContent("div#content", "storage", href, Storage_createCallback, CurrentStorage, "clone")
@@ -187,10 +186,16 @@ func Storage_operateEventsHistory(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
+	// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", *CurrentStorage.Storage))
+
 	BSTableQueryFilter.Lock()
+	BSTableQueryFilter.QueryFilter.Storages = make([]int, 0)
 	BSTableQueryFilter.QueryFilter.StorageHistory = true
-	BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(int(*CurrentStorage.StorageID))
-	BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d", CurrentStorage.StorageID)
+	// BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(int(*CurrentStorage.StorageID))
+	BSTableQueryFilter.QueryFilter.Id = int(*CurrentStorage.StorageID)
+	BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d", *CurrentStorage.StorageID)
+	BSTableQueryFilter.Unlock()
+
 	bstable.NewBootstraptable(jquery.Jq("#Storage_table"), nil).Refresh(nil)
 
 	return nil
@@ -202,9 +207,11 @@ func Storage_operateEventsBorrow(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
-	jquery.Jq("input#bstorage_id").SetVal(CurrentStorage.StorageID)
+	// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", *CurrentStorage.Storage))
 
-	if CurrentStorage.Borrowing.BorrowingID != nil {
+	jquery.Jq("input#bstorage_id").SetVal(*CurrentStorage.StorageID)
+
+	if CurrentStorage.Borrowing != nil && CurrentStorage.Borrowing.BorrowingID != nil {
 
 		// The storage has a borrowing.
 
@@ -258,7 +265,7 @@ func Storage_operateEventsArchive(this js.Value, args []js.Value) interface{} {
 	confirm := widgets.NewLink(
 		widgets.LinkAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:      fmt.Sprintf("archive%d", CurrentStorage.StorageID),
+				Id:      fmt.Sprintf("archive%d", *CurrentStorage.StorageID),
 				Classes: []string{"text-primary", "iconlabel"},
 				Visible: true,
 			},
@@ -275,11 +282,11 @@ func Storage_operateEventsArchive(this js.Value, args []js.Value) interface{} {
 		},
 	).OuterHTML()
 
-	jquery.Jq(fmt.Sprintf("div#confirm%d", CurrentStorage.StorageID)).SetHtml(confirm)
+	jquery.Jq(fmt.Sprintf("div#confirm%d", *CurrentStorage.StorageID)).SetHtml(confirm)
 
-	jquery.Jq(fmt.Sprintf("a#archive%d", CurrentStorage.StorageID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq(fmt.Sprintf("a#archive%d", *CurrentStorage.StorageID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-		url := fmt.Sprintf("%sstorages/%d/a", ApplicationProxyPath, CurrentStorage.StorageID)
+		url := fmt.Sprintf("%sstorages/%d/a", ApplicationProxyPath, *CurrentStorage.StorageID)
 		method := "delete"
 
 		done := func(data js.Value) {
@@ -317,7 +324,7 @@ func Storage_operateEventsDelete(this js.Value, args []js.Value) interface{} {
 	confirm := widgets.NewLink(
 		widgets.LinkAttributes{
 			BaseAttributes: widgets.BaseAttributes{
-				Id:      fmt.Sprintf("delete%d", CurrentStorage.StorageID),
+				Id:      fmt.Sprintf("delete%d", *CurrentStorage.StorageID),
 				Classes: []string{"text-primary", "iconlabel"},
 				Visible: true,
 			},
@@ -334,11 +341,11 @@ func Storage_operateEventsDelete(this js.Value, args []js.Value) interface{} {
 		},
 	).OuterHTML()
 
-	jquery.Jq(fmt.Sprintf("div#confirm%d", CurrentStorage.StorageID)).SetHtml(confirm)
+	jquery.Jq(fmt.Sprintf("div#confirm%d", *CurrentStorage.StorageID)).SetHtml(confirm)
 
-	jquery.Jq(fmt.Sprintf("a#delete%d", CurrentStorage.StorageID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq(fmt.Sprintf("a#delete%d", *CurrentStorage.StorageID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-		url := fmt.Sprintf("%sstorages/%d", ApplicationProxyPath, CurrentStorage.StorageID)
+		url := fmt.Sprintf("%sstorages/%d", ApplicationProxyPath, *CurrentStorage.StorageID)
 		method := "delete"
 
 		done := func(data js.Value) {
@@ -712,6 +719,8 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 	row := args[1]
 	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
+	js.Global().Get("console").Call("log", fmt.Sprintf("%#v", *CurrentStorage.Storage))
+
 	if CurrentStorage.Borrowing == nil || CurrentStorage.Borrowing.BorrowingID != nil {
 		iconBorrowing = themes.MDI_BORROW
 		iconBorrowingTitle = locales.Translate("storage_borrow", HTTPHeaderAcceptLanguage)
@@ -721,6 +730,9 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 	}
 
 	if CurrentStorage.StorageArchive {
+
+		// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", e.Entity))
+		js.Global().Get("console").Call("log", "archive")
 
 		// This is an archive.
 		buttonClone = widgets.NewLink(
@@ -786,6 +798,8 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 
 	} else if CurrentStorage.Storage != nil && CurrentStorage.Storage.Storage != nil && CurrentStorage.Storage.Storage.StorageID != nil {
 
+		js.Global().Get("console").Call("log", "history")
+
 		// This is an history.
 		buttonClone = widgets.NewLink(
 			widgets.LinkAttributes{
@@ -808,6 +822,8 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 		).OuterHTML()
 
 	} else {
+
+		js.Global().Get("console").Call("log", "normal")
 
 		buttonEdit = widgets.NewLink(
 			widgets.LinkAttributes{
@@ -894,6 +910,8 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 
 	if CurrentStorage.StorageHC != 0 {
 
+		js.Global().Get("console").Call("log", "history_count != 0")
+
 		buttonHistory = widgets.NewLink(
 			widgets.LinkAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -916,7 +934,10 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 
 	}
 
-	if CurrentStorage.Borrowing != nil && CurrentStorage.Borrowing.Borrower != nil && CurrentStorage.Borrowing.Borrower.PersonEmail != "" {
+	// if CurrentStorage.Borrowing != nil && CurrentStorage.Borrowing.Borrower != nil && CurrentStorage.Borrowing.Borrower.PersonEmail != "" {
+	if CurrentStorage.Borrowing != nil {
+
+		js.Global().Get("console").Call("log", "borrower")
 
 		divBorrowing := widgets.NewDiv(widgets.DivAttributes{
 			BaseAttributes: widgets.BaseAttributes{
@@ -924,12 +945,17 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 				Classes: []string{"row"},
 			},
 		})
+
+		if CurrentStorage.Borrowing.BorrowingComment == nil {
+			CurrentStorage.Borrowing.BorrowingComment = new(string)
+		}
+
 		borrowing := widgets.NewSpan(widgets.SpanAttributes{
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 				Classes: []string{"iconlabel"},
 			},
-			Text: fmt.Sprintf("%s: %s %s", locales.Translate("storage_borrower_title", HTTPHeaderAcceptLanguage), CurrentStorage.Borrowing.Borrower.PersonEmail, CurrentStorage.Borrowing.BorrowingComment),
+			Text: fmt.Sprintf("%s: %s %s", locales.Translate("storage_borrower_title", HTTPHeaderAcceptLanguage), CurrentStorage.Borrowing.Borrower.PersonEmail, *CurrentStorage.Borrowing.BorrowingComment),
 		})
 		divBorrowing.AppendChild(borrowing)
 		commentBorrowing = divBorrowing.OuterHTML()
@@ -1084,9 +1110,9 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
-					Classes: []string{".text-danger", "mr-sm-2"},
+					Classes: []string{"text-danger", "ml-sm-2"},
 				},
-				Text: locales.Translate("storage_todestroy_title", HTTPHeaderAcceptLanguage),
+				Text: locales.Translate("storage_to_destroy_title", HTTPHeaderAcceptLanguage),
 			}))
 	}
 
@@ -1305,7 +1331,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		}))
 		unit_label := ""
 		if CurrentStorage.UnitQuantity.UnitLabel != nil {
-			unit_label = fmt.Sprintf("%v %s", CurrentStorage.StorageQuantity, *CurrentStorage.UnitQuantity.UnitLabel)
+			unit_label = fmt.Sprintf("%v %s", *CurrentStorage.StorageQuantity, *CurrentStorage.UnitQuantity.UnitLabel)
 		}
 		colQuantity.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
@@ -1369,7 +1395,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 				BaseAttributes: widgets.BaseAttributes{
 					Visible: true,
 				},
-				Text: fmt.Sprintf("%d %s", CurrentStorage.StorageConcentration, *CurrentStorage.UnitConcentration.UnitLabel),
+				Text: fmt.Sprintf("%d %s", *CurrentStorage.StorageConcentration, *CurrentStorage.UnitConcentration.UnitLabel),
 			}))
 	}
 	// Batch number.
@@ -1663,7 +1689,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Visible: true,
 			Classes: []string{"blockquote-footer", "mr-sm-2"},
 		},
-		Text: fmt.Sprintf("%s id: %d", CurrentStorage.Person.PersonEmail, CurrentStorage.StorageID),
+		Text: fmt.Sprintf("%s", CurrentStorage.Person.PersonEmail),
 	}))
 
 	rowCreationDateAndPerson.AppendChild(colCreationDate)

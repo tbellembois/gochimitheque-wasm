@@ -29,7 +29,7 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 
 	jquery.Jq(fmt.Sprintf("button#delete%d", person.PersonID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-		url := fmt.Sprintf("%speople/%d", ApplicationProxyPath, person.PersonID)
+		url := fmt.Sprintf("%speople/%d", ApplicationProxyPath, *person.PersonID)
 		method := "delete"
 
 		done := func(data js.Value) {
@@ -64,8 +64,8 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 		Icon: themes.NewMdiIcon(themes.MDI_CONFIRM, ""),
 		Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
 	})
-	jquery.Jq(fmt.Sprintf("button#delete%d", person.PersonID)).SetHtml("")
-	jquery.Jq(fmt.Sprintf("button#delete%d", person.PersonID)).Append(buttonTitle.OuterHTML())
+	jquery.Jq(fmt.Sprintf("button#delete%d", *person.PersonID)).SetHtml("")
+	jquery.Jq(fmt.Sprintf("button#delete%d", *person.PersonID)).Append(buttonTitle.OuterHTML())
 
 	return nil
 
@@ -77,7 +77,7 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 	index := args[3].Int()
 	person := Person{Person: &models.Person{}}.FromJsJSONValue(row).(Person)
 
-	url := fmt.Sprintf("%speople/%d", ApplicationProxyPath, person.PersonID)
+	url := fmt.Sprintf("%speople/%d", ApplicationProxyPath, *person.PersonID)
 	method := "get"
 
 	done := func(data js.Value) {

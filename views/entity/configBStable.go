@@ -282,7 +282,7 @@ func ManagersFormatter(this js.Value, args []js.Value) interface{} {
 		}})
 
 	if (entity == Entity{} || entity.Managers != nil) {
-		for _, manager := range entity.Managers {
+		for _, manager := range *entity.Managers {
 			li := widgets.NewLi(widgets.LiAttributes{
 				BaseAttributes: widgets.BaseAttributes{Visible: true},
 				Text:           manager.PersonEmail,

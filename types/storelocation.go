@@ -34,13 +34,18 @@ func (elems StoreLocations) IsExactMatch() bool {
 
 func (s *StoreLocation) MarshalJSON() ([]byte, error) {
 
+	var id *int64
+	if s.StoreLocationID != nil {
+		id = s.StoreLocationID
+	}
+
 	type Copy StoreLocation
 	return json.Marshal(struct {
-		Id   int64  `json:"id"`
+		Id   *int64 `json:"id"`
 		Text string `json:"text"`
 		Copy
 	}{
-		Id:   s.GetSelect2Id(),
+		Id:   id,
 		Text: s.GetSelect2Text(),
 		Copy: (Copy)(*s),
 	})

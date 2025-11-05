@@ -90,7 +90,7 @@ func SaveBorrowing(this js.Value, args []js.Value) interface{} {
 	if len(select2Borrower.Select2Data()) > 0 {
 
 		select2ItemBorrower := select2Borrower.Select2Data()[0]
-		s.Borrowing.Borrower = &models.Person{}
+		s.Borrowing.Borrower = models.Person{}
 
 		var _person_id int
 		if _person_id, err = strconv.Atoi(select2ItemBorrower.Id); err != nil {
@@ -108,11 +108,11 @@ func SaveBorrowing(this js.Value, args []js.Value) interface{} {
 		borrowing_comment = s.Borrowing.BorrowingComment
 	}
 	var borrower_id int64
-	if s.Borrowing.Borrower != nil {
+	if s.Borrowing != nil {
 		borrower_id = *s.Borrowing.Borrower.PersonID
 	}
 
-	ajaxURL = fmt.Sprintf("%sborrows/%d?borrower_id=%d", ApplicationProxyPath, s.StorageID, borrower_id)
+	ajaxURL = fmt.Sprintf("%sborrows/%d?borrower_id=%d", ApplicationProxyPath, *s.StorageID, borrower_id)
 	ajaxMethod = "get"
 
 	if borrowing_comment != nil {
@@ -278,6 +278,7 @@ func SaveStorage(this js.Value, args []js.Value) any {
 		}
 
 		supplierIdInt64 := int64(supplierId)
+		globals.CurrentStorage.Supplier = &models.Supplier{}
 		globals.CurrentStorage.Supplier.SupplierID = &supplierIdInt64
 		globals.CurrentStorage.Supplier.SupplierLabel = &select2ItemSupplier.Text
 	}
@@ -373,7 +374,7 @@ func SaveStorage(this js.Value, args []js.Value) any {
 	}
 
 	if (!jquery.Jq("form#storage input#storage_id").GetVal().IsUndefined()) && jquery.Jq("form#storage input#storage_id").GetVal().String() != "" {
-		ajaxURL = fmt.Sprintf("%sstorages/%d", ApplicationProxyPath, globals.CurrentStorage.StorageID)
+		ajaxURL = fmt.Sprintf("%sstorages", ApplicationProxyPath)
 		ajaxMethod = "put"
 	} else {
 		ajaxURL = fmt.Sprintf("%sstorages?nb_items=%d&identical_barecode=%t", ApplicationProxyPath, nb_items, identical_barecode)

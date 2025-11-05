@@ -31,14 +31,16 @@ func FillInEntityForm(e Entity, id string) {
 	select2Managers := select2.NewSelect2(jquery.Jq("select#managers"), nil)
 
 	select2Managers.Select2Clear()
-	for _, manager := range e.Managers {
-		select2Managers.Select2AppendOption(
-			widgets.NewOption(widgets.OptionAttributes{
-				Text:            manager.PersonEmail,
-				Value:           strconv.Itoa(int(*manager.PersonID)),
-				DefaultSelected: true,
-				Selected:        true,
-			}).HTMLElement.OuterHTML())
+	if e.Managers != nil {
+		for _, manager := range *e.Managers {
+			select2Managers.Select2AppendOption(
+				widgets.NewOption(widgets.OptionAttributes{
+					Text:            manager.PersonEmail,
+					Value:           strconv.Itoa(int(*manager.PersonID)),
+					DefaultSelected: true,
+					Selected:        true,
+				}).HTMLElement.OuterHTML())
+		}
 	}
 
 	// select2LDAPGroups := select2.NewSelect2(jquery.Jq("select#ldapgroups"), nil)
@@ -83,9 +85,11 @@ func SaveEntity(this js.Value, args []js.Value) interface{} {
 	entity.EntityName = jquery.Jq("input#entity_name").GetVal().String()
 	entity.EntityDescription = jquery.Jq("input#entity_description").GetVal().String()
 
+	var managers []models.Person
+
 	select2Managers := select2.NewSelect2(jquery.Jq("select#managers"), nil)
 	for _, select2Item := range select2Managers.Select2Data() {
-		person := &models.Person{}
+		person := models.Person{}
 		var _person_id int
 		if _person_id, err = strconv.Atoi(select2Item.Id); err != nil {
 			fmt.Println(err)
@@ -95,8 +99,10 @@ func SaveEntity(this js.Value, args []js.Value) interface{} {
 		person.PersonID = &_person_id_64
 		person.PersonEmail = select2Item.Text
 
-		entity.Managers = append(entity.Managers, person)
+		// entity.Managers = append(entity.Managers, person)
+		managers = append(managers, person)
 	}
+	entity.Managers = &managers
 
 	// select2LDAPGroups := select2.NewSelect2(jquery.Jq("select#ldapgroups"), nil)
 	// for _, select2Item := range select2LDAPGroups.Select2Data() {
@@ -109,7 +115,7 @@ func SaveEntity(this js.Value, args []js.Value) interface{} {
 	}
 
 	if jquery.Jq("form#entity input#entity_id").Object.Length() > 0 {
-		ajaxURL = fmt.Sprintf("%sentities/%d", ApplicationProxyPath, *entity.EntityID)
+		ajaxURL = fmt.Sprintf("%sentities", ApplicationProxyPath)
 		ajaxMethod = "put"
 	} else {
 		ajaxURL = fmt.Sprintf("%sentities", ApplicationProxyPath)
@@ -124,15 +130,15 @@ func SaveEntity(this js.Value, args []js.Value) interface{} {
 
 			globals.LocalStorage.Clear()
 
-			var (
-				entity Entity
-				err    error
-			)
+			// var (
+			// 	entity Entity
+			// 	err    error
+			// )
 
-			if err = json.Unmarshal([]byte(data.String()), &entity); err != nil {
-				fmt.Println(err)
-				return
-			}
+			// if err = json.Unmarshal([]byte(data.String()), &entity); err != nil {
+			// 	fmt.Println(err)
+			// 	return
+			// }
 
 			// TODO: use entityId for redirection
 			href := fmt.Sprintf("%sv/entities", ApplicationProxyPath)

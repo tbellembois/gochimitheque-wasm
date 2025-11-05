@@ -127,6 +127,8 @@ func (q QueryFilter) ToJsValue() js.Value {
 // an url.RawQuery
 func (q QueryFilter) ToRawQuery() string {
 
+	js.Global().Get("console").Call("log", fmt.Sprintf("%#v", q))
+
 	values := url.Values{}
 	if q.Sort != "" {
 		values.Set("order_by", q.Sort)

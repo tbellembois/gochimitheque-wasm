@@ -442,7 +442,7 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 	}
 
 	if jquery.Jq("form#person input#person_id").Object.Length() > 0 {
-		ajaxURL = fmt.Sprintf("%speople/%d", ApplicationProxyPath, person.PersonID)
+		ajaxURL = fmt.Sprintf("%speople", ApplicationProxyPath)
 		ajaxMethod = "put"
 	} else {
 		ajaxURL = fmt.Sprintf("%speople", ApplicationProxyPath)

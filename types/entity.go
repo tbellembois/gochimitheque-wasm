@@ -33,14 +33,19 @@ func (elems Entities) IsExactMatch() bool {
 }
 
 func (e *Entity) MarshalJSON() ([]byte, error) {
+	var id *int64
+	if e.EntityID != nil {
+		id = e.EntityID
+	}
+
 	type Copy Entity
 	return json.Marshal(&struct {
-		Id   int64  `json:"id"`
+		Id   *int64 `json:"id"`
 		Text string `json:"text"`
 
 		*Copy
 	}{
-		Id:   e.GetSelect2Id(),
+		Id:   id,
 		Text: e.GetSelect2Text(),
 		Copy: (*Copy)(e),
 	})

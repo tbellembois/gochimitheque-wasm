@@ -88,6 +88,36 @@ func LoadContentWrapper(this js.Value, args []js.Value) interface{} {
 
 func ShowIfAuthorizedMenuItems(args ...interface{}) {
 
+	jquery.Jq("#menu_scan_qrcode").FadeIn()
+	jquery.Jq("#menu_list_products").FadeIn()
+	jquery.Jq("#menu_list_bookmarks").FadeIn()
+	jquery.Jq("#menu_pubchem").FadeIn()
+
+	jquery.Jq("#menu_create_product").FadeIn()
+
+	jquery.Jq("#menu_entities").FadeIn()
+	jquery.Jq("#menu_management").FadeIn()
+
+	jquery.Jq("#menu_create_entity").FadeIn()
+	jquery.Jq("#menu_management").FadeIn()
+
+	jquery.Jq("#menu_update_welcomeannounce").FadeIn()
+	jquery.Jq("#menu_settings").FadeIn()
+	jquery.Jq("#menu_management").FadeIn()
+
+	jquery.Jq("#menu_store_locations").FadeIn()
+	jquery.Jq("#menu_management").FadeIn()
+
+	jquery.Jq("#menu_create_store_location").FadeIn()
+	jquery.Jq("#menu_management").FadeIn()
+
+	jquery.Jq("#menu_people").FadeIn()
+	jquery.Jq("#menu_management").FadeIn()
+
+}
+
+func ShowIfAuthorizedMenuItems2(args ...interface{}) {
+
 	jsutils.HasPermission("products", "-2", "get", func() {
 		jquery.Jq("#menu_scan_qrcode").FadeIn()
 		jquery.Jq("#menu_list_products").FadeIn()
