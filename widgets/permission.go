@@ -66,7 +66,7 @@ func Permission(entityID int64, entityName string, ismanager bool) *dom.HTMLDivE
 				"value":     "none",
 				"checked":   "checked",
 				"label":     fmt.Sprintf("<label class=\"form-check-label ml-sm-1 pr-sm-1 pl-sm-1 text-secondary border border-secondary rounded\" for=\"permn%s%d\" title=\"%s\"><span class=\"mdi mdi-close\"></span></label>", i, entityID, locales.Translate("permission_none", HTTPHeaderAcceptLanguage)),
-				"perm_name": "n",
+				"perm_name": "None",
 				"item_name": i,
 				"entity_id": fmt.Sprintf("%d", entityID),
 				"class":     fmt.Sprintf("perm permn permn%s", i)}
@@ -75,7 +75,7 @@ func Permission(entityID int64, entityName string, ismanager bool) *dom.HTMLDivE
 				"name":      fmt.Sprintf("perm%s%d", i, entityID),
 				"value":     "r",
 				"label":     fmt.Sprintf("<label class=\"form-check-label ml-sm-1 pr-sm-1 pl-sm-1 text-secondary border border-secondary rounded\" for=\"permn%s%d\" title=\"%s\"><span class=\"mdi mdi-eye\"></span></label>", i, entityID, locales.Translate("permission_read", HTTPHeaderAcceptLanguage)),
-				"perm_name": "r",
+				"perm_name": "Read",
 				"item_name": i,
 				"entity_id": fmt.Sprintf("%d", entityID),
 				"class":     fmt.Sprintf("perm permr permr%s", i)}
@@ -84,7 +84,7 @@ func Permission(entityID int64, entityName string, ismanager bool) *dom.HTMLDivE
 				"name":      fmt.Sprintf("perm%s%d", i, entityID),
 				"value":     "w",
 				"label":     fmt.Sprintf("<label class=\"form-check-label ml-sm-1 pr-sm-1 pl-sm-1 text-secondary border border-secondary rounded\" for=\"permn%s%d\" title=\"%s\"><span class=\"mdi mdi-eye\"></span><span class=\"mdi mdi-creation\"></span><span class=\"mdi mdi-pencil-outline\"></span><span class=\"mdi mdi-delete\"></span></label>", i, entityID, locales.Translate("permission_crud", HTTPHeaderAcceptLanguage)),
-				"perm_name": "w",
+				"perm_name": "Write",
 				"item_name": i,
 				"entity_id": fmt.Sprintf("%d", entityID),
 				"class":     fmt.Sprintf("perm permw permw%s", i)}

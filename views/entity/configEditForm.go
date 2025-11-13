@@ -115,7 +115,7 @@ func SaveEntity(this js.Value, args []js.Value) interface{} {
 	}
 
 	if jquery.Jq("form#entity input#entity_id").Object.Length() > 0 {
-		ajaxURL = fmt.Sprintf("%sentities", ApplicationProxyPath)
+		ajaxURL = fmt.Sprintf("%sentities/%d", ApplicationProxyPath, entity.Entity.EntityID)
 		ajaxMethod = "put"
 	} else {
 		ajaxURL = fmt.Sprintf("%sentities", ApplicationProxyPath)

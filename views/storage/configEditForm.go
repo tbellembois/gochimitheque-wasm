@@ -374,7 +374,7 @@ func SaveStorage(this js.Value, args []js.Value) any {
 	}
 
 	if (!jquery.Jq("form#storage input#storage_id").GetVal().IsUndefined()) && jquery.Jq("form#storage input#storage_id").GetVal().String() != "" {
-		ajaxURL = fmt.Sprintf("%sstorages", ApplicationProxyPath)
+		ajaxURL = fmt.Sprintf("%sstorages/%d", ApplicationProxyPath, globals.CurrentStorage.Product.ProductID)
 		ajaxMethod = "put"
 	} else {
 		ajaxURL = fmt.Sprintf("%sstorages?nb_items=%d&identical_barecode=%t", ApplicationProxyPath, nb_items, identical_barecode)

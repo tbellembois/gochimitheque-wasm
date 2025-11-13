@@ -50,7 +50,7 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 		switch p.PermissionItem {
 		case "products":
 			switch p.PermissionName {
-			case "w", "all":
+			case "w", "all", "Write", "All":
 				if pentityid == "-1" {
 					for _, e := range Doc.GetElementsByClassName("permwproducts") {
 						e.(*dom.HTMLInputElement).SetChecked(true)
@@ -61,7 +61,7 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 						input.(*dom.HTMLInputElement).SetChecked(true)
 					}
 				}
-			case "r":
+			case "r", "Read":
 				if pentityid == "-1" {
 					for _, e := range Doc.GetElementsByClassName("permrproducts") {
 						// avoid selecting r if w is already selected
@@ -76,7 +76,7 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 						Doc.GetElementByID("permr" + p.PermissionItem + pentityid).(*dom.HTMLInputElement).SetChecked(true)
 					}
 				}
-			case "n":
+			case "n", "None":
 				if pentityid == "-1" {
 					for _, e := range Doc.GetElementsByClassName("permnproducts") {
 						e.(*dom.HTMLInputElement).SetChecked(true)
@@ -87,7 +87,7 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 			}
 		case "rproducts":
 			switch p.PermissionName {
-			case "w", "all":
+			case "w", "all", "Write", "All":
 				if pentityid == "-1" {
 					// for _, e := range Doc.GetElementsByClassName("permwrproducts") {
 					for _, e := range Doc.GetElementsByClassName("permrrproducts") {
@@ -99,7 +99,7 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 						input.(*dom.HTMLInputElement).SetChecked(true)
 					}
 				}
-			case "r":
+			case "r", "Read":
 				if pentityid == "-1" {
 					for _, e := range Doc.GetElementsByClassName("permrrproducts") {
 						// avoid selecting r if w is already selected
@@ -116,7 +116,7 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 					// 	Doc.GetElementByID("permr" + p.PermissionItem + pentityid).(*dom.HTMLInputElement).SetChecked(true)
 					// }
 				}
-			case "n":
+			case "n", "None":
 				if pentityid == "-1" {
 					for _, e := range Doc.GetElementsByClassName("permnrproducts") {
 						e.(*dom.HTMLInputElement).SetChecked(true)
@@ -127,7 +127,7 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 			}
 		case "storages":
 			switch p.PermissionName {
-			case "w", "all":
+			case "w", "all", "Write", "All":
 				if pentityid == "-1" {
 					for _, e := range Doc.GetElementsByClassName("permwstorages") {
 						e.(*dom.HTMLInputElement).SetChecked(true)
@@ -135,7 +135,7 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 				} else {
 					Doc.GetElementByID("permw" + p.PermissionItem + pentityid).(*dom.HTMLInputElement).SetChecked(true)
 				}
-			case "r":
+			case "r", "Read":
 				if pentityid == "-1" {
 					for _, e := range Doc.GetElementsByClassName("permrstorages") {
 						// avoid selecting r if w is already selected
@@ -151,16 +151,16 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 					}
 				}
 			}
-		case "all":
+		case "all", "All":
 			switch p.PermissionName {
-			case "w", "all":
+			case "w", "all", "Write", "All":
 				if pentityid == "-1" {
 					// super admin (if "all")
 					for _, e := range Doc.GetElementsByClassName("permw") {
 						e.(*dom.HTMLInputElement).SetChecked(true)
 					}
 				}
-			case "r":
+			case "r", "Read":
 				for _, e := range Doc.GetElementsByClassName("permr") {
 					e.(*dom.HTMLInputElement).SetChecked(true)
 				}
@@ -442,7 +442,7 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 	}
 
 	if jquery.Jq("form#person input#person_id").Object.Length() > 0 {
-		ajaxURL = fmt.Sprintf("%speople", ApplicationProxyPath)
+		ajaxURL = fmt.Sprintf("%speople/%d", ApplicationProxyPath, *person.PersonID)
 		ajaxMethod = "put"
 	} else {
 		ajaxURL = fmt.Sprintf("%speople", ApplicationProxyPath)
@@ -457,15 +457,15 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 
 			globals.LocalStorage.Clear()
 
-			var (
-				person Person
-				err    error
-			)
+			// var (
+			// 	person Person
+			// 	err    error
+			// )
 
-			if err = json.Unmarshal([]byte(data.String()), &person); err != nil {
-				fmt.Println(err)
-				return
-			}
+			// if err = json.Unmarshal([]byte(data.String()), &person); err != nil {
+			// 	fmt.Println(err)
+			// 	return
+			// }
 
 			// TODO: use personId for redirection
 			href := fmt.Sprintf("%sv/people", ApplicationProxyPath)

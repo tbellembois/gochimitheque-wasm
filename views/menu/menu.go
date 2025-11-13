@@ -12,7 +12,6 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/views/person"
 	"github.com/tbellembois/gochimitheque-wasm/views/product"
 	"github.com/tbellembois/gochimitheque-wasm/views/storelocation"
-	"github.com/tbellembois/gochimitheque-wasm/views/welcomeannounce"
 )
 
 // LoadContentWrapper is only called in the menu.jade template
@@ -49,9 +48,6 @@ func LoadContentWrapper(this js.Value, args []js.Value) interface{} {
 	aboutListCallbackWrapper := func(args ...interface{}) {
 		about.About_listCallback(js.Null(), nil)
 	}
-	welcomeannounceListCallbackWrapper := func(args ...interface{}) {
-		welcomeannounce.WelcomeAnnounce_listCallback(js.Null(), nil)
-	}
 
 	var callbackFunc func(args ...interface{})
 
@@ -74,8 +70,6 @@ func LoadContentWrapper(this js.Value, args []js.Value) interface{} {
 		callbackFunc = personCallbackWrapper
 	case "Person_create":
 		callbackFunc = personCreateCallbackWrapper
-	case "WelcomeAnnounce_list":
-		callbackFunc = welcomeannounceListCallbackWrapper
 	case "About_list":
 		callbackFunc = aboutListCallbackWrapper
 	}
@@ -86,39 +80,39 @@ func LoadContentWrapper(this js.Value, args []js.Value) interface{} {
 
 }
 
+// func ShowIfAuthorizedMenuItems(args ...interface{}) {
+
+// 	jquery.Jq("#menu_scan_qrcode").FadeIn()
+// 	jquery.Jq("#menu_list_products").FadeIn()
+// 	jquery.Jq("#menu_list_bookmarks").FadeIn()
+// 	jquery.Jq("#menu_pubchem").FadeIn()
+
+// 	jquery.Jq("#menu_create_product").FadeIn()
+
+// 	jquery.Jq("#menu_entities").FadeIn()
+// 	jquery.Jq("#menu_management").FadeIn()
+
+// 	jquery.Jq("#menu_create_entity").FadeIn()
+// 	jquery.Jq("#menu_management").FadeIn()
+
+// 	jquery.Jq("#menu_update_welcomeannounce").FadeIn()
+// 	jquery.Jq("#menu_settings").FadeIn()
+// 	jquery.Jq("#menu_management").FadeIn()
+
+// 	jquery.Jq("#menu_store_locations").FadeIn()
+// 	jquery.Jq("#menu_management").FadeIn()
+
+// 	jquery.Jq("#menu_create_store_location").FadeIn()
+// 	jquery.Jq("#menu_management").FadeIn()
+
+// 	jquery.Jq("#menu_people").FadeIn()
+// 	jquery.Jq("#menu_management").FadeIn()
+
+// }
+
 func ShowIfAuthorizedMenuItems(args ...interface{}) {
 
-	jquery.Jq("#menu_scan_qrcode").FadeIn()
-	jquery.Jq("#menu_list_products").FadeIn()
-	jquery.Jq("#menu_list_bookmarks").FadeIn()
-	jquery.Jq("#menu_pubchem").FadeIn()
-
-	jquery.Jq("#menu_create_product").FadeIn()
-
-	jquery.Jq("#menu_entities").FadeIn()
-	jquery.Jq("#menu_management").FadeIn()
-
-	jquery.Jq("#menu_create_entity").FadeIn()
-	jquery.Jq("#menu_management").FadeIn()
-
-	jquery.Jq("#menu_update_welcomeannounce").FadeIn()
-	jquery.Jq("#menu_settings").FadeIn()
-	jquery.Jq("#menu_management").FadeIn()
-
-	jquery.Jq("#menu_store_locations").FadeIn()
-	jquery.Jq("#menu_management").FadeIn()
-
-	jquery.Jq("#menu_create_store_location").FadeIn()
-	jquery.Jq("#menu_management").FadeIn()
-
-	jquery.Jq("#menu_people").FadeIn()
-	jquery.Jq("#menu_management").FadeIn()
-
-}
-
-func ShowIfAuthorizedMenuItems2(args ...interface{}) {
-
-	jsutils.HasPermission("products", "-2", "get", func() {
+	jsutils.HasPermission("products", "", "get", func() {
 		jquery.Jq("#menu_scan_qrcode").FadeIn()
 		jquery.Jq("#menu_list_products").FadeIn()
 		jquery.Jq("#menu_list_bookmarks").FadeIn()
@@ -126,43 +120,43 @@ func ShowIfAuthorizedMenuItems2(args ...interface{}) {
 	}, func() {
 	})
 
-	jsutils.HasPermission("products", "-2", "put", func() {
+	jsutils.HasPermission("products", "", "post", func() {
 		jquery.Jq("#menu_create_product").FadeIn()
 	}, func() {
 	})
 
-	jsutils.HasPermission("entities", "-2", "get", func() {
+	jsutils.HasPermission("entities", "", "get", func() {
 		jquery.Jq("#menu_entities").FadeIn()
 		jquery.Jq("#menu_management").FadeIn()
 	}, func() {
 	})
 
-	jsutils.HasPermission("entities", "-2", "put", func() {
+	jsutils.HasPermission("entities", "", "post", func() {
 		jquery.Jq("#menu_create_entity").FadeIn()
 		jquery.Jq("#menu_management").FadeIn()
 	}, func() {
 	})
 
-	jsutils.HasPermission("entities", "-2", "put", func() {
+	jsutils.HasPermission("entities", "", "post", func() {
 		jquery.Jq("#menu_update_welcomeannounce").FadeIn()
 		jquery.Jq("#menu_settings").FadeIn()
 		jquery.Jq("#menu_management").FadeIn()
 	}, func() {
 	})
 
-	jsutils.HasPermission("storages", "-2", "get", func() {
+	jsutils.HasPermission("storages", "", "get", func() {
 		jquery.Jq("#menu_store_locations").FadeIn()
 		jquery.Jq("#menu_management").FadeIn()
 	}, func() {
 	})
 
-	jsutils.HasPermission("store_locations", "-2", "put", func() {
+	jsutils.HasPermission("store_locations", "", "post", func() {
 		jquery.Jq("#menu_create_store_location").FadeIn()
 		jquery.Jq("#menu_management").FadeIn()
 	}, func() {
 	})
 
-	jsutils.HasPermission("people", "-2", "get", func() {
+	jsutils.HasPermission("people", "", "get", func() {
 		jquery.Jq("#menu_people").FadeIn()
 		jquery.Jq("#menu_management").FadeIn()
 	}, func() {

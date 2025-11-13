@@ -889,7 +889,7 @@ func PubchemGetProductByName(this js.Value, args []js.Value) interface{} {
 			jquery.Jq("#pubchemcompoundactions").Empty()
 			jquery.Jq("#pubchemcompoundcontent").Empty()
 
-			jsutils.HasPermission("products", "-2", "put", func() {
+			jsutils.HasPermission("products", "", "post", func() {
 
 				// import button.
 				jquery.Jq("#pubchemcompoundactions").Append(`<div id="import" class="row pb-3"></div>`)

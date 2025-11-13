@@ -28,7 +28,6 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/views/product"
 	"github.com/tbellembois/gochimitheque-wasm/views/storage"
 	"github.com/tbellembois/gochimitheque-wasm/views/storelocation"
-	"github.com/tbellembois/gochimitheque-wasm/views/welcomeannounce"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 
 	"github.com/tbellembois/gochimitheque/models"
@@ -291,13 +290,6 @@ func main() {
 	// Person page load callbacks.
 	js.Global().Set("Person_list", js.FuncOf(person.Person_listCallback))
 	js.Global().Set("Person_create", js.FuncOf(person.Person_createCallBack))
-
-	// Welcome announce
-	js.Global().Set("WelcomeAnnounce_saveWelcomeAnnounce", js.FuncOf(welcomeannounce.SaveWelcomeAnnounce))
-	js.Global().Set("WelcomeAnnounce_list", js.FuncOf(welcomeannounce.WelcomeAnnounce_listCallback))
-
-	// Login
-	js.Global().Set("Login_getAnnounce", js.FuncOf(login.GetAnnounce))
 
 	// About
 	js.Global().Set("About_list", js.FuncOf(about.About_listCallback))

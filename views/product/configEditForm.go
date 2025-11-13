@@ -906,7 +906,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 	}
 
 	if (!jquery.Jq("form#product input#product_id").GetVal().IsUndefined()) && jquery.Jq("form#product input#product_id").GetVal().String() != "" {
-		ajaxURL = fmt.Sprintf("%sproducts", ApplicationProxyPath)
+		ajaxURL = fmt.Sprintf("%sproducts/%d", ApplicationProxyPath, globals.CurrentProduct.ProductID)
 		ajaxMethod = "put"
 	} else {
 		ajaxURL = fmt.Sprintf("%sproducts", ApplicationProxyPath)

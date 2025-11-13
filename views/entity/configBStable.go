@@ -68,9 +68,9 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	entity := Entity{Entity: &models.Entity{}}.FromJsJSONValue(row).(Entity)
 
-	jquery.Jq(fmt.Sprintf("button#delete%d", entity.EntityID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	jquery.Jq(fmt.Sprintf("button#delete%d", *entity.EntityID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-		url := fmt.Sprintf("%sentities/%d", ApplicationProxyPath, entity.EntityID)
+		url := fmt.Sprintf("%sentities/%d", ApplicationProxyPath, *entity.EntityID)
 		method := "delete"
 
 		done := func(data js.Value) {
@@ -257,6 +257,12 @@ func NameFormatter(this js.Value, args []js.Value) interface{} {
 
 	if entity.EntityNbStoreLocations != nil {
 		label += " sl:" + strconv.Itoa(int(*entity.EntityNbStoreLocations))
+	}
+	label += " </i>]"
+
+	label += " [<i>"
+	if entity.EntityNbPeople != nil {
+		label += " p:" + strconv.Itoa(int(*entity.EntityNbPeople))
 	}
 	label += " </i>]"
 

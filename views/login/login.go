@@ -18,36 +18,6 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/views/search"
 )
 
-func GetAnnounce(this js.Value, args []js.Value) interface{} {
-
-	ajax.Ajax{
-		URL:    fmt.Sprintf("%swelcomeannounce", ApplicationProxyPath),
-		Method: "get",
-		Done: func(data js.Value) {
-
-			var (
-				welcomeAnnounce WelcomeAnnounce
-				err             error
-			)
-
-			if err = json.Unmarshal([]byte(data.String()), &welcomeAnnounce); err != nil {
-				fmt.Println(err)
-			}
-
-			jquery.Jq("#wannounce").SetHtml(welcomeAnnounce.WelcomeAnnounceHTML)
-
-		},
-		Fail: func(jqXHR js.Value) {
-
-			jsutils.DisplayGenericErrorMessage()
-
-		},
-	}.Send()
-
-	return nil
-
-}
-
 func Login_listCallback(this js.Value, args []js.Value) interface{} {
 
 	// Call the ping handler to see if if are already authenticated.
