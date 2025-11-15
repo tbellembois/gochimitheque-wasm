@@ -374,14 +374,14 @@ func SaveStorage(this js.Value, args []js.Value) any {
 	}
 
 	if (!jquery.Jq("form#storage input#storage_id").GetVal().IsUndefined()) && jquery.Jq("form#storage input#storage_id").GetVal().String() != "" {
-		ajaxURL = fmt.Sprintf("%sstorages/%d", ApplicationProxyPath, globals.CurrentStorage.Product.ProductID)
+		ajaxURL = fmt.Sprintf("%sstorages/%d", ApplicationProxyPath, *globals.CurrentStorage.StorageID)
 		ajaxMethod = "put"
 	} else {
 		ajaxURL = fmt.Sprintf("%sstorages?nb_items=%d&identical_barecode=%t", ApplicationProxyPath, nb_items, identical_barecode)
 		ajaxMethod = "post"
 	}
 
-	js.Global().Get("console").Call("log", fmt.Sprintf("%#v", *globals.CurrentStorage.Storage))
+	// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", *globals.CurrentStorage.Storage))
 
 	if dataBytes, err = json.Marshal(globals.CurrentStorage); err != nil {
 		fmt.Println(err)

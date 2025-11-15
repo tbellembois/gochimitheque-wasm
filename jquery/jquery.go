@@ -79,6 +79,19 @@ func (jq Jquery) SetVal(i interface{}) Jquery {
 
 }
 
+func (jq Jquery) SetAttr(i ...interface{}) Jquery {
+
+	jq.Object.Call("attr", i...)
+	return jq
+
+}
+
+func (jq Jquery) GetAttr(i interface{}) js.Value {
+
+	return jq.Object.Call("attr", i)
+
+}
+
 func (jq Jquery) GetVal() js.Value {
 
 	return jq.Object.Call("val")

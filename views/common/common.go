@@ -30,7 +30,7 @@ func Export(this js.Value, args []js.Value) interface{} {
 	}).OuterHTML())
 
 	jquery.Jq("#export").Show()
-	jquery.Jq("button#export").SetProp("disabled", true)
+	// jquery.Jq("button#export").SetProp("disabled", true)
 
 	if globals.CurrentView != "storage" {
 		bstable.NewBootstraptable(jquery.Jq("#Product_table"), nil).Refresh(nil)

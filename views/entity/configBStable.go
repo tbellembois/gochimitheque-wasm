@@ -105,8 +105,8 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 		Icon: themes.NewMdiIcon(themes.MDI_CONFIRM, ""),
 		Text: locales.Translate("confirm", HTTPHeaderAcceptLanguage),
 	})
-	jquery.Jq(fmt.Sprintf("button#delete%d", entity.EntityID)).SetHtml("")
-	jquery.Jq(fmt.Sprintf("button#delete%d", entity.EntityID)).Append(buttonTitle.OuterHTML())
+	jquery.Jq(fmt.Sprintf("button#delete%d", *entity.EntityID)).SetHtml("")
+	jquery.Jq(fmt.Sprintf("button#delete%d", *entity.EntityID)).Append(buttonTitle.OuterHTML())
 
 	return nil
 

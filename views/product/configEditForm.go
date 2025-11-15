@@ -335,6 +335,10 @@ func FillInProductForm(p Product, id string) {
 		jquery.Jq("#product_number_per_bag").SetVal(*p.ProductNumberPerBag)
 	}
 
+	if p.ProductTwoDFormula != nil {
+		jquery.Jq("#image").SetAttr("src", *p.ProductTwoDFormula)
+	}
+
 	// Chem/Bio/Consu detection.
 	switch p.ProductType {
 	case "cons":
@@ -445,6 +449,9 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 	if jquery.Jq("input#hidden_product_twod_formula_content").Html() != "" {
 		globals.CurrentProduct.ProductTwoDFormula = new(string)
 		*globals.CurrentProduct.ProductTwoDFormula = jquery.Jq("input#hidden_product_twod_formula_content").Html()
+	} else {
+		globals.CurrentProduct.ProductTwoDFormula = new(string)
+		*globals.CurrentProduct.ProductTwoDFormula = jquery.Jq("img#image").GetAttr("src").String()
 	}
 
 	if jquery.Jq("input#product_threed_formula").GetVal().Truthy() {
@@ -906,7 +913,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 	}
 
 	if (!jquery.Jq("form#product input#product_id").GetVal().IsUndefined()) && jquery.Jq("form#product input#product_id").GetVal().String() != "" {
-		ajaxURL = fmt.Sprintf("%sproducts/%d", ApplicationProxyPath, globals.CurrentProduct.ProductID)
+		ajaxURL = fmt.Sprintf("%sproducts/%d", ApplicationProxyPath, *globals.CurrentProduct.ProductID)
 		ajaxMethod = "put"
 	} else {
 		ajaxURL = fmt.Sprintf("%sproducts", ApplicationProxyPath)

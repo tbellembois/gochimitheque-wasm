@@ -1895,8 +1895,21 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 
 	go func() {
 
-		u := url.URL{Path: ApplicationProxyPath + "storages"}
+		var u url.URL
+
+		if params.Data.Export {
+			u = url.URL{Path: ApplicationProxyPath + "storages/export"}
+			params.Data.Offset = 0
+			params.Data.Limit = 999999999999999999
+		} else {
+			u = url.URL{Path: ApplicationProxyPath + "storages"}
+		}
 		u.RawQuery = params.Data.ToRawQuery()
+
+		if params.Data.Export {
+			jsutils.RedirectTo(u.String())
+			return
+		}
 
 		ajax := ajax.Ajax{
 			URL:    u.String(),
@@ -1912,31 +1925,31 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 				}
 
 				if storages.GetExportFn() != "" {
-					jsutils.DisplaySuccessMessage(locales.Translate("export_done", HTTPHeaderAcceptLanguage))
+					// jsutils.DisplaySuccessMessage(locales.Translate("export_done", HTTPHeaderAcceptLanguage))
 
-					var icon widgets.Widget
-					icon.HTMLElement = widgets.NewIcon(widgets.IconAttributes{
-						BaseAttributes: widgets.BaseAttributes{
-							Visible: true,
-						},
-						Text: locales.Translate("download_export", HTTPHeaderAcceptLanguage),
-						Icon: themes.NewMdiIcon(themes.MDI_DOWNLOAD, themes.MDI_24PX),
-					})
+					// var icon widgets.Widget
+					// icon.HTMLElement = widgets.NewIcon(widgets.IconAttributes{
+					// 	BaseAttributes: widgets.BaseAttributes{
+					// 		Visible: true,
+					// 	},
+					// 	Text: locales.Translate("download_export", HTTPHeaderAcceptLanguage),
+					// 	Icon: themes.NewMdiIcon(themes.MDI_DOWNLOAD, themes.MDI_24PX),
+					// })
 
-					downloadLink := widgets.NewLink(widgets.LinkAttributes{
-						BaseAttributes: widgets.BaseAttributes{
-							Visible: true,
-							Classes: []string{"iconlabel"},
-						},
-						Onclick: "$('#export').collapse('hide')",
-						Title:   locales.Translate("download_export", HTTPHeaderAcceptLanguage),
-						Href:    fmt.Sprintf("%sdownload/%s", ApplicationProxyPath, storages.GetExportFn()),
-						Label:   icon,
-					})
+					// downloadLink := widgets.NewLink(widgets.LinkAttributes{
+					// 	BaseAttributes: widgets.BaseAttributes{
+					// 		Visible: true,
+					// 		Classes: []string{"iconlabel"},
+					// 	},
+					// 	Onclick: "$('#export').collapse('hide')",
+					// 	Title:   locales.Translate("download_export", HTTPHeaderAcceptLanguage),
+					// 	Href:    fmt.Sprintf("%sdownload/%s", ApplicationProxyPath, storages.GetExportFn()),
+					// 	Label:   icon,
+					// })
 
-					jquery.Jq("#export-body").SetHtml(downloadLink.OuterHTML())
-					jquery.Jq("#export").Show()
-					jquery.Jq("button#export").SetProp("disabled", false)
+					// jquery.Jq("#export-body").SetHtml(downloadLink.OuterHTML())
+					// jquery.Jq("#export").Show()
+					// jquery.Jq("button#export").SetProp("disabled", false)
 
 				} else if storages.GetTotal() != 0 {
 
