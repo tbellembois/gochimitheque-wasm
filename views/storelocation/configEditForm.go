@@ -131,7 +131,7 @@ func SaveStoreLocation(this js.Value, args []js.Value) interface{} {
 	}
 
 	if jquery.Jq("form#store_location input#store_location_id").Object.Length() > 0 {
-		ajaxURL = fmt.Sprintf("%sstore_locations/%d", ApplicationProxyPath, storelocation.StoreLocationID)
+		ajaxURL = fmt.Sprintf("%sstore_locations/%d", ApplicationProxyPath, *storelocation.StoreLocationID)
 		ajaxMethod = "put"
 	} else {
 		ajaxURL = fmt.Sprintf("%sstore_locations", ApplicationProxyPath)

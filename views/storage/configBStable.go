@@ -419,7 +419,12 @@ func Storage_modificationdateFormatter(this js.Value, args []js.Value) interface
 	row := args[1]
 	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
-	return fmt.Sprintf("%s <span class='text-left blockquote-footer'>%s</span>", CurrentStorage.StorageModificationDate.Format("2006-01-02"), CurrentStorage.Person.PersonEmail)
+	var history_count = ""
+	if CurrentStorage.StorageHC > 0 {
+		history_count = fmt.Sprintf(" (%d mod.)", CurrentStorage.StorageHC)
+	}
+
+	return fmt.Sprintf("%s <i>%s</i><span class='text-left blockquote-footer'>%s</span>", CurrentStorage.StorageModificationDate.Format("2006-01-02"), history_count, CurrentStorage.Person.PersonEmail)
 
 }
 
@@ -719,7 +724,7 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 	row := args[1]
 	CurrentStorage = Storage{Storage: &models.Storage{}}.FromJsJSONValue(row)
 
-	js.Global().Get("console").Call("log", fmt.Sprintf("%#v", *CurrentStorage.Storage))
+	// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", *CurrentStorage.Storage))
 
 	if CurrentStorage.Borrowing == nil || CurrentStorage.Borrowing.BorrowingID != nil {
 		iconBorrowing = themes.MDI_BORROW
@@ -732,7 +737,7 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 	if CurrentStorage.StorageArchive {
 
 		// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", e.Entity))
-		js.Global().Get("console").Call("log", "archive")
+		// js.Global().Get("console").Call("log", "archive")
 
 		// This is an archive.
 		buttonClone = widgets.NewLink(
@@ -798,7 +803,7 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 
 	} else if CurrentStorage.Storage != nil && CurrentStorage.Storage.Storage != nil && CurrentStorage.Storage.Storage.StorageID != nil {
 
-		js.Global().Get("console").Call("log", "history")
+		// js.Global().Get("console").Call("log", "history")
 
 		// This is an history.
 		buttonClone = widgets.NewLink(
@@ -823,7 +828,7 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 
 	} else {
 
-		js.Global().Get("console").Call("log", "normal")
+		// js.Global().Get("console").Call("log", "normal")
 
 		buttonEdit = widgets.NewLink(
 			widgets.LinkAttributes{
@@ -910,7 +915,7 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 
 	if CurrentStorage.StorageHC != 0 {
 
-		js.Global().Get("console").Call("log", "history_count != 0")
+		// js.Global().Get("console").Call("log", "history_count != 0")
 
 		buttonHistory = widgets.NewLink(
 			widgets.LinkAttributes{
@@ -937,7 +942,7 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 	// if CurrentStorage.Borrowing != nil && CurrentStorage.Borrowing.Borrower != nil && CurrentStorage.Borrowing.Borrower.PersonEmail != "" {
 	if CurrentStorage.Borrowing != nil {
 
-		js.Global().Get("console").Call("log", "borrower")
+		// js.Global().Get("console").Call("log", "borrower")
 
 		divBorrowing := widgets.NewDiv(widgets.DivAttributes{
 			BaseAttributes: widgets.BaseAttributes{
@@ -1156,7 +1161,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			documentTitle: ' ',
 			css: ['../css/chimitheque.css', '../css/bootstrap.min.css'],
 			scanStyles: false,
-			})`, CurrentStorage.StorageID),
+			})`, *CurrentStorage.StorageID),
 		Href:  "#",
 		Label: icon,
 	}))
@@ -1715,6 +1720,7 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 
 	queryFilter := ajax.QueryFilterFromJsJSONValue(params)
 
+	queryFilter.Id = BSTableQueryFilter.Id
 	queryFilter.Storages = BSTableQueryFilter.Storages
 	queryFilter.StoragesFilterLabel = BSTableQueryFilter.StoragesFilterLabel
 	queryFilter.Product = BSTableQueryFilter.Product

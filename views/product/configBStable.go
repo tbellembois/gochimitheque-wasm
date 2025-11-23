@@ -287,7 +287,7 @@ func OperateEventsSelect(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
-	jquery.Jq("input[name=selected_product_id]").SetVal(globals.CurrentProduct.ProductID)
+	jquery.Jq("input[name=selected_product_id]").SetVal(*globals.CurrentProduct.ProductID)
 	jquery.Jq("input[name=selected_product_name]").SetVal(globals.CurrentProduct.Name.NameLabel)
 
 	jsutils.DisplaySuccessMessage(locales.Translate("selected", HTTPHeaderAcceptLanguage) + ": #" + strconv.Itoa(int(*globals.CurrentProduct.ProductID)) + " " + globals.CurrentProduct.Name.NameLabel)
@@ -403,7 +403,7 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 					fmt.Println(err)
 				}
 
-				jsutils.ConsoleLog(fmt.Sprintf("%#v", data.String()))
+				// jsutils.ConsoleLog(fmt.Sprintf("%#v", data.String()))
 
 				if products.GetExportFn() != "" {
 					// jsutils.DisplaySuccessMessage(locales.Translate("export_done", HTTPHeaderAcceptLanguage))
