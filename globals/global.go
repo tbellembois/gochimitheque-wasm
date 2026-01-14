@@ -12,14 +12,14 @@ import (
 )
 
 var (
-	URLParameters                                  url.Values
-	ApplicationProxyPath, HTTPHeaderAcceptLanguage string
-	ConnectedUserEmail                             string
-	ConnectedUserID                                int64
-	DisableCache                                   bool
-	CurrentView                                    string
-	BSTableQueryFilter                             ajax.SafeQueryFilter
-	LocalStorage                                   localstorage.LocalStorage
+	URLParameters                                                 url.Values
+	BackProxyPath, ApplicationProxyPath, HTTPHeaderAcceptLanguage string
+	ConnectedUserEmail                                            string
+	ConnectedUserID                                               int64
+	DisableCache                                                  bool
+	CurrentView                                                   string
+	BSTableQueryFilter                                            ajax.SafeQueryFilter
+	LocalStorage                                                  localstorage.LocalStorage
 	// CurrentProduct is the current viewed or edited product, or the product of
 	// the listed storages.
 	CurrentProduct types.Product

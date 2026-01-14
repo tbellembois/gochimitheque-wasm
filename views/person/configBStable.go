@@ -29,7 +29,7 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 
 	jquery.Jq(fmt.Sprintf("button#delete%d", person.PersonID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-		url := fmt.Sprintf("%speople/%d", ApplicationProxyPath, *person.PersonID)
+		url := fmt.Sprintf("%speople/%d", BackProxyPath, *person.PersonID)
 		method := "delete"
 
 		done := func(data js.Value) {
@@ -78,7 +78,7 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 	index := args[3].Int()
 	person := Person{Person: &models.Person{}}.FromJsJSONValue(row).(Person)
 
-	url := fmt.Sprintf("%speople/%d", ApplicationProxyPath, *person.PersonID)
+	url := fmt.Sprintf("%speople_old/%d", BackProxyPath, *person.PersonID)
 	method := "get"
 
 	done := func(data js.Value) {
@@ -234,7 +234,7 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 
 	go func() {
 
-		u := url.URL{Path: ApplicationProxyPath + "people"}
+		u, _ := url.Parse(BackProxyPath + "people_old")
 		u.RawQuery = params.Data.ToRawQuery()
 
 		ajax := ajax.Ajax{

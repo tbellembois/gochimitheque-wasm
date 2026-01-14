@@ -112,7 +112,7 @@ func SaveBorrowing(this js.Value, args []js.Value) interface{} {
 		borrower_id = *s.Borrowing.Borrower.PersonID
 	}
 
-	ajaxURL = fmt.Sprintf("%sborrows/%d?borrower_id=%d", ApplicationProxyPath, *s.StorageID, borrower_id)
+	ajaxURL = fmt.Sprintf("%sborrows/%d?borrower_id=%d", BackProxyPath, *s.StorageID, borrower_id)
 	ajaxMethod = "get"
 
 	if borrowing_comment != nil {
@@ -374,10 +374,10 @@ func SaveStorage(this js.Value, args []js.Value) any {
 	}
 
 	if (!jquery.Jq("form#storage input#storage_id").GetVal().IsUndefined()) && jquery.Jq("form#storage input#storage_id").GetVal().String() != "" {
-		ajaxURL = fmt.Sprintf("%sstorages/%d", ApplicationProxyPath, *globals.CurrentStorage.StorageID)
+		ajaxURL = fmt.Sprintf("%sstorages/%d", BackProxyPath, *globals.CurrentStorage.StorageID)
 		ajaxMethod = "put"
 	} else {
-		ajaxURL = fmt.Sprintf("%sstorages?nb_items=%d&identical_barecode=%t", ApplicationProxyPath, nb_items, identical_barecode)
+		ajaxURL = fmt.Sprintf("%sstorages?nb_items=%d&identical_barecode=%t", BackProxyPath, nb_items, identical_barecode)
 		ajaxMethod = "post"
 	}
 

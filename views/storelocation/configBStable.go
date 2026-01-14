@@ -78,7 +78,7 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 	index := args[3].Int()
 	storeLocation := StoreLocation{StoreLocation: &models.StoreLocation{}}.FromJsJSONValue(row).(StoreLocation)
 
-	url := fmt.Sprintf("%sstore_locations/%d", ApplicationProxyPath, *storeLocation.StoreLocationID)
+	url := fmt.Sprintf("%sstore_locations_old/%d", BackProxyPath, *storeLocation.StoreLocationID)
 	method := "get"
 
 	done := func(data js.Value) {
@@ -285,7 +285,8 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 
 	go func() {
 
-		u := url.URL{Path: ApplicationProxyPath + "store_locations"}
+		u, _ := url.Parse(BackProxyPath + "store_locations_old")
+
 		u.RawQuery = params.Data.ToRawQuery()
 
 		ajax := ajax.Ajax{

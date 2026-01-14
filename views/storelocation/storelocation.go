@@ -3,6 +3,7 @@
 package storelocation
 
 import (
+	"encoding/json"
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/bstable"
@@ -44,15 +45,22 @@ func storelocation_common() {
 		},
 	}).Validate()
 
+	window := js.Global()
+	var keycloak js.Value
+	keycloak = window.Get("keycloak")
+	token := keycloak.Get("token").String()
+	marshalToken, _ := json.Marshal(map[string]string{"Authorization": "Bearer " + token})
+
 	// select2
 	select2.NewSelect2(jquery.Jq("select#entity"), &select2.Select2Config{
 		Placeholder:    locales.Translate("store_location_entity_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Entity{})),
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "entities",
+			URL:            BackProxyPath + "entities_old",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Entities{})),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 		},
 	}).Select2ify()
 	jquery.Jq("select#entity").On("select2:select", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -67,10 +75,11 @@ func storelocation_common() {
 		AllowClear:     true,
 		Tags:           true,
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "store_locations",
+			URL:            BackProxyPath + "store_locations_old",
 			DataType:       "json",
 			Data:           js.FuncOf(Select2StoreLocationAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(StoreLocations{})),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 		},
 	}).Select2ify()
 

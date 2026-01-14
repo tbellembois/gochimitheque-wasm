@@ -3,6 +3,7 @@
 package storage
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"syscall/js"
@@ -97,16 +98,23 @@ func storage_common() {
 		},
 	}).Validate()
 
+	window := js.Global()
+	var keycloak js.Value
+	keycloak = window.Get("keycloak")
+	token := keycloak.Get("token").String()
+	marshalToken, _ := json.Marshal(map[string]string{"Authorization": "Bearer " + token})
+
 	// select2
 	select2.NewSelect2(jquery.Jq("select#unit_concentration"), &select2.Select2Config{
 		Placeholder:    locales.Translate("product_unit_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Unit{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "storages/units",
+			URL:            BackProxyPath + "storages/units_old",
 			DataType:       "json",
 			Data:           js.FuncOf(Select2UnitConcentrationAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Units{})),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 		},
 	}).Select2ify()
 
@@ -115,10 +123,11 @@ func storage_common() {
 		TemplateResult: js.FuncOf(Select2StoreLocationTemplateResults),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "store_locations",
+			URL:            BackProxyPath + "store_locations_old",
 			DataType:       "json",
 			Data:           js.FuncOf(Select2StoreLocationAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(StoreLocations{})),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 		},
 	}).Select2ify()
 
@@ -127,10 +136,11 @@ func storage_common() {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Unit{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "storages/units",
+			URL:            BackProxyPath + "storages/units_old",
 			DataType:       "json",
 			Data:           js.FuncOf(Select2UnitQuantityAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Units{})),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 		},
 	}).Select2ify()
 
@@ -141,10 +151,11 @@ func storage_common() {
 		Tags:           true,
 		CreateTag:      js.FuncOf(select2.Select2GenericCreateTag(Supplier{})),
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "products/suppliers/",
+			URL:            BackProxyPath + "products/suppliers_old",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Suppliers{})),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 		},
 	}).Select2ify()
 
@@ -153,6 +164,12 @@ func storage_common() {
 }
 
 func storage_borrower() {
+
+	window := js.Global()
+	var keycloak js.Value
+	keycloak = window.Get("keycloak")
+	token := keycloak.Get("token").String()
+	marshalToken, _ := json.Marshal(map[string]string{"Authorization": "Bearer " + token})
 
 	validate.NewValidate(jquery.Jq("#borrowing"), &validate.ValidateConfig{
 		ErrorClass: "alert alert-danger",
@@ -176,10 +193,11 @@ func storage_borrower() {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Person{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "people",
+			URL:            BackProxyPath + "people_old",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(People{})),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 		},
 	}).Select2ify()
 

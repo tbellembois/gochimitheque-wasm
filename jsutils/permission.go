@@ -27,9 +27,9 @@ func HasPermission(item, id, method string, done, fail func()) {
 		} else {
 			var url string
 			if id != "" {
-				url = ApplicationProxyPath + "f/" + item + "/" + id
+				url = BackProxyPath + "f/" + item + "/" + id
 			} else {
-				url = ApplicationProxyPath + "f/" + item
+				url = BackProxyPath + "f/" + item
 			}
 
 			ajaxDone := func(js.Value) {

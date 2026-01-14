@@ -24,7 +24,7 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Tag{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "products/tags/",
+			URL:            BackProxyPath + "products/tags",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Tags{})),
@@ -36,7 +36,7 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Category{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "products/categories/",
+			URL:            BackProxyPath + "products/categories",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Categories{})),
@@ -48,7 +48,7 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Entity{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "entities",
+			URL:            BackProxyPath + "entities",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Entities{})),
@@ -60,7 +60,7 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(Select2StoreLocationTemplateResults),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "store_locations",
+			URL:            BackProxyPath + "store_locations",
 			DataType:       "json",
 			Data:           js.FuncOf(Select2StoreLocationAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(StoreLocations{})),
@@ -72,7 +72,7 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(CasNumber{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "products/casnumbers/",
+			URL:            BackProxyPath + "products/casnumbers",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(CasNumbers{})),
@@ -84,7 +84,7 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Name{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "products/names/",
+			URL:            BackProxyPath + "products/names",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Names{})),
@@ -96,7 +96,7 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(EmpiricalFormula{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "products/empiricalformulas/",
+			URL:            BackProxyPath + "products/empiricalformulas",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(EmpiricalFormulas{})),
@@ -108,7 +108,7 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(ProducerRef{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "products/producerrefs/",
+			URL:            BackProxyPath + "products/producerrefs",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(ProducerRefs{})),
@@ -120,7 +120,7 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(SignalWord{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "products/signalwords/",
+			URL:            BackProxyPath + "products/signalwords",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(SignalWords{})),
@@ -132,7 +132,7 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(Select2SymbolTemplateResults),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "products/symbols/",
+			URL:            BackProxyPath + "products/symbols",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Symbols{})),
@@ -144,7 +144,7 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(HazardStatement{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "products/hazardstatements/",
+			URL:            BackProxyPath + "products/hazardstatements",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(HazardStatements{})),
@@ -156,7 +156,7 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(PrecautionaryStatement{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "products/precautionarystatements/",
+			URL:            BackProxyPath + "products/precautionarystatements",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(PrecautionaryStatements{})),

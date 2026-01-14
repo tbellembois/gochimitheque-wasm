@@ -32,7 +32,7 @@ func OperateEventsBookmark(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
-	url := fmt.Sprintf("%sbookmarks/%d", ApplicationProxyPath, *globals.CurrentProduct.ProductID)
+	url := fmt.Sprintf("%sbookmarks/%d", BackProxyPath, *globals.CurrentProduct.ProductID)
 	method := "get"
 
 	done := func(data js.Value) {
@@ -116,7 +116,7 @@ func OperateEventsOStorages(this js.Value, args []js.Value) interface{} {
 	row := args[2]
 	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
-	url := fmt.Sprintf("%sstorages/others?product=%d", ApplicationProxyPath, globals.CurrentProduct.ProductID)
+	url := fmt.Sprintf("%sstorages/others?product=%d", BackProxyPath, globals.CurrentProduct.ProductID)
 	method := "get"
 
 	done := func(data js.Value) {
@@ -238,7 +238,7 @@ func OperateEventsTotalStock(this js.Value, args []js.Value) interface{} {
 
 	jquery.Jq(fmt.Sprintf("#totalstock-collapse-%d", *product.ProductID)).Show()
 
-	url := fmt.Sprintf("%sstocks/%d", ApplicationProxyPath, *product.ProductID)
+	url := fmt.Sprintf("%sstocks/%d", BackProxyPath, *product.ProductID)
 	method := "get"
 
 	done := func(data js.Value) {
@@ -324,7 +324,7 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 
 	jquery.Jq(fmt.Sprintf("a#delete%d", *globals.CurrentProduct.ProductID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-		url := fmt.Sprintf("%sproducts/%d", ApplicationProxyPath, *globals.CurrentProduct.ProductID)
+		url := fmt.Sprintf("%sproducts/%d", BackProxyPath, *globals.CurrentProduct.ProductID)
 		method := "delete"
 
 		done := func(data js.Value) {
@@ -374,14 +374,16 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 
 	go func() {
 
-		var u url.URL
+		var u *url.URL
 
 		if params.Data.Export {
-			u = url.URL{Path: ApplicationProxyPath + "products/export"}
+			u, _ = url.Parse(BackProxyPath + "products/exports")
+
 			params.Data.Offset = 0
 			params.Data.Limit = 999999999999999999
 		} else {
-			u = url.URL{Path: ApplicationProxyPath + "products"}
+			u, _ = url.Parse(BackProxyPath + "products_old")
+
 		}
 		u.RawQuery = params.Data.ToRawQuery()
 

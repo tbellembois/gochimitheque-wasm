@@ -45,11 +45,18 @@ func (ajax Ajax) Send() {
 			return
 		}
 
+		window := js.Global()
+
+		var keycloak js.Value
+		keycloak = window.Get("keycloak")
+		token := keycloak.Get("token").String()
+
 		req := &http.Request{
 			Method: ajax.Method,
 			URL:    reqURL,
 			Header: map[string][]string{
-				"Content-Type": {"application/json; charset=UTF-8"},
+				"Content-Type":  {"application/json; charset=UTF-8"},
+				"Authorization": {"Bearer " + token},
 			},
 		}
 

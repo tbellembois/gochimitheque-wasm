@@ -21,7 +21,7 @@ func ValidatePersonEmailBeforeSend(this js.Value, args []js.Value) interface{} {
 		id = pid.GetVal().String()
 	}
 
-	settings.Set("url", fmt.Sprintf("%svalidate/person/%s/email/", ApplicationProxyPath, id))
+	settings.Set("url", fmt.Sprintf("%svalidate/person/%s/email/", BackProxyPath, id))
 
 	return nil
 

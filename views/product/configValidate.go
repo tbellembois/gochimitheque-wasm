@@ -22,7 +22,7 @@ func ValidateProductCeNumberBeforeSend(this js.Value, args []js.Value) interface
 		id = pid.GetVal().String()
 	}
 
-	settings.Set("url", fmt.Sprintf("%svalidate/product/%s/cenumber/", ApplicationProxyPath, id))
+	settings.Set("url", fmt.Sprintf("%svalidate/product/%s/cenumber/", BackProxyPath, id))
 
 	return nil
 
@@ -45,7 +45,7 @@ func ValidateProductCasNumberBeforeSend(this js.Value, args []js.Value) interfac
 		id = pid.GetVal().String()
 	}
 
-	settings.Set("url", fmt.Sprintf("%svalidate/product/%s/cas_number/", ApplicationProxyPath, id))
+	settings.Set("url", fmt.Sprintf("%svalidate/product/%s/cas_number/", BackProxyPath, id))
 
 	return nil
 
@@ -62,7 +62,7 @@ func ValidateProductEmpiricalFormulaBeforeSend(this js.Value, args []js.Value) i
 		id = pid.GetVal().String()
 	}
 
-	settings.Set("url", fmt.Sprintf("%svalidate/product/%s/empiricalformula/", ApplicationProxyPath, id))
+	settings.Set("url", fmt.Sprintf("%svalidate/product/%s/empiricalformula/", BackProxyPath, id))
 
 	return nil
 

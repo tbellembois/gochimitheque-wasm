@@ -3,6 +3,7 @@
 package person
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"syscall/js"
@@ -44,15 +45,22 @@ func person_common() {
 		},
 	}).Validate()
 
+	window := js.Global()
+	var keycloak js.Value
+	keycloak = window.Get("keycloak")
+	token := keycloak.Get("token").String()
+	marshalToken, _ := json.Marshal(map[string]string{"Authorization": "Bearer " + token})
+
 	// select2
 	select2.NewSelect2(jquery.Jq("select#entities"), &select2.Select2Config{
 		Placeholder:    locales.Translate("person_entity_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Entity{})),
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "entities",
+			URL:            BackProxyPath + "entities_old",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Entities{})),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 		},
 	}).Select2ify()
 	jquery.Jq("select#entities").On("select2:unselecting", js.FuncOf(func(this js.Value, args []js.Value) interface{} {

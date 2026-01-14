@@ -52,6 +52,8 @@ type Container struct {
 	PersonID       int    `json:"PersonID"`
 	AppURL         string `json:"AppURL"`
 	AppPath        string `json:"AppPath"`
+	BackURL        string `json:"BackURL"`
+	BackPath       string `json:"BackPath"`
 	BuildID        string `json:"BuildID"`
 	DisableCache   bool   `json:"DisableCache"`
 }
@@ -82,7 +84,8 @@ func init() {
 		panic(err)
 	}
 
-	ApplicationProxyPath = c.AppPath
+	ApplicationProxyPath = c.AppURL + "/app/"
+	BackProxyPath = c.AppURL + "/back/"
 	HTTPHeaderAcceptLanguage = c.PersonLanguage
 	DisableCache = c.DisableCache
 
@@ -196,7 +199,7 @@ func main() {
 	js.Global().Set("Product_addProducer", js.FuncOf(product.AddProducer))
 	js.Global().Set("Product_addSupplier", js.FuncOf(product.AddSupplier))
 
-	js.Global().Set("Product_linearToEmpirical", js.FuncOf(product.LinearToEmpirical))
+	// js.Global().Set("Product_linearToEmpirical", js.FuncOf(product.LinearToEmpirical))
 	js.Global().Set("Product_noCas", js.FuncOf(product.NoCas))
 	js.Global().Set("Product_noEmpiricalFormula", js.FuncOf(product.NoEmpiricalFormula))
 	js.Global().Set("Product_magic", js.FuncOf(product.Magic))
@@ -311,10 +314,37 @@ func main() {
 	loginCallbackWrapper := func(args ...interface{}) {
 		login.Login_listCallback(js.Null(), nil)
 	}
+
 	jsutils.LoadContent("div#content", "login", fmt.Sprintf("%slogin", ApplicationProxyPath), loginCallbackWrapper)
+
+	// l := js.Global().Get("window").Get("location").Get("search")
+	// if l.String() == "?auth=true" {
+	// 	login.AfterLogin_listCallback(js.Null(), nil)
+	// }
+	// jsutils.LoadContent("div#content", "login", fmt.Sprintf("%slogin", ApplicationProxyPath), afterLoginCallbackWrapper)
 
 	fmt.Println("wasm loaded")
 	fmt.Println("ApplicationProxyPath:" + ApplicationProxyPath)
+	fmt.Println("BackProxyPath:" + BackProxyPath)
+
+	// Call the ping handler to see if if are already authenticated.
+	// ajax.Ajax{
+	// 	URL:    fmt.Sprintf("%sauthenticated", BackProxyPath),
+	// 	Method: "get",
+	// 	Done: func(data js.Value) {
+	// 		js.Global().Get("console").Call("log", fmt.Sprint("done"))
+
+	// 		login.AfterLogin_listCallback(js.Null(), nil)
+	// 	},
+	// 	Fail: func(jqXHR js.Value) {
+	// 		js.Global().Get("console").Call("log", fmt.Sprint("fail"))
+
+	// 		loginCallbackWrapper := func(args ...interface{}) {
+	// 			login.Login_listCallback(js.Null(), nil)
+	// 		}
+	// 		jsutils.LoadContent("div#content", "login", fmt.Sprintf("%slogin", ApplicationProxyPath), loginCallbackWrapper)
+	// 	},
+	// }.Send()
 
 	keepAlive()
 

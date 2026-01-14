@@ -3,6 +3,7 @@
 package entity
 
 import (
+	"encoding/json"
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/bstable"
@@ -22,11 +23,11 @@ func entity_common() {
 		Rules: map[string]validate.ValidateRule{
 			"entity_name": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
-				Remote: validate.ValidateRemote{
-					URL:        "",
-					Type:       "post",
-					BeforeSend: js.FuncOf(ValidateEntityNameBeforeSend),
-				},
+				// Remote: validate.ValidateRemote{
+				// 	URL:        "",
+				// 	Type:       "post",
+				// 	BeforeSend: js.FuncOf(ValidateEntityNameBeforeSend),
+				// },
 			},
 		},
 		Messages: map[string]validate.ValidateMessage{
@@ -36,15 +37,22 @@ func entity_common() {
 		},
 	}).Validate()
 
+	window := js.Global()
+	var keycloak js.Value
+	keycloak = window.Get("keycloak")
+	token := keycloak.Get("token").String()
+	marshalToken, _ := json.Marshal(map[string]string{"Authorization": "Bearer " + token})
+
 	// select2
 	select2.NewSelect2(jquery.Jq("select#managers"), &select2.Select2Config{
 		Placeholder:    locales.Translate("entity_manager_placeholder", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Person{})),
 		Ajax: select2.Select2Ajax{
-			URL:            ApplicationProxyPath + "people",
+			URL:            BackProxyPath + "people_old",
 			DataType:       "json",
 			Data:           js.FuncOf(Select2ManagerAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(People{})),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 		},
 	}).Select2ify()
 

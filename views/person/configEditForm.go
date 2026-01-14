@@ -172,7 +172,7 @@ func populatePermission(permissions []types.Permission, managedEntitiesIds map[i
 
 func SelectAllEntity(this js.Value, args []js.Value) interface{} {
 
-	url := fmt.Sprintf("%sentities", ApplicationProxyPath)
+	url := fmt.Sprintf("%sentities", BackProxyPath)
 	method := "get"
 
 	done := func(data js.Value) {
@@ -442,10 +442,10 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 	}
 
 	if jquery.Jq("form#person input#person_id").Object.Length() > 0 {
-		ajaxURL = fmt.Sprintf("%speople/%d", ApplicationProxyPath, *person.PersonID)
+		ajaxURL = fmt.Sprintf("%speople/%d", BackProxyPath, *person.PersonID)
 		ajaxMethod = "put"
 	} else {
-		ajaxURL = fmt.Sprintf("%speople", ApplicationProxyPath)
+		ajaxURL = fmt.Sprintf("%speople", BackProxyPath)
 		ajaxMethod = "post"
 	}
 

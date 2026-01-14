@@ -133,7 +133,7 @@ func Storage_operateEventsRestore(this js.Value, args []js.Value) interface{} {
 
 	jquery.Jq(fmt.Sprintf("a#restore%d", *CurrentStorage.StorageID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-		url := fmt.Sprintf("%sstorages/%d/r", ApplicationProxyPath, *CurrentStorage.StorageID)
+		url := fmt.Sprintf("%sstorages/%d/r", BackProxyPath, *CurrentStorage.StorageID)
 		method := "put"
 
 		done := func(data js.Value) {
@@ -286,7 +286,7 @@ func Storage_operateEventsArchive(this js.Value, args []js.Value) interface{} {
 
 	jquery.Jq(fmt.Sprintf("a#archive%d", *CurrentStorage.StorageID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-		url := fmt.Sprintf("%sstorages/%d/a", ApplicationProxyPath, *CurrentStorage.StorageID)
+		url := fmt.Sprintf("%sstorages/%d/a", BackProxyPath, *CurrentStorage.StorageID)
 		method := "delete"
 
 		done := func(data js.Value) {
@@ -345,7 +345,7 @@ func Storage_operateEventsDelete(this js.Value, args []js.Value) interface{} {
 
 	jquery.Jq(fmt.Sprintf("a#delete%d", *CurrentStorage.StorageID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-		url := fmt.Sprintf("%sstorages/%d", ApplicationProxyPath, *CurrentStorage.StorageID)
+		url := fmt.Sprintf("%sstorages/%d", BackProxyPath, *CurrentStorage.StorageID)
 		method := "delete"
 
 		done := func(data js.Value) {
@@ -1901,14 +1901,16 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 
 	go func() {
 
-		var u url.URL
+		var u *url.URL
 
 		if params.Data.Export {
-			u = url.URL{Path: ApplicationProxyPath + "storages/export"}
+			u, _ = url.Parse(BackProxyPath + "storages/exports")
+
 			params.Data.Offset = 0
 			params.Data.Limit = 999999999999999999
 		} else {
-			u = url.URL{Path: ApplicationProxyPath + "storages"}
+			u, _ = url.Parse(BackProxyPath + "storages_old")
+
 		}
 		u.RawQuery = params.Data.ToRawQuery()
 
