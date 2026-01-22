@@ -72,7 +72,7 @@ type QueryFilter struct {
 	BorrowingFilterLabel               string
 	StorageToDestroy                   bool `json:"storage_to_destroy,omitempty"`
 	StorageToDestroyFilterLabel        string
-	StorageArchive                     bool   `json:"storage_archive,omitempty"`
+	StorageArchive                     *bool  `json:"storage_archive,omitempty"`
 	StorageHistory                     bool   `json:"storage_history,omitempty"`
 	StorageBatchNumber                 string `json:"storage_batch_number,omitempty"`
 	StorageBatchNumberFilterLabel      string
@@ -238,8 +238,11 @@ func (q QueryFilter) ToRawQuery() string {
 	if q.StorageToDestroy {
 		values.Set("storage_to_destroy", strconv.FormatBool(true))
 	}
-	if q.StorageArchive {
+	if q.StorageArchive != nil && *q.StorageArchive {
 		values.Set("storage_archive", strconv.FormatBool(true))
+	}
+	if q.StorageArchive != nil && !*q.StorageArchive {
+		values.Set("storage_archive", strconv.FormatBool(false))
 	}
 	if q.StorageHistory {
 		values.Set("history", strconv.FormatBool(true))

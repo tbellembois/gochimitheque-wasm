@@ -189,11 +189,13 @@ func Search_listCallback(args ...interface{}) {
 		BSTableQueryFilter.Lock()
 
 		if jquery.Jq("#s_storage_archive_button > span").HasClass(themes.MDI_SHOW_DELETED.ToString()) {
-			BSTableQueryFilter.QueryFilter.StorageArchive = true
+			BSTableQueryFilter.QueryFilter.StorageArchive = new(bool)
+			*BSTableQueryFilter.QueryFilter.StorageArchive = true
 			btnIcon = themes.MDI_HIDE_DELETED
 			btnLabel = locales.Translate("hidedeleted_text", HTTPHeaderAcceptLanguage)
 		} else {
-			BSTableQueryFilter.QueryFilter.StorageArchive = false
+			BSTableQueryFilter.QueryFilter.StorageArchive = new(bool)
+			*BSTableQueryFilter.QueryFilter.StorageArchive = false
 			btnIcon = themes.MDI_SHOW_DELETED
 			btnLabel = locales.Translate("showdeleted_text", HTTPHeaderAcceptLanguage)
 		}

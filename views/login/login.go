@@ -5,6 +5,7 @@ package login
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"syscall/js"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	. "github.com/tbellembois/gochimitheque-wasm/globals"
 	"github.com/tbellembois/gochimitheque-wasm/jquery"
 	"github.com/tbellembois/gochimitheque-wasm/jsutils"
+	"github.com/tbellembois/gochimitheque-wasm/locales"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
 	"github.com/tbellembois/gochimitheque-wasm/views/menu"
 	"github.com/tbellembois/gochimitheque-wasm/views/product"
@@ -98,7 +100,8 @@ func AfterLogin_listCallback(this js.Value, args []js.Value) interface{} {
 		},
 		Fail: func(jqXHR js.Value) {
 
-			jsutils.DisplayGenericErrorMessage()
+			jquery.Jq("body").SetHtml(locales.Translate("user_not_enrolled", HTTPHeaderAcceptLanguage))
+			os.Exit(0)
 
 		},
 	}.Send()

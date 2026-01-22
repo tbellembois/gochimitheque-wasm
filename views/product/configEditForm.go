@@ -389,8 +389,8 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		if productTemperature, err = strconv.Atoi(jquery.Jq("input#product_temperature").GetVal().String()); err != nil {
 			return nil
 		}
-		var ProductTemperaturePointer *int64 = new(int64)
-		*ProductTemperaturePointer = int64(productTemperature)
+		var ProductTemperaturePointer *float64 = new(float64)
+		*ProductTemperaturePointer = float64(productTemperature)
 		globals.CurrentProduct.ProductTemperature = ProductTemperaturePointer
 	}
 

@@ -133,14 +133,14 @@ func Storage_operateEventsRestore(this js.Value, args []js.Value) interface{} {
 
 	jquery.Jq(fmt.Sprintf("a#restore%d", *CurrentStorage.StorageID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-		url := fmt.Sprintf("%sstorages/%d/r", BackProxyPath, *CurrentStorage.StorageID)
+		url := fmt.Sprintf("%sstorages/%d/unarchive", BackProxyPath, *CurrentStorage.StorageID)
 		method := "put"
 
 		done := func(data js.Value) {
 
 			jsutils.DisplaySuccessMessage(locales.Translate("storage_restored_message", HTTPHeaderAcceptLanguage))
 			BSTableQueryFilter.Lock()
-			BSTableQueryFilter.QueryFilter.StorageArchive = false
+			*BSTableQueryFilter.QueryFilter.StorageArchive = false
 			BSTableQueryFilter.QueryFilter.Storage = strconv.Itoa(int(*CurrentStorage.StorageID))
 			BSTableQueryFilter.QueryFilter.StorageFilterLabel = fmt.Sprintf("#%d", *CurrentStorage.StorageID)
 			bstable.NewBootstraptable(jquery.Jq("#Storage_table"), nil).Refresh(nil)
@@ -286,7 +286,7 @@ func Storage_operateEventsArchive(this js.Value, args []js.Value) interface{} {
 
 	jquery.Jq(fmt.Sprintf("a#archive%d", *CurrentStorage.StorageID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-		url := fmt.Sprintf("%sstorages/%d/a", BackProxyPath, *CurrentStorage.StorageID)
+		url := fmt.Sprintf("%sstorages/%d/archive", BackProxyPath, *CurrentStorage.StorageID)
 		method := "delete"
 
 		done := func(data js.Value) {
@@ -517,7 +517,7 @@ func Storage_productFormatter(this js.Value, args []js.Value) interface{} {
 		)
 	}
 
-	if CurrentStorage.StorageArchive {
+	if CurrentStorage.StorageArchive != nil && *CurrentStorage.StorageArchive {
 		d.AppendChild(
 			widgets.NewSpan(widgets.SpanAttributes{
 				BaseAttributes: widgets.BaseAttributes{
@@ -734,7 +734,7 @@ func Storage_operateFormatter(this js.Value, args []js.Value) interface{} {
 		iconBorrowingTitle = locales.Translate("storage_unborrow", HTTPHeaderAcceptLanguage)
 	}
 
-	if CurrentStorage.StorageArchive {
+	if CurrentStorage.StorageArchive != nil && *CurrentStorage.StorageArchive {
 
 		// js.Global().Get("console").Call("log", fmt.Sprintf("%#v", e.Entity))
 		// js.Global().Get("console").Call("log", "archive")
@@ -1914,25 +1914,49 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 		}
 		u.RawQuery = params.Data.ToRawQuery()
 
-		if params.Data.Export {
-			jsutils.RedirectTo(u.String())
-			return
-		}
+		// if params.Data.Export {
+		// 	jsutils.RedirectTo(u.String())
+		// 	return
+		// }
 
 		ajax := ajax.Ajax{
 			URL:    u.String(),
 			Method: "get",
 			Done: func(data js.Value) {
 
-				var (
-					storages Storages
-					err      error
-				)
-				if err = json.Unmarshal([]byte(data.String()), &storages); err != nil {
-					fmt.Println(err)
-				}
+				if params.Data.Export {
 
-				if storages.GetExportFn() != "" {
+					text := data.String()
+
+					// Create Blob from text
+					array := js.Global().Get("Array").New()
+					array.Call("push", text)
+
+					blob := js.Global().Get("Blob").New(
+						array,
+						map[string]any{
+							"type": "text/plain;charset=utf-8",
+						},
+					)
+
+					// Create object URL
+					url := js.Global().Get("URL").Call("createObjectURL", blob)
+
+					// Create <a> element
+					document := js.Global().Get("document")
+					a := document.Call("createElement", "a")
+					a.Set("href", url)
+					a.Set("download", "chimitheque_export.csv")
+
+					document.Get("body").Call("appendChild", a)
+					a.Call("click")
+					document.Get("body").Call("removeChild", a)
+
+					// Cleanup
+					js.Global().Get("URL").Call("revokeObjectURL", url)
+
+					return
+
 					// jsutils.DisplaySuccessMessage(locales.Translate("export_done", HTTPHeaderAcceptLanguage))
 
 					// var icon widgets.Widget
@@ -1951,7 +1975,7 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 					// 	},
 					// 	Onclick: "$('#export').collapse('hide')",
 					// 	Title:   locales.Translate("download_export", HTTPHeaderAcceptLanguage),
-					// 	Href:    fmt.Sprintf("%sdownload/%s", ApplicationProxyPath, storages.GetExportFn()),
+					// 	Href:    fmt.Sprintf("%sdownload/%s", ApplicationProxyPath, products.GetExportFn()),
 					// 	Label:   icon,
 					// })
 
@@ -1959,14 +1983,25 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 					// jquery.Jq("#export").Show()
 					// jquery.Jq("button#export").SetProp("disabled", false)
 
-				} else if storages.GetTotal() != 0 {
-
-					row.Call("success", js.ValueOf(js.Global().Get("JSON").Call("parse", data)))
-
 				} else {
+					var (
+						storages Storages
+						err      error
+					)
+					if err = json.Unmarshal([]byte(data.String()), &storages); err != nil {
+						fmt.Println(err)
+					}
 
-					// TODO: improve this
-					jquery.Jq("span.loading-wrap").SetHtml(locales.Translate("no_result", globals.HTTPHeaderAcceptLanguage))
+					if storages.GetTotal() != 0 {
+
+						row.Call("success", js.ValueOf(js.Global().Get("JSON").Call("parse", data)))
+
+					} else {
+
+						// TODO: improve this
+						jquery.Jq("span.loading-wrap").SetHtml(locales.Translate("no_result", globals.HTTPHeaderAcceptLanguage))
+
+					}
 
 				}
 

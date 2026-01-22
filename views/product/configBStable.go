@@ -377,7 +377,7 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 		var u *url.URL
 
 		if params.Data.Export {
-			u, _ = url.Parse(BackProxyPath + "products/exports")
+			u, _ = url.Parse(BackProxyPath + "products/export")
 
 			params.Data.Offset = 0
 			params.Data.Limit = 999999999999999999
@@ -387,27 +387,51 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 		}
 		u.RawQuery = params.Data.ToRawQuery()
 
-		if params.Data.Export {
-			jsutils.RedirectTo(u.String())
-			return
-		}
+		// if params.Data.Export {
+		// 	jsutils.RedirectTo(u.String())
+		// 	return
+		// }
 
 		ajax := ajax.Ajax{
 			URL:    u.String(),
 			Method: "get",
 			Done: func(data js.Value) {
 
-				var (
-					products Products
-					err      error
-				)
-				if err = json.Unmarshal([]byte(data.String()), &products); err != nil {
-					fmt.Println(err)
-				}
-
 				// jsutils.ConsoleLog(fmt.Sprintf("%#v", data.String()))
 
-				if products.GetExportFn() != "" {
+				if params.Data.Export {
+
+					text := data.String()
+
+					// Create Blob from text
+					array := js.Global().Get("Array").New()
+					array.Call("push", text)
+
+					blob := js.Global().Get("Blob").New(
+						array,
+						map[string]any{
+							"type": "text/plain;charset=utf-8",
+						},
+					)
+
+					// Create object URL
+					url := js.Global().Get("URL").Call("createObjectURL", blob)
+
+					// Create <a> element
+					document := js.Global().Get("document")
+					a := document.Call("createElement", "a")
+					a.Set("href", url)
+					a.Set("download", "chimitheque_export.csv")
+
+					document.Get("body").Call("appendChild", a)
+					a.Call("click")
+					document.Get("body").Call("removeChild", a)
+
+					// Cleanup
+					js.Global().Get("URL").Call("revokeObjectURL", url)
+
+					return
+
 					// jsutils.DisplaySuccessMessage(locales.Translate("export_done", HTTPHeaderAcceptLanguage))
 
 					// var icon widgets.Widget
@@ -434,14 +458,25 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 					// jquery.Jq("#export").Show()
 					// jquery.Jq("button#export").SetProp("disabled", false)
 
-				} else if products.GetTotal() != 0 {
-
-					row.Call("success", js.ValueOf(js.Global().Get("JSON").Call("parse", data)))
-
 				} else {
+					var (
+						products Products
+						err      error
+					)
+					if err = json.Unmarshal([]byte(data.String()), &products); err != nil {
+						fmt.Println(err)
+					}
 
-					// TODO: improve this
-					jquery.Jq("span.loading-wrap").SetHtml(locales.Translate("no_result", globals.HTTPHeaderAcceptLanguage))
+					if products.GetTotal() != 0 {
+
+						row.Call("success", js.ValueOf(js.Global().Get("JSON").Call("parse", data)))
+
+					} else {
+
+						// TODO: improve this
+						jquery.Jq("span.loading-wrap").SetHtml(locales.Translate("no_result", globals.HTTPHeaderAcceptLanguage))
+
+					}
 
 				}
 
@@ -1057,7 +1092,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			BaseAttributes: widgets.BaseAttributes{
 				Visible: true,
 			},
-			Text: fmt.Sprintf("%d%s", *globals.CurrentProduct.ProductTemperature, *globals.CurrentProduct.UnitTemperature.UnitLabel),
+			Text: fmt.Sprintf("%f%s", *globals.CurrentProduct.ProductTemperature, *globals.CurrentProduct.UnitTemperature.UnitLabel),
 		}))
 	}
 
