@@ -1730,6 +1730,10 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 	queryFilter.StorageArchive = BSTableQueryFilter.StorageArchive
 	queryFilter.StorageHistory = BSTableQueryFilter.StorageHistory
 	queryFilter.Export = BSTableQueryFilter.Export
+	// hack
+	if BSTableQueryFilter.Limit == 1 {
+		queryFilter.Limit = 1
+	}
 	BSTableQueryFilter.Export = false
 	BSTableQueryFilter.Unlock()
 

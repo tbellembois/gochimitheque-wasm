@@ -98,6 +98,8 @@ func OperateEventsStorages(this js.Value, args []js.Value) interface{} {
 	globals.CurrentProduct = Product{Product: &models.Product{}}.ProductFromJsJSONValue(row)
 
 	BSTableQueryFilter.Lock()
+	BSTableQueryFilter.QueryFilter.StorageArchive = new(bool)
+	*BSTableQueryFilter.QueryFilter.StorageArchive = false
 	BSTableQueryFilter.QueryFilter.Product = strconv.Itoa(int(*globals.CurrentProduct.ProductID))
 	if globals.CurrentProduct.ProductSpecificity != nil {
 		BSTableQueryFilter.QueryFilter.ProductFilterLabel = fmt.Sprintf("%s %s", globals.CurrentProduct.Name.NameLabel, *globals.CurrentProduct.ProductSpecificity)
@@ -1691,6 +1693,10 @@ func NameFormatter(this js.Value, args []js.Value) interface{} {
 		result += fmt.Sprintf("<span class='mdi mdi-bookmark mdi-24px iconlabel'>%s</span>", "")
 	}
 
+	if globals.CurrentProduct.ProductSC != nil && *globals.CurrentProduct.ProductSC > 0 {
+		result += fmt.Sprintf("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>[<i> st: %d </i>]</span>", *globals.CurrentProduct.ProductSC)
+	}
+
 	result += "</div>"
 
 	return result
@@ -1862,26 +1868,27 @@ func OperateFormatter(this js.Value, args []js.Value) interface{} {
 			_product_asc = *globals.CurrentProduct.ProductASC
 		}
 
-		buttonStorages = widgets.NewLink(
-			widgets.LinkAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Id:      "storages" + strconv.Itoa(int(*globals.CurrentProduct.ProductID)),
-					Classes: []string{"storages", "dropdown-item", "text-primary", "iconlabel"},
-					Visible: false,
-				},
-				Href: "#",
-				Label: widgets.NewSpan(
-					widgets.SpanAttributes{
-						BaseAttributes: widgets.BaseAttributes{
-							Classes: []string{"mdi", themes.MDI_STORAGE.ToString()},
-							Visible: true,
-						},
-						Text: fmt.Sprintf("%s %d  (%d)", locales.Translate("storages", HTTPHeaderAcceptLanguage), _product_sc, _product_asc),
+		if _product_sc > 0 || _product_asc > 0 {
+			buttonStorages = widgets.NewLink(
+				widgets.LinkAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Id:      "storages" + strconv.Itoa(int(*globals.CurrentProduct.ProductID)),
+						Classes: []string{"storages", "dropdown-item", "text-primary", "iconlabel"},
+						Visible: false,
 					},
-				),
-			},
-		).OuterHTML()
-
+					Href: "#",
+					Label: widgets.NewSpan(
+						widgets.SpanAttributes{
+							BaseAttributes: widgets.BaseAttributes{
+								Classes: []string{"mdi", themes.MDI_STORAGE.ToString()},
+								Visible: true,
+							},
+							Text: fmt.Sprintf("%s %d  (%d)", locales.Translate("storages", HTTPHeaderAcceptLanguage), _product_sc, _product_asc),
+						},
+					),
+				},
+			).OuterHTML()
+		}
 	}
 
 	buttonStore := widgets.NewLink(

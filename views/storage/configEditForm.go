@@ -27,7 +27,10 @@ func ScanQRdone(this js.Value, args []js.Value) interface{} {
 
 	qr := args[0].String()
 	BSTableQueryFilter.Clean()
-	BSTableQueryFilter.Storage = qr
+	qr_int, _ := strconv.Atoi(qr)
+	BSTableQueryFilter.Id = qr_int
+	// hack
+	BSTableQueryFilter.Limit = 1
 
 	storageCallbackWrapper := func(args ...interface{}) {
 		Storage_listCallback(js.Null(), nil)
