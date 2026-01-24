@@ -3,6 +3,7 @@
 package search
 
 import (
+	"encoding/json"
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/bstable"
@@ -19,15 +20,22 @@ import (
 
 func Search_listCallback(args ...interface{}) {
 
+	window := js.Global()
+	var keycloak js.Value
+	keycloak = window.Get("keycloak")
+	token := keycloak.Get("token").String()
+	marshalToken, _ := json.Marshal(map[string]string{"Authorization": "Bearer " + token})
+
 	select2.NewSelect2(jquery.Jq("select#s_tags"), &select2.Select2Config{
 		Placeholder:    locales.Translate("s_tags", HTTPHeaderAcceptLanguage),
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Tag{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            BackProxyPath + "products/tags",
+			URL:            BackProxyPath + "products/tags_old",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Tags{})),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 		},
 	}).Select2ify()
 
@@ -36,10 +44,11 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Category{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            BackProxyPath + "products/categories",
+			URL:            BackProxyPath + "products/categories_old",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Categories{})),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 		},
 	}).Select2ify()
 
@@ -48,10 +57,11 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Entity{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            BackProxyPath + "entities",
+			URL:            BackProxyPath + "entities_old",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Entities{})),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 		},
 	}).Select2ify()
 
@@ -60,10 +70,11 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(Select2StoreLocationTemplateResults),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            BackProxyPath + "store_locations",
+			URL:            BackProxyPath + "store_locations_old",
 			DataType:       "json",
 			Data:           js.FuncOf(Select2StoreLocationAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(StoreLocations{})),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 		},
 	}).Select2ify()
 
@@ -72,10 +83,11 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(CasNumber{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            BackProxyPath + "products/casnumbers",
+			URL:            BackProxyPath + "products/casnumbers_old",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(CasNumbers{})),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 		},
 	}).Select2ify()
 
@@ -84,10 +96,11 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(Name{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            BackProxyPath + "products/names",
+			URL:            BackProxyPath + "products/names_old",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Names{})),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 		},
 	}).Select2ify()
 
@@ -96,10 +109,11 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(EmpiricalFormula{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            BackProxyPath + "products/empiricalformulas",
+			URL:            BackProxyPath + "products/empiricalformulas_old",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(EmpiricalFormulas{})),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 		},
 	}).Select2ify()
 
@@ -108,10 +122,11 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(ProducerRef{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            BackProxyPath + "products/producerrefs",
+			URL:            BackProxyPath + "products/producerrefs_old",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(ProducerRefs{})),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 		},
 	}).Select2ify()
 
@@ -120,10 +135,11 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(SignalWord{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            BackProxyPath + "products/signalwords",
+			URL:            BackProxyPath + "products/signalwords_old",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(SignalWords{})),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 		},
 	}).Select2ify()
 
@@ -132,10 +148,11 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(Select2SymbolTemplateResults),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            BackProxyPath + "products/symbols",
+			URL:            BackProxyPath + "products/symbols_old",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Symbols{})),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 		},
 	}).Select2ify()
 
@@ -144,9 +161,10 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(HazardStatement{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            BackProxyPath + "products/hazardstatements",
+			URL:            BackProxyPath + "products/hazardstatements_old",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(HazardStatements{})),
 		},
 	}).Select2ify()
@@ -156,9 +174,10 @@ func Search_listCallback(args ...interface{}) {
 		TemplateResult: js.FuncOf(select2.Select2GenericTemplateResults(PrecautionaryStatement{})),
 		AllowClear:     true,
 		Ajax: select2.Select2Ajax{
-			URL:            BackProxyPath + "products/precautionarystatements",
+			URL:            BackProxyPath + "products/precautionarystatements_old",
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
+			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(PrecautionaryStatements{})),
 		},
 	}).Select2ify()

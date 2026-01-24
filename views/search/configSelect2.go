@@ -7,7 +7,11 @@ import (
 
 	"github.com/tbellembois/gochimitheque-wasm/ajax"
 	"github.com/tbellembois/gochimitheque-wasm/jquery"
+	"github.com/tbellembois/gochimitheque-wasm/jsutils"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
+	. "github.com/tbellembois/gochimitheque-wasm/types"
+	"github.com/tbellembois/gochimitheque-wasm/widgets"
+	"github.com/tbellembois/gochimitheque/models"
 )
 
 func Select2StoreLocationAjaxData(this js.Value, args []js.Value) interface{} {
@@ -49,5 +53,75 @@ func Select2StoreLocationAjaxData(this js.Value, args []js.Value) interface{} {
 		Page:   page,
 		Limit:  limit,
 	}.ToJsValue()
+
+}
+
+func Select2PrecautionaryStatementTemplateResults(this js.Value, args []js.Value) interface{} {
+
+	data := args[0]
+	ps := PrecautionaryStatement{PrecautionaryStatement: &models.PrecautionaryStatement{}}.FromJsJSONValue(data).(PrecautionaryStatement)
+
+	if ps.PrecautionaryStatement == nil {
+		return jsutils.CreateJsHTMLElementFromString(widgets.NewDiv(widgets.DivAttributes{}).OuterHTML())
+	}
+
+	spanLabel := widgets.NewSpan(widgets.SpanAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"iconlabel"},
+		},
+		Text: ps.PrecautionaryStatementLabel,
+	})
+	spanReference := widgets.NewSpan(widgets.SpanAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+		},
+		Text: ps.PrecautionaryStatementReference,
+	})
+	d := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+		},
+	})
+
+	d.AppendChild(spanReference)
+	d.AppendChild(spanLabel)
+
+	return jsutils.CreateJsHTMLElementFromString(d.OuterHTML())
+
+}
+
+func Select2HazardStatementTemplateResults(this js.Value, args []js.Value) interface{} {
+
+	data := args[0]
+	hs := HazardStatement{HazardStatement: &models.HazardStatement{}}.FromJsJSONValue(data).(HazardStatement)
+
+	if hs.HazardStatement == nil {
+		return jsutils.CreateJsHTMLElementFromString(widgets.NewDiv(widgets.DivAttributes{}).OuterHTML())
+	}
+
+	spanLabel := widgets.NewSpan(widgets.SpanAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"iconlabel"},
+		},
+		Text: hs.HazardStatementLabel,
+	})
+	spanReference := widgets.NewSpan(widgets.SpanAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+		},
+		Text: hs.HazardStatementReference,
+	})
+	d := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+		},
+	})
+
+	d.AppendChild(spanReference)
+	d.AppendChild(spanLabel)
+
+	return jsutils.CreateJsHTMLElementFromString(d.OuterHTML())
 
 }
