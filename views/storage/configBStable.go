@@ -632,8 +632,8 @@ func Storage_quantityFormatter(this js.Value, args []js.Value) interface{} {
 
 	if CurrentStorage.StorageQuantity != nil && *CurrentStorage.StorageQuantity != 0 {
 
-		if CurrentStorage.UnitQuantity != nil && CurrentStorage.UnitQuantity.Unit != nil && CurrentStorage.UnitQuantity.Unit.UnitLabel != nil {
-			ret = fmt.Sprintf("%v %s", *CurrentStorage.StorageQuantity, *CurrentStorage.UnitQuantity.Unit.UnitLabel)
+		if CurrentStorage.UnitQuantity != nil && CurrentStorage.UnitQuantity.UnitLabel != nil {
+			ret = fmt.Sprintf("%v %s", *CurrentStorage.StorageQuantity, *CurrentStorage.UnitQuantity.UnitLabel)
 		} else {
 			ret = fmt.Sprintf("%v", *CurrentStorage.StorageQuantity)
 		}
@@ -660,10 +660,6 @@ func Storage_quantityFormatter(this js.Value, args []js.Value) interface{} {
 			totalUnits += *CurrentStorage.Product.ProductNumberPerBag * *CurrentStorage.StorageNumberOfBag
 
 		}
-		// if CurrentStorage.StorageNumberOfUnit.Valid &&
-		// 	CurrentStorage.StorageNumberOfUnit.Int64 != 0 {
-		// 	totalUnits += int64(CurrentStorage.StorageNumberOfUnit.Int64)
-		// }
 
 		ret = fmt.Sprintf("%d", totalUnits)
 
