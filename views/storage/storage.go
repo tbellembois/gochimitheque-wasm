@@ -3,7 +3,6 @@
 package storage
 
 import (
-	"encoding/json"
 	"fmt"
 	"reflect"
 	"syscall/js"
@@ -98,11 +97,11 @@ func storage_common() {
 		},
 	}).Validate()
 
-	window := js.Global()
-	var keycloak js.Value
-	keycloak = window.Get("keycloak")
-	token := keycloak.Get("token").String()
-	marshalToken, _ := json.Marshal(map[string]string{"Authorization": "Bearer " + token})
+	// window := js.Global()
+	// var keycloak js.Value
+	// keycloak = window.Get("keycloak")
+	// token := keycloak.Get("token").String()
+	// marshalToken, _ := json.Marshal(map[string]string{"Authorization": "Bearer " + token})
 
 	// select2
 	select2.NewSelect2(jquery.Jq("select#unit_concentration"), &select2.Select2Config{
@@ -114,7 +113,13 @@ func storage_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(Select2UnitConcentrationAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Units{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 
@@ -127,7 +132,13 @@ func storage_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(Select2StoreLocationAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(StoreLocations{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 
@@ -140,7 +151,13 @@ func storage_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(Select2UnitQuantityAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Units{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 
@@ -155,7 +172,13 @@ func storage_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Suppliers{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 
@@ -165,11 +188,11 @@ func storage_common() {
 
 func storage_borrower() {
 
-	window := js.Global()
-	var keycloak js.Value
-	keycloak = window.Get("keycloak")
-	token := keycloak.Get("token").String()
-	marshalToken, _ := json.Marshal(map[string]string{"Authorization": "Bearer " + token})
+	// window := js.Global()
+	// var keycloak js.Value
+	// keycloak = window.Get("keycloak")
+	// token := keycloak.Get("token").String()
+	// marshalToken, _ := json.Marshal(map[string]string{"Authorization": "Bearer " + token})
 
 	validate.NewValidate(jquery.Jq("#borrowing"), &validate.ValidateConfig{
 		ErrorClass: "alert alert-danger",
@@ -197,7 +220,13 @@ func storage_borrower() {
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(People{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 
@@ -317,6 +346,11 @@ func Storage_listCallback(this js.Value, args []js.Value) interface{} {
 
 	//storage_common()
 	storage_borrower()
+
+	if BSTableQueryFilter.QueryFilter.StorageArchive == nil {
+		BSTableQueryFilter.QueryFilter.StorageArchive = new(bool)
+		*BSTableQueryFilter.QueryFilter.StorageArchive = false
+	}
 
 	bstable.NewBootstraptable(jquery.Jq("#Storage_table"), &bstable.BootstraptableParams{Ajax: "Storage_getTableData"})
 	jquery.Jq("#Storage_table").On("load-success.bs.table", js.FuncOf(ShowIfAuthorizedActionButtons))

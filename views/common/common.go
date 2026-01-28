@@ -8,6 +8,7 @@ import (
 
 	"github.com/tbellembois/gochimitheque-wasm/bstable"
 	"github.com/tbellembois/gochimitheque-wasm/globals"
+	. "github.com/tbellembois/gochimitheque-wasm/globals"
 	"github.com/tbellembois/gochimitheque-wasm/jquery"
 	"github.com/tbellembois/gochimitheque-wasm/jsutils"
 	"github.com/tbellembois/gochimitheque-wasm/locales"
@@ -45,6 +46,8 @@ func Export(this js.Value, args []js.Value) interface{} {
 func SwitchProductStorageWrapper(this js.Value, args []js.Value) interface{} {
 
 	storageCallbackWrapper := func(args ...interface{}) {
+		BSTableQueryFilter.StorageArchive = new(bool)
+		*BSTableQueryFilter.StorageArchive = false
 		storage.Storage_listCallback(js.Null(), nil)
 	}
 	productCallbackWrapper := func(args ...interface{}) {

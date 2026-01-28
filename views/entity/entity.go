@@ -3,7 +3,6 @@
 package entity
 
 import (
-	"encoding/json"
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/bstable"
@@ -37,11 +36,11 @@ func entity_common() {
 		},
 	}).Validate()
 
-	window := js.Global()
-	var keycloak js.Value
-	keycloak = window.Get("keycloak")
-	token := keycloak.Get("token").String()
-	marshalToken, _ := json.Marshal(map[string]string{"Authorization": "Bearer " + token})
+	// window := js.Global()
+	// var keycloak js.Value
+	// keycloak = window.Get("keycloak")
+	// token := keycloak.Get("token").String()
+	// marshalToken, _ := json.Marshal(map[string]string{"Authorization": "Bearer " + token})
 
 	// select2
 	select2.NewSelect2(jquery.Jq("select#managers"), &select2.Select2Config{
@@ -52,7 +51,13 @@ func entity_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(Select2ManagerAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(People{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 

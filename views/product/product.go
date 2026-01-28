@@ -295,11 +295,11 @@ func product_common() {
 		},
 	}).Validate()
 
-	window := js.Global()
-	var keycloak js.Value
-	keycloak = window.Get("keycloak")
-	token := keycloak.Get("token").String()
-	marshalToken, _ := json.Marshal(map[string]string{"Authorization": "Bearer " + token})
+	// window := js.Global()
+	// var keycloak js.Value
+	// keycloak = window.Get("keycloak")
+	// token := keycloak.Get("token").String()
+	// marshalToken, _ := json.Marshal(map[string]string{"Authorization": "Bearer " + token})
 
 	// select2
 	select2.NewSelect2(jquery.Jq("select#producer_ref"), &select2.Select2Config{
@@ -314,7 +314,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(Select2ProducerRefAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(ProducerRefs{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 	jquery.Jq("select#producer_ref").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -353,7 +359,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Producers{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 
@@ -369,7 +381,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(Select2SupplierRefAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(SupplierRefs{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 
@@ -382,7 +400,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Suppliers{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 
@@ -397,7 +421,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Tags{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 
@@ -412,7 +442,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Categories{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 
@@ -425,7 +461,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(Select2UnitTemperatureAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Units{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 	jquery.Jq("select#unit_temperature").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -441,7 +483,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(Select2UnitMolecularWeightAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Units{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 	jquery.Jq("select#unit_molecularweight").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -459,7 +507,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(CasNumbers{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 	jquery.Jq("select#cas_number").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -477,7 +531,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(CeNumbers{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 	jquery.Jq("select#ce_number").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -495,7 +555,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(PhysicalStates{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 
@@ -508,7 +574,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(SignalWords{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 
@@ -523,7 +595,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(ClassesOfCompound{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 
@@ -538,7 +616,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Names{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 	jquery.Jq("select#name").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -556,7 +640,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(EmpiricalFormulas{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 	jquery.Jq("select#empirical_formula").On("change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -574,7 +664,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(LinearFormulas{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 
@@ -589,7 +685,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Names{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 
@@ -602,7 +704,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(Symbols{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 
@@ -615,7 +723,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(HazardStatements{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 
@@ -628,7 +742,13 @@ func product_common() {
 			DataType:       "json",
 			Data:           js.FuncOf(select2.Select2GenericAjaxData),
 			ProcessResults: js.FuncOf(select2.Select2GenericAjaxProcessResults(PrecautionaryStatements{})),
-			Headers:        js.Global().Get("JSON").Call("parse", string(marshalToken)),
+			BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				jqXHR := args[0] // the XMLHttpRequest object
+				keycloak := js.Global().Get("keycloak")
+				token := keycloak.Get("token").String()
+				jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+				return nil
+			}),
 		},
 	}).Select2ify()
 

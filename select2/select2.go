@@ -117,6 +117,7 @@ type Select2Ajax struct {
 	Data           interface{} `json:"data"`
 	ProcessResults interface{} `json:"processResults"`
 	Headers        interface{} `json:"headers"`
+	BeforeSend     interface{} `json:"beforeSend"`
 }
 
 // Select2Data is a select2 data struct
