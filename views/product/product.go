@@ -1022,7 +1022,7 @@ func PubchemGetProductByName(this js.Value, args []js.Value) interface{} {
 
 						if products.GetTotal() != 0 {
 							jquery.Jq("#pubchemcasexist").Empty()
-							jquery.Jq("#pubchemcasexist").Append(`<div class="alert alert-danger" role="alert">` + locales.Translate("cas_number_validate_cas", HTTPHeaderAcceptLanguage) + `</div>`)
+							jquery.Jq("#pubchemcasexist").Append(`<div class="alert alert-warning" role="alert">` + locales.Translate("cas_number_validate_cas", HTTPHeaderAcceptLanguage) + `</div>`)
 						}
 					},
 				}.Send()
@@ -1037,14 +1037,16 @@ func PubchemGetProductByName(this js.Value, args []js.Value) interface{} {
 
 			jsutils.HasPermission("products", "", "post", func() {
 
-				// import button.
+				jquery.Jq("#pubchemcompoundactions").Append(`<div class="alert alert-info">` + locales.Translate("pubchem_import_info", HTTPHeaderAcceptLanguage) + `</div>`)
 				jquery.Jq("#pubchemcompoundactions").Append(`<div id="import" class="row pb-3"></div>`)
-				jquery.Jq("#pubchemcompoundactions #import").Append(`<button type="buton" class="btn btn-primary" href="#" onclick="Product_pubchemCreateProduct('` + base64JsonPubchem + `')">` + locales.Translate("import", HTTPHeaderAcceptLanguage) + `</button>`)
 
 				if jquery.Jq("input[name='selected_product_id']").GetVal().String() != "" {
 					// replace button.
 					jquery.Jq("#pubchemcompoundactions").Append(`<div id="replace" class="row pb-3"></div>`)
 					jquery.Jq("#pubchemcompoundactions #replace").Append(`<button type="buton" class="btn btn-primary" href="#" onclick="Product_pubchemUpdateProduct('` + base64JsonPubchem + `', '` + jquery.Jq("input[name='selected_product_id']").GetVal().String() + `')">` + locales.Translate("replace", HTTPHeaderAcceptLanguage) + " " + jquery.Jq("input[name='selected_product_name']").GetVal().String() + `</button>`)
+				} else {
+					// import button.
+					jquery.Jq("#pubchemcompoundactions #import").Append(`<button type="buton" class="btn btn-primary" href="#" onclick="Product_pubchemCreateProduct('` + base64JsonPubchem + `')">` + locales.Translate("import", HTTPHeaderAcceptLanguage) + `</button>`)
 				}
 
 			}, func() {
