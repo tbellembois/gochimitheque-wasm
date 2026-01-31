@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -35,44 +36,46 @@ func init() {
 	supplierrefToSupplier = make(map[string]int64)
 }
 
-// func LinearToEmpirical(this js.Value, args []js.Value) interface{} {
+func LinearToEmpirical(this js.Value, args []js.Value) interface{} {
 
-// 	select2LinearFormula := select2.NewSelect2(jquery.Jq("select#linear_formula"), nil).Select2Data()
+	select2LinearFormula := select2.NewSelect2(jquery.Jq("select#linear_formula"), nil).Select2Data()
 
-// 	if len(select2LinearFormula) == 0 {
-// 		return ""
-// 	}
+	if len(select2LinearFormula) == 0 {
+		return ""
+	}
 
-// 	ajaxData := struct {
-// 		EmpiricalFormula string `json:"empirical_formula"`
-// 	}{
-// 		EmpiricalFormula: select2LinearFormula[0].Text,
-// 	}
+	select2LinearFormula2 := url.QueryEscape(select2LinearFormula[0].Text)
 
-// 	var (
-// 		ajaxDataJson []byte
-// 		err          error
-// 	)
-// 	if ajaxDataJson, err = json.Marshal(ajaxData); err != nil {
-// 		fmt.Println(err)
-// 		return ""
-// 	}
+	// ajaxData := struct {
+	// 	EmpiricalFormula string `json:"empirical_formula"`
+	// }{
+	// 	EmpiricalFormula: select2LinearFormula[0].Text,
+	// }
 
-// 	ajax.Ajax{
-// 		URL:    fmt.Sprintf("%sformat/empiricalformula/", ApplicationProxyPath),
-// 		Method: "post",
-// 		Data:   ajaxDataJson,
-// 		Done: func(data js.Value) {
-// 			jquery.Jq("#convertedEmpiricalFormula").SetHtml(data)
-// 		},
-// 		Fail: func(jqXHR js.Value) {
-// 			jsutils.DisplayErrorMessage(locales.Translate("empirical_formula_convert_failed", HTTPHeaderAcceptLanguage))
-// 		},
-// 	}.Send()
+	// var (
+	// 	ajaxDataJson []byte
+	// 	err          error
+	// )
+	// if ajaxDataJson, err = json.Marshal(ajaxData); err != nil {
+	// 	fmt.Println(err)
+	// 	return ""
+	// }
 
-// 	return nil
+	ajax.Ajax{
+		URL:    fmt.Sprintf("%svalidate/lineartoempiricalformula/%s", BackProxyPath, select2LinearFormula2),
+		Method: "get",
+		// Data:   ajaxDataJson,
+		Done: func(data js.Value) {
+			jquery.Jq("#convertedEmpiricalFormula").SetHtml(data)
+		},
+		Fail: func(jqXHR js.Value) {
+			jsutils.DisplayErrorMessage(locales.Translate("empirical_formula_convert_failed", HTTPHeaderAcceptLanguage))
+		},
+	}.Send()
 
-// }
+	return nil
+
+}
 
 func NoEmpiricalFormula(this js.Value, args []js.Value) interface{} {
 
@@ -248,9 +251,15 @@ func product_common() {
 			"empirical_formula": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
 				Remote: validate.ValidateRemote{
-					URL:        "",
-					Type:       "post",
-					BeforeSend: js.FuncOf(ValidateProductEmpiricalFormulaBeforeSend),
+					URL:  fmt.Sprintf("%svalidate/empiricalformula_old", BackProxyPath),
+					Type: "get",
+					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+						jqXHR := args[0] // the XMLHttpRequest object
+						keycloak := js.Global().Get("keycloak")
+						token := keycloak.Get("token").String()
+						jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+						return nil
+					}),
 					Data: map[string]interface{}{
 						"empirical_formula": js.FuncOf(ValidateProductEmpiricalFormulaData),
 					},
@@ -259,20 +268,31 @@ func product_common() {
 			"cas_number": {
 				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
 				Remote: validate.ValidateRemote{
-					URL:        "",
-					Type:       "post",
-					BeforeSend: js.FuncOf(ValidateProductCasNumberBeforeSend),
+					URL:  fmt.Sprintf("%svalidate/casnumber_old", BackProxyPath),
+					Type: "get",
+					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+						jqXHR := args[0] // the XMLHttpRequest object
+						keycloak := js.Global().Get("keycloak")
+						token := keycloak.Get("token").String()
+						jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+						return nil
+					}),
 					Data: map[string]interface{}{
-						"cas_number":          js.FuncOf(ValidateProductCasNumberData1),
-						"product_specificity": js.FuncOf(ValidateProductCasNumberData2),
+						"cas_number": js.FuncOf(ValidateProductCasNumberData1),
 					},
 				},
 			},
 			"ce_number": {
 				Remote: validate.ValidateRemote{
-					URL:        "",
-					Type:       "post",
-					BeforeSend: js.FuncOf(ValidateProductCeNumberBeforeSend),
+					URL:  fmt.Sprintf("%svalidate/cenumber_old", BackProxyPath),
+					Type: "get",
+					BeforeSend: js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+						jqXHR := args[0] // the XMLHttpRequest object
+						keycloak := js.Global().Get("keycloak")
+						token := keycloak.Get("token").String()
+						jqXHR.Call("setRequestHeader", "Authorization", "Bearer "+token)
+						return nil
+					}),
 					Data: map[string]interface{}{
 						"ce_number": js.FuncOf(ValidateProductCeNumberData),
 					},

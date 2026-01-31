@@ -258,13 +258,13 @@ func OperateEventsTotalStock(this js.Value, args []js.Value) interface{} {
 		jquery.Jq("div#stock").SetHtml("")
 
 		for _, stock := range stocks {
-			jquery.Jq("div#stock").Append(fmt.Sprintf("<div class='col-sm-auto'><span>%s</span></div>", stock.StoreLocation.StoreLocationFullPath))
+			jquery.Jq("div#stock").Append(fmt.Sprintf("<div class='col-sm-8 border-bottom'><span>%s</span></div>", stock.StoreLocation.StoreLocationFullPath))
 
 			unit := ""
 			if stock.Unit != nil {
 				unit = *stock.Unit.UnitLabel
 			}
-			jquery.Jq("div#stock").Append(fmt.Sprintf("<div class='col-sm-auto'><span>%.2f %s</span></div>", stock.Quantity, unit))
+			jquery.Jq("div#stock").Append(fmt.Sprintf("<div class='col-sm-4'><span>%.2f %s</span></div>", stock.Quantity, unit))
 		}
 
 	}

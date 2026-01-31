@@ -14,35 +14,34 @@ import (
 	"github.com/tbellembois/gochimitheque-wasm/locales"
 	"github.com/tbellembois/gochimitheque-wasm/select2"
 	. "github.com/tbellembois/gochimitheque-wasm/types"
-	"github.com/tbellembois/gochimitheque-wasm/validate"
 	"github.com/tbellembois/gochimitheque-wasm/widgets"
 )
 
 func person_common() {
 
 	// validate
-	validate.NewValidate(jquery.Jq("#person"), &validate.ValidateConfig{
-		ErrorClass: "alert alert-danger",
-		Rules: map[string]validate.ValidateRule{
-			"person_email": {
-				Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
-				Email:    true,
-				Remote: validate.ValidateRemote{
-					URL:        "",
-					Type:       "post",
-					BeforeSend: js.FuncOf(ValidatePersonEmailBeforeSend),
-					Data: map[string]interface{}{
-						"email": js.FuncOf(ValidatePersonEmailData),
-					},
-				},
-			},
-		},
-		Messages: map[string]validate.ValidateMessage{
-			"person_email": {
-				Required: locales.Translate("required_input", HTTPHeaderAcceptLanguage),
-			},
-		},
-	}).Validate()
+	// validate.NewValidate(jquery.Jq("#person"), &validate.ValidateConfig{
+	// 	ErrorClass: "alert alert-danger",
+	// 	Rules: map[string]validate.ValidateRule{
+	// 		"person_email": {
+	// 			Required: js.FuncOf(func(this js.Value, args []js.Value) interface{} { return true }),
+	// 			Email:    true,
+	// 			Remote: validate.ValidateRemote{
+	// 				URL:        "",
+	// 				Type:       "post",
+	// 				BeforeSend: js.FuncOf(ValidatePersonEmailBeforeSend),
+	// 				Data: map[string]interface{}{
+	// 					"email": js.FuncOf(ValidatePersonEmailData),
+	// 				},
+	// 			},
+	// 		},
+	// 	},
+	// 	Messages: map[string]validate.ValidateMessage{
+	// 		"person_email": {
+	// 			Required: locales.Translate("required_input", HTTPHeaderAcceptLanguage),
+	// 		},
+	// 	},
+	// }).Validate()
 
 	// window := js.Global()
 	// var keycloak js.Value

@@ -199,7 +199,7 @@ func main() {
 	js.Global().Set("Product_addProducer", js.FuncOf(product.AddProducer))
 	js.Global().Set("Product_addSupplier", js.FuncOf(product.AddSupplier))
 
-	// js.Global().Set("Product_linearToEmpirical", js.FuncOf(product.LinearToEmpirical))
+	js.Global().Set("Product_linearToEmpirical", js.FuncOf(product.LinearToEmpirical))
 	js.Global().Set("Product_noCas", js.FuncOf(product.NoCas))
 	js.Global().Set("Product_noEmpiricalFormula", js.FuncOf(product.NoEmpiricalFormula))
 	js.Global().Set("Product_magic", js.FuncOf(product.Magic))
