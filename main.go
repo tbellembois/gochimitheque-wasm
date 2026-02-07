@@ -3,11 +3,9 @@
 package main
 
 import (
-	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"strings"
 	"syscall/js"
 
 	"github.com/tbellembois/gochimitheque-wasm/ajax"
@@ -89,58 +87,162 @@ func init() {
 	HTTPHeaderAcceptLanguage = c.PersonLanguage
 	DisableCache = c.DisableCache
 
+	ajax.Ajax{
+		URL:    BackProxyPath + "products/precautionarystatements_old",
+		Method: "GET",
+		Done: func(data js.Value) {
+			// fmt.Println(data.String())
+
+			type DataReceived struct {
+				Rows  []models.PrecautionaryStatement
+				Total int
+			}
+
+			var dataReceived DataReceived
+			if err = json.Unmarshal([]byte(data.String()), &dataReceived); err != nil {
+				fmt.Println(err)
+				jsutils.DisplayGenericErrorMessage()
+			}
+
+			var precautionarystatements = dataReceived.Rows
+
+			for _, precautionarystatement := range precautionarystatements {
+				globals.DBPrecautionaryStatements = append(globals.DBPrecautionaryStatements,
+					types.PrecautionaryStatement{PrecautionaryStatement: &models.PrecautionaryStatement{
+						PrecautionaryStatementID:        precautionarystatement.PrecautionaryStatementID,
+						PrecautionaryStatementLabel:     precautionarystatement.PrecautionaryStatementLabel,
+						PrecautionaryStatementReference: precautionarystatement.PrecautionaryStatementReference,
+					}})
+			}
+		},
+		Fail: func(jqXHR js.Value) {
+
+			jsutils.DisplayGenericErrorMessage()
+
+		},
+	}.Send()
+
+	ajax.Ajax{
+		URL:    BackProxyPath + "products/hazardstatements_old",
+		Method: "GET",
+		Done: func(data js.Value) {
+			// fmt.Println(data.String())
+
+			type DataReceived struct {
+				Rows  []models.HazardStatement
+				Total int
+			}
+
+			var dataReceived DataReceived
+			if err = json.Unmarshal([]byte(data.String()), &dataReceived); err != nil {
+				fmt.Println(err)
+				jsutils.DisplayGenericErrorMessage()
+			}
+
+			var hazardstatements = dataReceived.Rows
+
+			for _, hazardstatement := range hazardstatements {
+				globals.DBHazardStatements = append(globals.DBHazardStatements,
+					types.HazardStatement{HazardStatement: &models.HazardStatement{
+						HazardStatementID:        hazardstatement.HazardStatementID,
+						HazardStatementLabel:     hazardstatement.HazardStatementLabel,
+						HazardStatementReference: hazardstatement.HazardStatementReference,
+					}})
+			}
+		},
+		Fail: func(jqXHR js.Value) {
+
+			jsutils.DisplayGenericErrorMessage()
+
+		},
+	}.Send()
+
+	ajax.Ajax{
+		URL:    BackProxyPath + "products/symbols_old",
+		Method: "GET",
+		Done: func(data js.Value) {
+			// fmt.Println(data.String())
+
+			type DataReceived struct {
+				Rows  []models.Symbol
+				Total int
+			}
+
+			var dataReceived DataReceived
+			if err = json.Unmarshal([]byte(data.String()), &dataReceived); err != nil {
+				fmt.Println(err)
+				jsutils.DisplayGenericErrorMessage()
+			}
+
+			var symbols = dataReceived.Rows
+
+			for _, symbol := range symbols {
+				globals.DBSymbols = append(globals.DBSymbols,
+					types.Symbol{Symbol: &models.Symbol{
+						SymbolID:    symbol.SymbolID,
+						SymbolLabel: symbol.SymbolLabel,
+					}})
+			}
+		},
+		Fail: func(jqXHR js.Value) {
+
+			jsutils.DisplayGenericErrorMessage()
+
+		},
+	}.Send()
+
 	// Initializing the slices of statements for the magic selector.
-	var (
-		r       *csv.Reader
-		records [][]string
-	)
-	r = csv.NewReader(strings.NewReader(globals.PRECAUTIONARYSTATEMENT))
-	r.Comma = '\t'
-	if records, err = r.ReadAll(); err != nil {
-		panic(err)
-	}
-	// FIXME: we assume here that the id starts by 1 in the DB
-	for id, record := range records {
-		_id := int64(id + 1)
-		globals.DBPrecautionaryStatements = append(globals.DBPrecautionaryStatements,
-			types.PrecautionaryStatement{PrecautionaryStatement: &models.PrecautionaryStatement{
-				PrecautionaryStatementID:        &_id,
-				PrecautionaryStatementLabel:     record[0],
-				PrecautionaryStatementReference: record[1],
-			}})
-	}
+	// var (
+	// 	r       *csv.Reader
+	// 	records [][]string
+	// )
+	// r = csv.NewReader(strings.NewReader(globals.PRECAUTIONARYSTATEMENT))
+	// r.Comma = '\t'
+	// if records, err = r.ReadAll(); err != nil {
+	// 	panic(err)
+	// }
+	// // FIXME: we assume here that the id starts by 1 in the DB
+	// for id, record := range records {
+	// 	_id := int64(id + 1)
+	// 	globals.DBPrecautionaryStatements = append(globals.DBPrecautionaryStatements,
+	// 		types.PrecautionaryStatement{PrecautionaryStatement: &models.PrecautionaryStatement{
+	// 			PrecautionaryStatementID:        &_id,
+	// 			PrecautionaryStatementLabel:     record[0],
+	// 			PrecautionaryStatementReference: record[1],
+	// 		}})
+	// }
 
-	r = csv.NewReader(strings.NewReader(globals.HAZARDSTATEMENT))
-	r.FieldsPerRecord = 3
-	r.Comma = '\t'
-	if records, err = r.ReadAll(); err != nil {
-		panic(err)
-	}
-	// FIXME: we assume here that the id starts by 1 in the DB
-	for id, record := range records {
-		_id := int64(id + 1)
-		globals.DBHazardStatements = append(globals.DBHazardStatements,
-			types.HazardStatement{HazardStatement: &models.HazardStatement{
-				HazardStatementID:        &_id,
-				HazardStatementLabel:     record[0],
-				HazardStatementReference: record[1],
-			}})
-	}
+	// r = csv.NewReader(strings.NewReader(globals.HAZARDSTATEMENT))
+	// r.FieldsPerRecord = 3
+	// r.Comma = '\t'
+	// if records, err = r.ReadAll(); err != nil {
+	// 	panic(err)
+	// }
+	// // FIXME: we assume here that the id starts by 1 in the DB
+	// for id, record := range records {
+	// 	_id := int64(id + 1)
+	// 	globals.DBHazardStatements = append(globals.DBHazardStatements,
+	// 		types.HazardStatement{HazardStatement: &models.HazardStatement{
+	// 			HazardStatementID:        &_id,
+	// 			HazardStatementLabel:     record[0],
+	// 			HazardStatementReference: record[1],
+	// 		}})
+	// }
 
-	r = csv.NewReader(strings.NewReader(globals.SYMBOLS))
-	r.Comma = '\t'
-	if records, err = r.ReadAll(); err != nil {
-		panic(err)
-	}
-	// FIXME: we assume here that the id starts by 1 in the DB
-	for id, record := range records {
-		_id := int64(id + 1)
-		globals.DBSymbols = append(globals.DBSymbols,
-			types.Symbol{Symbol: &models.Symbol{
-				SymbolID:    &_id,
-				SymbolLabel: record[0],
-			}})
-	}
+	// r = csv.NewReader(strings.NewReader(globals.SYMBOLS))
+	// r.Comma = '\t'
+	// if records, err = r.ReadAll(); err != nil {
+	// 	panic(err)
+	// }
+	// // FIXME: we assume here that the id starts by 1 in the DB
+	// for id, record := range records {
+	// 	_id := int64(id + 1)
+	// 	globals.DBSymbols = append(globals.DBSymbols,
+	// 		types.Symbol{Symbol: &models.Symbol{
+	// 			SymbolID:    &_id,
+	// 			SymbolLabel: record[0],
+	// 		}})
+	// }
 
 }
 

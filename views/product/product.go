@@ -97,7 +97,7 @@ func NoCas(this js.Value, args []js.Value) interface{} {
 
 func HowToMagicalSelector(this js.Value, args []js.Value) interface{} {
 
-	js.Global().Get("window").Call("open", fmt.Sprintf("%simg/magicalselector.webm", ApplicationProxyPath), "_blank")
+	js.Global().Get("window").Call("open", fmt.Sprintf("%sstatic/img/magicalselector.webm", ApplicationProxyPath), "_blank")
 
 	return nil
 
@@ -158,6 +158,9 @@ func Magic(this js.Value, args []js.Value) interface{} {
 
 			for _, hs := range globals.DBPrecautionaryStatements {
 				if hs.PrecautionaryStatementReference == p[1] {
+
+					// fmt.Println(*hs.PrecautionaryStatementID)
+
 					select2PS.Select2AppendOption(
 						widgets.NewOption(widgets.OptionAttributes{
 							Text:            p[0],
