@@ -30,7 +30,7 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 
 	jquery.Jq(fmt.Sprintf("button#delete%d", *storeLocation.StoreLocationID)).On("click", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 
-		url := fmt.Sprintf("%sstore_locations/%d", ApplicationProxyPath, *storeLocation.StoreLocationID)
+		url := fmt.Sprintf("%sstore_locations/%d", BackProxyPath, *storeLocation.StoreLocationID)
 		method := "delete"
 
 		done := func(data js.Value) {
