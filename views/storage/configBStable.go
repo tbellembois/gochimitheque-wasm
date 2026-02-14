@@ -1721,9 +1721,14 @@ func DataQueryParams(this js.Value, args []js.Value) interface{} {
 	queryFilter.StoragesFilterLabel = BSTableQueryFilter.StoragesFilterLabel
 	queryFilter.Product = BSTableQueryFilter.Product
 	queryFilter.ProductFilterLabel = BSTableQueryFilter.ProductFilterLabel
+	if BSTableQueryFilter.StorageArchive == nil {
+		queryFilter.StorageArchive = new(bool)
+		*queryFilter.StorageArchive = false
+	} else {
+		queryFilter.StorageArchive = BSTableQueryFilter.StorageArchive
+	}
 	queryFilter.Storage = BSTableQueryFilter.Storage
 	queryFilter.StorageFilterLabel = BSTableQueryFilter.StorageFilterLabel
-	queryFilter.StorageArchive = BSTableQueryFilter.StorageArchive
 	queryFilter.StorageHistory = BSTableQueryFilter.StorageHistory
 	queryFilter.Export = BSTableQueryFilter.Export
 	// hack
