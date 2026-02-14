@@ -945,6 +945,8 @@ func PubchemUpdateProduct(this js.Value, args []js.Value) interface{} {
 		},
 	}.Send()
 
+	jquery.Jq("input[name='selected_product_id']").SetVal("")
+
 	return nil
 }
 
@@ -998,6 +1000,8 @@ func PubchemCreateProduct(this js.Value, args []js.Value) interface{} {
 
 		},
 	}.Send()
+
+	jquery.Jq("input[name='selected_product_id']").SetVal("")
 
 	return nil
 }
@@ -1067,10 +1071,9 @@ func PubchemGetProductByName(this js.Value, args []js.Value) interface{} {
 					// replace button.
 					jquery.Jq("#pubchemcompoundactions").Append(`<div id="replace" class="row pb-3"></div>`)
 					jquery.Jq("#pubchemcompoundactions #replace").Append(`<button type="buton" class="btn btn-primary" href="#" onclick="Product_pubchemUpdateProduct('` + base64JsonPubchem + `', '` + jquery.Jq("input[name='selected_product_id']").GetVal().String() + `')">` + locales.Translate("replace", HTTPHeaderAcceptLanguage) + " " + jquery.Jq("input[name='selected_product_name']").GetVal().String() + `</button>`)
-				} else {
-					// import button.
-					jquery.Jq("#pubchemcompoundactions #import").Append(`<button type="buton" class="btn btn-primary" href="#" onclick="Product_pubchemCreateProduct('` + base64JsonPubchem + `')">` + locales.Translate("import", HTTPHeaderAcceptLanguage) + `</button>`)
 				}
+				// import button.
+				jquery.Jq("#pubchemcompoundactions #import").Append(`<button type="buton" class="btn btn-primary" href="#" onclick="Product_pubchemCreateProduct('` + base64JsonPubchem + `')">` + locales.Translate("import", HTTPHeaderAcceptLanguage) + `</button>`)
 
 			}, func() {
 			})
