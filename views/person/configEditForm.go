@@ -372,6 +372,13 @@ func FillInPersonForm(p Person, id string) {
 	// Populating the permissions widget.
 	populatePermission(permissions, managedEntitiesIds)
 
+	if len(p.ManagedEntities) > 0 {
+		jquery.Jq("#permwproducts-1").SetProp("checked", true);
+		jquery.Jq("#permrrproducts-1").SetProp("checked", true);
+		jquery.Jq("#permissionsproducts input").SetAttr("disabled", "disabled");
+		jquery.Jq("#permissionsrproducts input").SetAttr("disabled", "disabled");
+	}
+
 }
 
 func SavePerson(this js.Value, args []js.Value) interface{} {
