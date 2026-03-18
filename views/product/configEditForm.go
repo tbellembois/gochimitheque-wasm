@@ -929,7 +929,7 @@ func SaveProduct(this js.Value, args []js.Value) interface{} {
 		URL:    ajaxURL,
 		Method: ajaxMethod,
 		Data:   dataBytes,
-		Done: func(data js.Value) {
+		Done: func(data js.Value, textStatus string, jqXHR js.Value) {
 
 			var (
 				err        error

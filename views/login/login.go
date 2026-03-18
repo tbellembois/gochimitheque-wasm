@@ -80,7 +80,7 @@ func AfterLogin_listCallback(this js.Value, args []js.Value) interface{} {
 	ajax.Ajax{
 		URL:    fmt.Sprintf("%sgetconnecteduser", BackProxyPath),
 		Method: "get",
-		Done: func(data js.Value) {
+		Done: func(data js.Value, textStatus string, jqXHR js.Value) {
 
 			var (
 				person *Person

@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"syscall/js"
 )
@@ -28,7 +29,7 @@ type Response struct {
 }
 
 // type AjaxDone func(data js.Value, textStatus string, jqXHR js.Value)
-type AjaxDone func(data js.Value)
+type AjaxDone func(data js.Value, textStatus string, jqXHR js.Value)
 type AjaxFail func(jqXHR js.Value)
 
 func (ajax Ajax) Send() {
@@ -80,7 +81,7 @@ func (ajax Ajax) Send() {
 		jsResponse := js.ValueOf(string(data))
 
 		if res.StatusCode == 200 {
-			ajax.Done(jsResponse)
+			ajax.Done(jsResponse, strconv.Itoa(res.StatusCode), js.ValueOf(res.Header.Get("X-Throttling-Control")))
 		} else {
 			if ajax.Fail != nil {
 				ajax.Fail(jsResponse)

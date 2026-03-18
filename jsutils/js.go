@@ -52,7 +52,7 @@ func LoadContent(containerId string, viewName string, url string, callback func(
 		globals.CurrentView = viewName
 	}
 
-	done := func(data js.Value) {
+	done := func(data js.Value, textStatus string, jqXHR js.Value) {
 		jquery.Jq(containerId).SetHtml(data.String())
 		if callback != nil {
 			callback(args...)

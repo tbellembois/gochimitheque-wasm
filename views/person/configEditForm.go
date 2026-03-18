@@ -175,7 +175,7 @@ func SelectAllEntity(this js.Value, args []js.Value) interface{} {
 	url := fmt.Sprintf("%sentities", BackProxyPath)
 	method := "get"
 
-	done := func(data js.Value) {
+	done := func(data js.Value, textStatus string, jqXHR js.Value) {
 
 		var (
 			entities Entities
@@ -373,10 +373,10 @@ func FillInPersonForm(p Person, id string) {
 	populatePermission(permissions, managedEntitiesIds)
 
 	if len(p.ManagedEntities) > 0 {
-		jquery.Jq("#permwproducts-1").SetProp("checked", true);
-		jquery.Jq("#permrrproducts-1").SetProp("checked", true);
-		jquery.Jq("#permissionsproducts input").SetAttr("disabled", "disabled");
-		jquery.Jq("#permissionsrproducts input").SetAttr("disabled", "disabled");
+		jquery.Jq("#permwproducts-1").SetProp("checked", true)
+		jquery.Jq("#permrrproducts-1").SetProp("checked", true)
+		jquery.Jq("#permissionsproducts input").SetAttr("disabled", "disabled")
+		jquery.Jq("#permissionsrproducts input").SetAttr("disabled", "disabled")
 	}
 
 }
@@ -460,7 +460,7 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 		URL:    ajaxURL,
 		Method: ajaxMethod,
 		Data:   dataBytes,
-		Done: func(data js.Value) {
+		Done: func(data js.Value, textStatus string, jqXHR js.Value) {
 
 			globals.LocalStorage.Clear()
 

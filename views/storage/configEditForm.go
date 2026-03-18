@@ -125,7 +125,7 @@ func SaveBorrowing(this js.Value, args []js.Value) interface{} {
 	ajax.Ajax{
 		URL:    ajaxURL,
 		Method: ajaxMethod,
-		Done: func(data js.Value) {
+		Done: func(data js.Value, textStatus string, jqXHR js.Value) {
 
 			jquery.Jq("#borrow").Object.Call("modal", "hide")
 
@@ -397,7 +397,7 @@ func SaveStorage(this js.Value, args []js.Value) any {
 		URL:    ajaxURL,
 		Method: ajaxMethod,
 		Data:   dataBytes,
-		Done: func(data js.Value) {
+		Done: func(data js.Value, textStatus string, jqXHR js.Value) {
 
 			var (
 				err error

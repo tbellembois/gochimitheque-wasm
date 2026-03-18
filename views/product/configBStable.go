@@ -35,7 +35,7 @@ func OperateEventsBookmark(this js.Value, args []js.Value) interface{} {
 	url := fmt.Sprintf("%sbookmarks/%d", BackProxyPath, *globals.CurrentProduct.ProductID)
 	method := "get"
 
-	done := func(data js.Value) {
+	done := func(data js.Value, textStatus string, jqXHR js.Value) {
 
 		var (
 			product Product
@@ -121,7 +121,7 @@ func OperateEventsOStorages(this js.Value, args []js.Value) interface{} {
 	url := fmt.Sprintf("%sstorages/others?product=%d", BackProxyPath, globals.CurrentProduct.ProductID)
 	method := "get"
 
-	done := func(data js.Value) {
+	done := func(data js.Value, textStatus string, jqXHR js.Value) {
 
 		var (
 			entities Entities
@@ -243,7 +243,7 @@ func OperateEventsTotalStock(this js.Value, args []js.Value) interface{} {
 	url := fmt.Sprintf("%sstocks/%d", BackProxyPath, *product.ProductID)
 	method := "get"
 
-	done := func(data js.Value) {
+	done := func(data js.Value, textStatus string, jqXHR js.Value) {
 
 		var (
 			stocks []models.Stock
@@ -329,7 +329,7 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 		url := fmt.Sprintf("%sproducts/%d", BackProxyPath, *globals.CurrentProduct.ProductID)
 		method := "delete"
 
-		done := func(data js.Value) {
+		done := func(data js.Value, textStatus string, jqXHR js.Value) {
 
 			jsutils.DisplaySuccessMessage(locales.Translate("product_deleted_message", HTTPHeaderAcceptLanguage))
 			bstable.NewBootstraptable(jquery.Jq("#Product_table"), nil).Refresh(nil)
@@ -397,7 +397,7 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 		ajax := ajax.Ajax{
 			URL:    u.String(),
 			Method: "get",
-			Done: func(data js.Value) {
+			Done: func(data js.Value, textStatus string, jqXHR js.Value) {
 
 				// jsutils.ConsoleLog(fmt.Sprintf("%#v", data.String()))
 
@@ -2071,7 +2071,7 @@ func AddProducer(this js.Value, args []js.Value) interface{} {
 		URL:    ApplicationProxyPath + "products/producers",
 		Method: "post",
 		Data:   dataBytes,
-		Done: func(data js.Value) {
+		Done: func(data js.Value, textStatus string, jqXHR js.Value) {
 
 			jsutils.DisplaySuccessMessage(locales.Translate("producer_added", HTTPHeaderAcceptLanguage))
 			jquery.Jq("input#addproducer").SetVal("")
@@ -2117,7 +2117,7 @@ func AddSupplier(this js.Value, args []js.Value) interface{} {
 		URL:    ApplicationProxyPath + "products/suppliers",
 		Method: "post",
 		Data:   dataBytes,
-		Done: func(data js.Value) {
+		Done: func(data js.Value, textStatus string, jqXHR js.Value) {
 
 			jsutils.DisplaySuccessMessage(locales.Translate("supplier_added", HTTPHeaderAcceptLanguage))
 			jquery.Jq("input#addsupplier").SetVal("")

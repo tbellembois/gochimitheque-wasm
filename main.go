@@ -90,7 +90,7 @@ func init() {
 	ajax.Ajax{
 		URL:    BackProxyPath + "products/precautionarystatements_old",
 		Method: "GET",
-		Done: func(data js.Value) {
+		Done: func(data js.Value, textStatus string, jqXHR js.Value) {
 			// fmt.Println(data.String())
 
 			type DataReceived struct {
@@ -125,7 +125,7 @@ func init() {
 	ajax.Ajax{
 		URL:    BackProxyPath + "products/hazardstatements_old",
 		Method: "GET",
-		Done: func(data js.Value) {
+		Done: func(data js.Value, textStatus string, jqXHR js.Value) {
 			// fmt.Println(data.String())
 
 			type DataReceived struct {
@@ -160,7 +160,7 @@ func init() {
 	ajax.Ajax{
 		URL:    BackProxyPath + "products/symbols_old",
 		Method: "GET",
-		Done: func(data js.Value) {
+		Done: func(data js.Value, textStatus string, jqXHR js.Value) {
 			// fmt.Println(data.String())
 
 			type DataReceived struct {

@@ -65,7 +65,7 @@ func LinearToEmpirical(this js.Value, args []js.Value) interface{} {
 		URL:    fmt.Sprintf("%svalidate/lineartoempiricalformula/%s", BackProxyPath, select2LinearFormula2),
 		Method: "get",
 		// Data:   ajaxDataJson,
-		Done: func(data js.Value) {
+		Done: func(data js.Value, textStatus string, jqXHR js.Value) {
 			jquery.Jq("#convertedEmpiricalFormula").SetHtml(data)
 		},
 		Fail: func(jqXHR js.Value) {
@@ -921,7 +921,7 @@ func PubchemUpdateProduct(this js.Value, args []js.Value) interface{} {
 		URL:    BackProxyPath + "products/pubchemproduct/" + product_id,
 		Method: "post",
 		Data:   jsonPubchemProduct,
-		Done: func(data js.Value) {
+		Done: func(data js.Value, textStatus string, jqXHR js.Value) {
 			var (
 				err        error
 				product_id int64
@@ -977,7 +977,7 @@ func PubchemCreateProduct(this js.Value, args []js.Value) interface{} {
 		URL:    BackProxyPath + "products/pubchemproduct",
 		Method: "post",
 		Data:   jsonPubchemProduct,
-		Done: func(data js.Value) {
+		Done: func(data js.Value, textStatus string, jqXHR js.Value) {
 			var (
 				err        error
 				product_id int64
@@ -1027,7 +1027,7 @@ func PubchemGetProductByName(this js.Value, args []js.Value) interface{} {
 	ajax.Ajax{
 		URL:    BackProxyPath + "products/pubchemgetproductbyname/" + name,
 		Method: "get",
-		Done: func(data js.Value) {
+		Done: func(data js.Value, textStatus string, jqXHR js.Value) {
 
 			if err = json.Unmarshal([]byte(data.String()), &pubchemProduct); err != nil {
 				fmt.Println(err)
@@ -1038,7 +1038,7 @@ func PubchemGetProductByName(this js.Value, args []js.Value) interface{} {
 				ajax.Ajax{
 					URL:    BackProxyPath + "products?cas_number_string=" + *pubchemProduct.Cas,
 					Method: "get",
-					Done: func(data js.Value) {
+					Done: func(data js.Value, textStatus string, jqXHR js.Value) {
 						var (
 							products Products
 							err      error
@@ -1340,7 +1340,12 @@ func PubchemSearch(this js.Value, args []js.Value) interface{} {
 	ajax.Ajax{
 		URL:    BackProxyPath + "products/pubchemautocomplete/" + search,
 		Method: "get",
-		Done: func(data js.Value) {
+		Done: func(data js.Value, textStatus string, jqXHR js.Value) {
+
+			// jqXHR.getResponseHeader('Header-Name');
+			XThrottlingControl := jqXHR.String()
+			jquery.Jq("#pubchemstatus").Empty()
+			jquery.Jq("#pubchemstatus").Append(`<div class="row"><div class="col-sm-auto mx-auto small mb-4 text-secondary"><i>PubChem ` + XThrottlingControl + `</i></div></div>`)
 
 			if err = json.Unmarshal([]byte(data.String()), &autocomplete); err != nil {
 				fmt.Println(err)

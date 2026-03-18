@@ -136,7 +136,7 @@ func Storage_operateEventsRestore(this js.Value, args []js.Value) interface{} {
 		url := fmt.Sprintf("%sstorages/%d/unarchive", BackProxyPath, *CurrentStorage.StorageID)
 		method := "put"
 
-		done := func(data js.Value) {
+		done := func(data js.Value, textStatus string, jqXHR js.Value) {
 
 			jsutils.DisplaySuccessMessage(locales.Translate("storage_restored_message", HTTPHeaderAcceptLanguage))
 			BSTableQueryFilter.Lock()
@@ -289,7 +289,7 @@ func Storage_operateEventsArchive(this js.Value, args []js.Value) interface{} {
 		url := fmt.Sprintf("%sstorages/%d/archive", BackProxyPath, *CurrentStorage.StorageID)
 		method := "delete"
 
-		done := func(data js.Value) {
+		done := func(data js.Value, textStatus string, jqXHR js.Value) {
 
 			jsutils.DisplaySuccessMessage(locales.Translate("storage_trashed_message", HTTPHeaderAcceptLanguage))
 			bstable.NewBootstraptable(jquery.Jq("#Storage_table"), nil).Refresh(nil)
@@ -348,7 +348,7 @@ func Storage_operateEventsDelete(this js.Value, args []js.Value) interface{} {
 		url := fmt.Sprintf("%sstorages/%d", BackProxyPath, *CurrentStorage.StorageID)
 		method := "delete"
 
-		done := func(data js.Value) {
+		done := func(data js.Value, textStatus string, jqXHR js.Value) {
 
 			jsutils.DisplaySuccessMessage(locales.Translate("storage_deleted_message", HTTPHeaderAcceptLanguage))
 			BSTableQueryFilter.Lock()
@@ -1934,7 +1934,7 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 		ajax := ajax.Ajax{
 			URL:    u.String(),
 			Method: "get",
-			Done: func(data js.Value) {
+			Done: func(data js.Value, textStatus string, jqXHR js.Value) {
 
 				if params.Data.Export {
 

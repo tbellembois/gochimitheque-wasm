@@ -32,7 +32,7 @@ func HasPermission(item, id, method string, done, fail func()) {
 				url = BackProxyPath + "f/" + item
 			}
 
-			ajaxDone := func(js.Value) {
+			ajaxDone := func(data js.Value, textStatus string, jqXHR js.Value) {
 				// globals.LocalStorage.SetItem(cacheKey, "true")
 
 				done()

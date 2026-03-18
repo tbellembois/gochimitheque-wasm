@@ -33,7 +33,7 @@ func OperateEventsDelete(this js.Value, args []js.Value) interface{} {
 		url := fmt.Sprintf("%sstore_locations/%d", BackProxyPath, *storeLocation.StoreLocationID)
 		method := "delete"
 
-		done := func(data js.Value) {
+		done := func(data js.Value, textStatus string, jqXHR js.Value) {
 
 			jsutils.DisplaySuccessMessage(locales.Translate("store_location_deleted_message", HTTPHeaderAcceptLanguage))
 			bstable.NewBootstraptable(jquery.Jq("#StoreLocation_table"), nil).ResetSearch("")
@@ -81,7 +81,7 @@ func OperateEventsEdit(this js.Value, args []js.Value) interface{} {
 	url := fmt.Sprintf("%sstore_locations_old/%d", BackProxyPath, *storeLocation.StoreLocationID)
 	method := "get"
 
-	done := func(data js.Value) {
+	done := func(data js.Value, textStatus string, jqXHR js.Value) {
 
 		var (
 			storeLocation StoreLocation
@@ -292,7 +292,7 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 		ajax := ajax.Ajax{
 			URL:    u.String(),
 			Method: "get",
-			Done: func(data js.Value) {
+			Done: func(data js.Value, textStatus string, jqXHR js.Value) {
 
 				row.Call("success", js.ValueOf(js.Global().Get("JSON").Call("parse", data)))
 
