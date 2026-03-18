@@ -238,13 +238,12 @@ func SaveStorage(this js.Value, args []js.Value) any {
 	}
 
 	if jquery.Jq("input#storage_concentration").GetVal().Truthy() {
-		var storageConcentration int
-		if storageConcentration, err = strconv.Atoi(jquery.Jq("input#storage_concentration").GetVal().String()); err != nil {
+		var storageConcentration float64
+		if storageConcentration, err = strconv.ParseFloat(jquery.Jq("input#storage_concentration").GetVal().String(), 64); err != nil {
 			fmt.Println(err)
 			return nil
 		}
-		var storageConcentrationInt int64 = int64(storageConcentration)
-		globals.CurrentStorage.StorageConcentration = &storageConcentrationInt
+		globals.CurrentStorage.StorageConcentration = &storageConcentration
 	}
 
 	select2UnitConcentration := select2.NewSelect2(jquery.Jq("select#unit_concentration"), nil)
@@ -270,8 +269,8 @@ func SaveStorage(this js.Value, args []js.Value) any {
 	select2Supplier := select2.NewSelect2(jquery.Jq("select#supplier"), nil)
 	if len(select2Supplier.Select2Data()) > 0 {
 		select2ItemSupplier := select2Supplier.Select2Data()[0]
-
-		var supplierId int
+		globals.CurrentStorage.Supplier = &models.Supplier{}
+		var supplierId = -1
 
 		if select2ItemSupplier.IDIsDigit() {
 			if supplierId, err = strconv.Atoi(select2ItemSupplier.Id); err != nil {
@@ -281,8 +280,11 @@ func SaveStorage(this js.Value, args []js.Value) any {
 		}
 
 		supplierIdInt64 := int64(supplierId)
-		globals.CurrentStorage.Supplier = &models.Supplier{}
-		globals.CurrentStorage.Supplier.SupplierID = &supplierIdInt64
+		if supplierId != -1 {
+			globals.CurrentStorage.Supplier.SupplierID = &supplierIdInt64
+		} else {
+			globals.CurrentStorage.Supplier.SupplierID = nil
+		}
 		globals.CurrentStorage.Supplier.SupplierLabel = &select2ItemSupplier.Text
 	}
 

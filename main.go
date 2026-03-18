@@ -308,7 +308,7 @@ func main() {
 	js.Global().Set("Product_howToMagicalSelector", js.FuncOf(product.HowToMagicalSelector))
 
 	js.Global().Set("Product_pubchemSearch", js.FuncOf(product.PubchemSearch))
-	js.Global().Set("Product_pubchemGetCompoundByName", js.FuncOf(product.PubchemGetCompoundByName))
+	// js.Global().Set("Product_pubchemGetCompoundByName", js.FuncOf(product.PubchemGetCompoundByName))
 	js.Global().Set("Product_pubchemGetProductByName", js.FuncOf(product.PubchemGetProductByName))
 	js.Global().Set("Product_pubchemCreateProduct", js.FuncOf(product.PubchemCreateProduct))
 	js.Global().Set("Product_pubchemUpdateProduct", js.FuncOf(product.PubchemUpdateProduct))

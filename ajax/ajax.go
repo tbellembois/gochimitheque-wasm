@@ -27,6 +27,7 @@ type Response struct {
 	Total js.Value `json:"total"`
 }
 
+// type AjaxDone func(data js.Value, textStatus string, jqXHR js.Value)
 type AjaxDone func(data js.Value)
 type AjaxFail func(jqXHR js.Value)
 

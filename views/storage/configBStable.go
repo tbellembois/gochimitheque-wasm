@@ -680,22 +680,26 @@ func Storage_barecodeFormatter(this js.Value, args []js.Value) interface{} {
 		},
 	})
 
-	for _, chunk := range chunks(*CurrentStorage.StorageBarecode, 10) {
-		d.AppendChild(
-			widgets.NewSpan(widgets.SpanAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-				},
-				Text: chunk,
-			}),
-		)
-		d.AppendChild(
-			widgets.NewBr(widgets.BrAttributes{
-				BaseAttributes: widgets.BaseAttributes{
-					Visible: true,
-				},
-			}),
-		)
+	if CurrentStorage.StorageBarecode != nil {
+
+		for _, chunk := range chunks(*CurrentStorage.StorageBarecode, 10) {
+			d.AppendChild(
+				widgets.NewSpan(widgets.SpanAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+					},
+					Text: chunk,
+				}),
+			)
+			d.AppendChild(
+				widgets.NewBr(widgets.BrAttributes{
+					BaseAttributes: widgets.BaseAttributes{
+						Visible: true,
+					},
+				}),
+			)
+		}
+
 	}
 
 	return d.OuterHTML()
@@ -1331,7 +1335,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 			Text: locales.Translate("storage_quantity_title", HTTPHeaderAcceptLanguage),
 		}))
 		unit_label := ""
-		if CurrentStorage.UnitQuantity.UnitLabel != nil {
+		if CurrentStorage.UnitQuantity != nil && CurrentStorage.UnitQuantity.UnitLabel != nil {
 			unit_label = fmt.Sprintf("%v %s", *CurrentStorage.StorageQuantity, *CurrentStorage.UnitQuantity.UnitLabel)
 		}
 		colQuantity.AppendChild(
@@ -1356,13 +1360,16 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 		},
 		Text: locales.Translate("storage_barecode_title", HTTPHeaderAcceptLanguage),
 	}))
-	colBarecode.AppendChild(
-		widgets.NewSpan(widgets.SpanAttributes{
-			BaseAttributes: widgets.BaseAttributes{
-				Visible: true,
-			},
-			Text: *CurrentStorage.StorageBarecode,
-		}))
+
+	if CurrentStorage.StorageBarecode != nil {
+		colBarecode.AppendChild(
+			widgets.NewSpan(widgets.SpanAttributes{
+				BaseAttributes: widgets.BaseAttributes{
+					Visible: true,
+				},
+				Text: *CurrentStorage.StorageBarecode,
+			}))
+	}
 
 	rowQuantityandBarecode.AppendChild(colQuantity)
 	rowQuantityandBarecode.AppendChild(colBarecode)

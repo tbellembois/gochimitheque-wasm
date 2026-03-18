@@ -1208,116 +1208,116 @@ func PubchemGetProductByName(this js.Value, args []js.Value) interface{} {
 	return nil
 }
 
-func PubchemGetCompoundByName(this js.Value, args []js.Value) interface{} {
+// func PubchemGetCompoundByName(this js.Value, args []js.Value) interface{} {
 
-	var (
-		compounds Compounds
-		err       error
-	)
+// 	var (
+// 		compounds Compounds
+// 		err       error
+// 	)
 
-	name := args[0].String()
+// 	name := args[0].String()
 
-	if name == "" {
-		return nil
-	}
+// 	if name == "" {
+// 		return nil
+// 	}
 
-	ajax.Ajax{
-		URL:    BackProxyPath + "products/pubchemgetcompoundbyname/" + name,
-		Method: "get",
-		Done: func(data js.Value) {
+// 	ajax.Ajax{
+// 		URL:    BackProxyPath + "products/pubchemgetcompoundbyname/" + name,
+// 		Method: "get",
+// 		Done: func(data js.Value) {
 
-			if err = json.Unmarshal([]byte(data.String()), &compounds); err != nil {
-				fmt.Println(err)
-			}
+// 			if err = json.Unmarshal([]byte(data.String()), &compounds); err != nil {
+// 				fmt.Println(err)
+// 			}
 
-			jquery.Jq("#pubchemcompoundcontent").Empty()
+// 			jquery.Jq("#pubchemcompoundcontent").Empty()
 
-			for _, pccompound := range compounds.PCCompounds {
-				jquery.Jq("#pubchemcompoundcontent").Append(
-					widgets.NewImg(widgets.ImgAttributes{
-						BaseAttributes: widgets.BaseAttributes{
-							Visible: true,
-						},
-						Src:   fmt.Sprintf("%s", compounds.Base64Png),
-						Alt:   "2dpng",
-						Title: "2dpng",
-					}).OuterHTML())
-				jquery.Jq("#pubchemcompoundcontent").Append(widgets.NewBr(widgets.BrAttributes{
-					BaseAttributes: widgets.BaseAttributes{
-						Visible: true,
-					},
-				}).OuterHTML())
+// 			for _, pccompound := range compounds.PCCompounds {
+// 				jquery.Jq("#pubchemcompoundcontent").Append(
+// 					widgets.NewImg(widgets.ImgAttributes{
+// 						BaseAttributes: widgets.BaseAttributes{
+// 							Visible: true,
+// 						},
+// 						Src:   fmt.Sprintf("%s", compounds.Base64Png),
+// 						Alt:   "2dpng",
+// 						Title: "2dpng",
+// 					}).OuterHTML())
+// 				jquery.Jq("#pubchemcompoundcontent").Append(widgets.NewBr(widgets.BrAttributes{
+// 					BaseAttributes: widgets.BaseAttributes{
+// 						Visible: true,
+// 					},
+// 				}).OuterHTML())
 
-				jquery.Jq("#pubchemcompoundcontent").Append(
-					widgets.NewSpan(widgets.SpanAttributes{
-						BaseAttributes: widgets.BaseAttributes{
-							Visible: true,
-							Classes: []string{"iconlabel"},
-						},
-						Text: "cid ",
-					}).OuterHTML())
-				jquery.Jq("#pubchemcompoundcontent").Append(
-					widgets.NewSpan(widgets.SpanAttributes{
-						BaseAttributes: widgets.BaseAttributes{
-							Visible: true,
-						},
-						Text: fmt.Sprint(pccompound.ID.ID.CID),
-					}).OuterHTML())
-				jquery.Jq("#pubchemcompoundcontent").Append(widgets.NewBr(widgets.BrAttributes{
-					BaseAttributes: widgets.BaseAttributes{
-						Visible: true,
-					},
-				}).OuterHTML())
+// 				jquery.Jq("#pubchemcompoundcontent").Append(
+// 					widgets.NewSpan(widgets.SpanAttributes{
+// 						BaseAttributes: widgets.BaseAttributes{
+// 							Visible: true,
+// 							Classes: []string{"iconlabel"},
+// 						},
+// 						Text: "cid ",
+// 					}).OuterHTML())
+// 				jquery.Jq("#pubchemcompoundcontent").Append(
+// 					widgets.NewSpan(widgets.SpanAttributes{
+// 						BaseAttributes: widgets.BaseAttributes{
+// 							Visible: true,
+// 						},
+// 						Text: fmt.Sprint(pccompound.ID.ID.CID),
+// 					}).OuterHTML())
+// 				jquery.Jq("#pubchemcompoundcontent").Append(widgets.NewBr(widgets.BrAttributes{
+// 					BaseAttributes: widgets.BaseAttributes{
+// 						Visible: true,
+// 					},
+// 				}).OuterHTML())
 
-				for _, section := range compounds.Record.Record.Section {
-					displaySection(section)
-				}
+// 				for _, section := range compounds.Record.Record.Section {
+// 					displaySection(section)
+// 				}
 
-				for _, prop := range pccompound.Props {
+// 				for _, prop := range pccompound.Props {
 
-					propval := ""
-					if prop.Value.Ival != nil {
-						propval = fmt.Sprint(*prop.Value.Ival)
-					} else if prop.Value.Fval != nil {
-						propval = strconv.FormatFloat(*prop.Value.Fval, 'f', 64, 64)
-					} else if prop.Value.Sval != nil {
-						propval = *prop.Value.Sval
-					} else {
-						propval = *prop.Value.Binary
-					}
+// 					propval := ""
+// 					if prop.Value.Ival != nil {
+// 						propval = fmt.Sprint(*prop.Value.Ival)
+// 					} else if prop.Value.Fval != nil {
+// 						propval = strconv.FormatFloat(*prop.Value.Fval, 'f', 64, 64)
+// 					} else if prop.Value.Sval != nil {
+// 						propval = *prop.Value.Sval
+// 					} else {
+// 						propval = *prop.Value.Binary
+// 					}
 
-					jquery.Jq("#pubchemcompoundcontent").Append(
-						widgets.NewSpan(widgets.SpanAttributes{
-							BaseAttributes: widgets.BaseAttributes{
-								Visible: true,
-								Classes: []string{"iconlabel"},
-							},
-							Text: prop.URN.Name + " " + prop.URN.Label + " ",
-						}).OuterHTML())
-					jquery.Jq("#pubchemcompoundcontent").Append(
-						widgets.NewSpan(widgets.SpanAttributes{
-							BaseAttributes: widgets.BaseAttributes{
-								Visible: true,
-							},
-							Text: propval,
-						}).OuterHTML())
-					jquery.Jq("#pubchemcompoundcontent").Append(widgets.NewBr(widgets.BrAttributes{
-						BaseAttributes: widgets.BaseAttributes{
-							Visible: true,
-						},
-					}).OuterHTML())
-				}
-			}
+// 					jquery.Jq("#pubchemcompoundcontent").Append(
+// 						widgets.NewSpan(widgets.SpanAttributes{
+// 							BaseAttributes: widgets.BaseAttributes{
+// 								Visible: true,
+// 								Classes: []string{"iconlabel"},
+// 							},
+// 							Text: prop.URN.Name + " " + prop.URN.Label + " ",
+// 						}).OuterHTML())
+// 					jquery.Jq("#pubchemcompoundcontent").Append(
+// 						widgets.NewSpan(widgets.SpanAttributes{
+// 							BaseAttributes: widgets.BaseAttributes{
+// 								Visible: true,
+// 							},
+// 							Text: propval,
+// 						}).OuterHTML())
+// 					jquery.Jq("#pubchemcompoundcontent").Append(widgets.NewBr(widgets.BrAttributes{
+// 						BaseAttributes: widgets.BaseAttributes{
+// 							Visible: true,
+// 						},
+// 					}).OuterHTML())
+// 				}
+// 			}
 
-		},
-		Fail: func(jqXHR js.Value) {
+// 		},
+// 		Fail: func(jqXHR js.Value) {
 
-			jsutils.DisplayGenericErrorMessage()
+// 			jsutils.DisplayGenericErrorMessage()
 
-		},
-	}.Send()
-	return nil
-}
+// 		},
+// 	}.Send()
+// 	return nil
+// }
 
 func PubchemSearch(this js.Value, args []js.Value) interface{} {
 
