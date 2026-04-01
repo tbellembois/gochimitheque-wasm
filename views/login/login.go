@@ -78,7 +78,7 @@ func AfterLogin_listCallback(this js.Value, args []js.Value) interface{} {
 	jsutils.LoadContent("div#content", "product", fmt.Sprintf("%sv/products", ApplicationProxyPath), productCallbackWrapper)
 
 	ajax.Ajax{
-		URL:    fmt.Sprintf("%sgetconnecteduser", BackProxyPath),
+		URL:    fmt.Sprintf("%sconnecteduser", BackProxyPath),
 		Method: "get",
 		Done: func(data js.Value, textStatus string, jqXHR js.Value) {
 
