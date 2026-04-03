@@ -1169,6 +1169,32 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	rowPrintQrcode.AppendChild(colPrint)
 
 	//
+	// Id.
+	//
+	rowId := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"row", "mt-sm-3"},
+		},
+	})
+	// Id.
+	colId := widgets.NewDiv(widgets.DivAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"col-sm-6"},
+		},
+	})
+	colId.AppendChild(widgets.NewSpan(widgets.SpanAttributes{
+		BaseAttributes: widgets.BaseAttributes{
+			Visible: true,
+			Classes: []string{"iconlabel", "mr-sm-2"},
+		},
+		Text: fmt.Sprintf("#%d", *CurrentStorage.StorageID),
+	}))
+
+	rowId.AppendChild(colId)
+
+	//
 	// Product and store location.
 	//
 	rowProductAndStorelocation := widgets.NewDiv(widgets.DivAttributes{
@@ -1194,6 +1220,8 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 	specificity = ""
 	if CurrentStorage.Product.ProductSpecificity != nil {
 		specificity = fmt.Sprintf("%s %s", CurrentStorage.Product.Name.NameLabel, *CurrentStorage.Product.ProductSpecificity)
+	} else {
+		specificity = CurrentStorage.Product.Name.NameLabel
 	}
 	colProduct.AppendChild(
 		widgets.NewSpan(widgets.SpanAttributes{
@@ -1706,6 +1734,7 @@ func DetailFormatter(this js.Value, args []js.Value) interface{} {
 
 	return rowQrcodeAndToDestroy.OuterHTML() +
 		rowPrintQrcode.OuterHTML() +
+		rowId.OuterHTML() +
 		rowProductAndStorelocation.OuterHTML() +
 		rowNumberOfCartonBagUnit.OuterHTML() +
 		rowQuantityandBarecode.OuterHTML() +
