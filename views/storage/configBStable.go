@@ -1945,7 +1945,7 @@ func GetTableData(this js.Value, args []js.Value) interface{} {
 		var u *url.URL
 
 		if params.Data.Export {
-			u, _ = url.Parse(BackProxyPath + "storages/exports")
+			u, _ = url.Parse(BackProxyPath + "exportstorages")
 
 			params.Data.Offset = 0
 			params.Data.Limit = 999999999999999999
