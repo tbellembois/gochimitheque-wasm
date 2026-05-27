@@ -451,7 +451,9 @@ func SavePerson(this js.Value, args []js.Value) interface{} {
 			return nil
 		}
 		_entity_id_64 := int64(_entity_id)
-		permission.PermissionEntity = &_entity_id_64
+		if _entity_id_64 != -1 {
+			permission.PermissionEntity = &_entity_id_64
+		}
 
 		person.Permissions = append(person.Permissions, permission)
 	}
